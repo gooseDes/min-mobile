@@ -1,32 +1,26 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { StatusBar, StyleSheet, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import Colors from "./Style";
+import { Colors, Constants, Styles } from "./Style";
 import MessagesContainer from "@components/MessagesContainer";
 import { useEffect, useState } from "react";
-import { MessageData } from "./Types";
+import { getSocket } from "./Socket";
+import SignPage from "./pages/SignPage";
+import Auth from "./Auth";
+import { MessageData } from "./types/MessageData";
+import Button from "@components/Button";
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.backgroundColor,
-    },
     panel: {
         backgroundColor: Colors.backgroundPanelColor,
         borderColor: Colors.borderColor,
-        borderWidth: 2,
-        borderRadius: 15,
+        borderWidth: Constants.borderWidth,
+        borderRadius: Constants.rounding,
         padding: 10,
         margin: 10,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        width: "100%",
     },
     topPanel: {
         height: 60,
@@ -39,10 +33,31 @@ const styles = StyleSheet.create({
 });
 
 function App() {
+    const [currentPage, setCurrentPage] = useState<string>("sign");
+    useEffect(() => {
+        async function loadDefaultPage() {
+            if (await Auth.getFromStorage("token")) {
+                setCurrentPage("home");
+            } else {
+                setCurrentPage("sign");
+            }
+        }
+
+        loadDefaultPage();
+    }, []);
+
+    function commandHandler(command: any) {
+        switch (command.action) {
+            case "go":
+                setCurrentPage(command.to || "home");
+        }
+    }
+
     return (
         <SafeAreaProvider>
             <StatusBar barStyle={"light-content"} />
-            <AppContent />
+            {currentPage === "home" && <HomePage handler={commandHandler} />}
+            {currentPage === "sign" && <SignPage handler={commandHandler} />}
         </SafeAreaProvider>
     );
 }
@@ -56,21 +71,52 @@ function CreateMessage(obj: any): MessageData {
     };
 }
 
-function AppContent() {
+interface HomePageProps {
+    handler: (command: any) => void;
+}
+
+function HomePage(props: HomePageProps) {
     const [messages, setMessages] = useState<MessageData[]>([]);
 
+    async function SignOut() {
+        await Auth.clearStorage();
+        props.handler({ action: "go", to: "sign" });
+    }
+
     useEffect(() => {
-        setMessages([
-            CreateMessage({ text: "Hello, world!" }),
-            CreateMessage({ text: "This is a message." }),
-            CreateMessage({ text: "Another message." }),
-        ]);
+        async function initSocket() {
+            const socket = await getSocket();
+            socket.on("connect", () => {
+                console.log("Connected to server");
+            });
+            socket.on("history", async data => {
+                setMessages(
+                    data.messages.slice().map((msg: any) =>
+                        CreateMessage({
+                            id: msg.id,
+                            text: msg.text,
+                            author: msg.author_id,
+                            authorName: msg.author,
+                        }),
+                    ),
+                );
+            });
+            socket.on("error", data => {
+                console.error(data);
+            });
+            socket.emit("getChatHistory", { chat: 1 });
+
+            socket.on("connect_error", err => {
+                console.log("Connection Error:", err);
+            });
+        }
+        initSocket();
     }, []);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={Styles.container}>
             <View style={[styles.panel, styles.topPanel]}>
-                <Text style={{ color: "white" }}>Top Panel</Text>
+                <Button text="Sign Out" onPress={SignOut} />
             </View>
             <View style={[styles.panel, styles.contentPanel]}>
                 <MessagesContainer messages={messages} />

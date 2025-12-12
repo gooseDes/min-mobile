@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import Colors, { Styles } from "@/Style";
+import { Colors, Constants, Styles } from "@/Style";
 
 const styles = StyleSheet.create({
     messageContainer: {
@@ -12,8 +12,8 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.messageBackgroundColor,
         padding: 10,
         borderColor: Colors.borderColor,
-        borderWidth: 1,
-        borderRadius: 15,
+        borderWidth: Constants.borderWidth,
+        borderRadius: Constants.rounding,
         borderTopRightRadius: 0,
         shadowColor: Colors.messageBackgroundColor,
         shadowOffset: { width: 0, height: 0 },
