@@ -2,6 +2,15 @@ import * as Keychain from "react-native-keychain";
 import { SERVER } from "@env";
 
 export default class Auth {
+    static username: string | null;
+
+    static init() {
+        Auth.getFromStorage("username").then(username => {
+            Auth.username = username;
+            console.log(username, Auth.username);
+        });
+    }
+
     static async login(email: string, password: string): Promise<boolean> {
         const response = await fetch(`${SERVER}/login`, {
             method: "POST",

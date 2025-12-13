@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { getSocket } from "./Socket";
 import SignPage from "./pages/SignPage";
 import Auth from "./Auth";
-import { MessageData } from "./types/MessageData";
 import Button from "@components/Button";
 
 const styles = StyleSheet.create({
@@ -44,12 +43,14 @@ function App() {
         }
 
         loadDefaultPage();
+        Auth.init();
     }, []);
 
-    function commandHandler(command: any) {
+    function commandHandler(command: CommandData) {
         switch (command.action) {
             case "go":
                 setCurrentPage(command.to || "home");
+                break;
         }
     }
 
@@ -66,16 +67,12 @@ function CreateMessage(obj: any): MessageData {
     return {
         id: obj.id || -1,
         text: obj.text || "",
-        author: obj.author || -1,
+        authorId: obj.author || -1,
         authorName: obj.authorName || "",
     };
 }
 
-interface HomePageProps {
-    handler: (command: any) => void;
-}
-
-function HomePage(props: HomePageProps) {
+function HomePage(props: PageProps) {
     const [messages, setMessages] = useState<MessageData[]>([]);
 
     async function SignOut() {

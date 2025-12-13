@@ -1,6 +1,6 @@
-export type MessageData = {
+interface MessageData {
     id: number;
     text: string;
-    author: number;
+    authorId: number;
     authorName: string;
-};
+}

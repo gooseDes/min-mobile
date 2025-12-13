@@ -28,11 +28,7 @@ const styles = StyleSheet.create({
     },
 });
 
-interface SignPageProps {
-    handler: (command: any) => void;
-}
-
-function SignPage(props: SignPageProps) {
+function SignPage(props: PageProps) {
     const [emailValue, setEmailValue] = useState<string>("");
     const [passwordValue, setPasswordValue] = useState<string>("");
 
