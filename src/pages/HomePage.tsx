@@ -2,8 +2,8 @@ import Auth from "@/Auth";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import Button from "@components/Button";
-import MessagesContainer from "@components/MessagesContainer";
-import { useEffect, useState } from "react";
+import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
+import { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
 });
 
 function HomePage(props: PageProps) {
-    const [messages, setMessages] = useState<MessageData[]>([]);
+    const messagesRef = useRef<MessagesContainerHandle>(null);
 
     async function SignOut() {
         await Auth.clearStorage();
@@ -54,7 +54,7 @@ function HomePage(props: PageProps) {
                 console.log("Connected to server");
             });
             socket.on("history", async data => {
-                setMessages(
+                messagesRef.current?.setMessages(
                     data.messages.slice().map((msg: any) =>
                         CreateMessage({
                             id: msg.id,
@@ -64,6 +64,7 @@ function HomePage(props: PageProps) {
                         }),
                     ),
                 );
+                messagesRef.current?.show();
             });
             socket.on("error", data => {
                 console.error(data);
@@ -83,7 +84,7 @@ function HomePage(props: PageProps) {
                 <Button text="Sign Out" onPress={SignOut} />
             </View>
             <View style={[styles.panel, styles.contentPanel]}>
-                <MessagesContainer messages={messages} />
+                <MessagesContainer ref={messagesRef} />
             </View>
         </SafeAreaView>
     );

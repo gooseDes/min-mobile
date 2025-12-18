@@ -1,7 +1,8 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { Colors, Constants, Styles } from "@/Style";
 import Auth from "@/Auth";
 import { SERVER } from "@env";
+import Animated, { useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
     messageContainer: {
@@ -20,6 +21,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 0 },
         shadowRadius: 0,
         elevation: 1,
+        maxWidth: "80%",
     },
     authorText: {
         fontSize: 12,
@@ -49,24 +51,48 @@ interface MessageProps extends React.PropsWithChildren {
     author_id?: number;
     side?: "left" | "right";
     show_avatar?: boolean;
+    shown?: boolean;
 }
 
 function Message(props: MessageProps) {
     const isCurrentUser = props.author_name === Auth.username;
     const showAvatar = props.show_avatar === undefined ? true : props.show_avatar;
+    const shown = props.shown === undefined ? true : props.shown;
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            opacity: withTiming(shown ? 1 : 0, { duration: 200 }),
+            transform: [
+                {
+                    translateX: withSpring(shown ? 0 : props.side === "left" ? -250 : 250, {
+                        stiffness: 100,
+                        damping: 10,
+                        mass: 1.2,
+                    }),
+                },
+                { scale: withTiming(shown ? 1 : 0.95, { duration: 200 }) },
+            ],
+        };
+    }, [shown]);
 
     return (
-        <View style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide]}>
+        <Animated.View
+            style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
+        >
             {showAvatar && <Image source={{ uri: `${SERVER}/avatars/${props.author_id || ""}.webp` }} style={styles.avatar} />}
-            <View style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}>
+            <Animated.View
+                style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}
+            >
                 {props.author_name && (
-                    <Text style={[Styles.secondaryText, styles.authorText, { textAlign: props.side || "left" }]}>
+                    <Animated.Text style={[Styles.secondaryText, styles.authorText, { textAlign: props.side || "left" }]}>
                         {isCurrentUser ? "You" : props.author_name}
-                    </Text>
+                    </Animated.Text>
                 )}
-                <Text style={[Styles.primaryText, { textAlign: props.side || "left" }]}>{props.children}</Text>
-            </View>
-        </View>
+                <Animated.Text style={[Styles.primaryText, { textAlign: props.side || "left" }]}>
+                    {props.children}
+                </Animated.Text>
+            </Animated.View>
+        </Animated.View>
     );
 }
 
