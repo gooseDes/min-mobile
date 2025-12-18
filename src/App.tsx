@@ -4,11 +4,16 @@ import { JSX, useEffect, useState } from "react";
 import SignPage from "./pages/SignPage";
 import Auth from "./Auth";
 import HomePage from "./pages/HomePage";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { Easing, ZoomInDown, ZoomOutUp } from "react-native-reanimated";
+import { Colors } from "./Style";
 
 function PageWrapper({ children }: { children: JSX.Element }) {
     return (
-        <Animated.View style={{ flex: 1 }} entering={FadeIn} exiting={FadeOut}>
+        <Animated.View
+            style={{ flex: 1 }}
+            entering={ZoomInDown.duration(600).easing(Easing.out(Easing.cubic))}
+            exiting={ZoomOutUp.duration(600).easing(Easing.out(Easing.cubic))}
+        >
             {children}
         </Animated.View>
     );
@@ -38,7 +43,7 @@ function App() {
     }
 
     return (
-        <SafeAreaProvider style={{ backgroundColor: "#000" }}>
+        <SafeAreaProvider style={{ backgroundColor: Colors.backgroundColor }}>
             <StatusBar barStyle={"light-content"} />
             {currentPage === "home" && (
                 <PageWrapper>

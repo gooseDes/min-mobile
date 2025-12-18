@@ -7,7 +7,6 @@ export default class Auth {
     static init() {
         Auth.getFromStorage("username").then(username => {
             Auth.username = username;
-            console.log(username, Auth.username);
         });
     }
 

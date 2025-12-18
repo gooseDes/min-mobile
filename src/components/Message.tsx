@@ -60,17 +60,22 @@ function Message(props: MessageProps) {
     const shown = props.shown === undefined ? true : props.shown;
 
     const animatedStyle = useAnimatedStyle(() => {
+        const springConfig = {
+            damping: 12,
+            stiffness: 150,
+            mass: 1,
+            overshootClamping: false,
+        };
         return {
-            opacity: withTiming(shown ? 1 : 0, { duration: 200 }),
+            opacity: withTiming(shown ? 1 : 0, { duration: 400 }),
             transform: [
                 {
-                    translateX: withSpring(shown ? 0 : props.side === "left" ? -250 : 250, {
-                        stiffness: 100,
-                        damping: 10,
-                        mass: 1.2,
-                    }),
+                    translateX: withSpring(shown ? 0 : props.side === "left" ? "-100%" : "100%", springConfig),
                 },
-                { scale: withTiming(shown ? 1 : 0.95, { duration: 200 }) },
+                {
+                    translateY: withSpring(shown ? 0 : 100, springConfig),
+                },
+                { scale: withTiming(shown ? 1 : 0, { duration: 400 }) },
             ],
         };
     }, [shown]);

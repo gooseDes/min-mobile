@@ -20,25 +20,26 @@ const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) 
     const messagesRef = useRef<MessageData[]>([]);
     const [showProgress, setShowProgress] = useState(0);
 
+    const reversedMessages = [...messagesRef.current].reverse();
+
     useImperativeHandle(ref, () => ({
         setMessages: (newMessages: MessageData[]) => {
             messagesRef.current = newMessages;
         },
         show: () => {
-            for (let i = 0; i < messagesRef.current.length; i++) {
-                if (i <= 15) {
-                    setTimeout(() => {
-                        setShowProgress(i + 1);
-                    }, i * 100);
-                } else {
-                    setShowProgress(messagesRef.current.length);
-                }
+            for (let i = 0; i < Math.min(messagesRef.current.length, 15); i++) {
+                setTimeout(() => {
+                    setShowProgress(i - 1);
+                }, i * 100);
             }
+            setTimeout(() => {
+                setShowProgress(messagesRef.current.length);
+            }, 16 * 100);
         },
     }));
 
     const renderMessage = ({ item: message, index }: { item: MessageData; index: number }) => {
-        const prevMessage = messagesRef.current[index + 1];
+        const prevMessage = reversedMessages[index + 1];
         const showAvatar = prevMessage ? prevMessage.authorId !== message.authorId : true;
 
         return (
@@ -61,7 +62,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) 
     return (
         <FlatList
             style={styles.messagesContainer}
-            data={[...messagesRef.current].reverse()}
+            data={reversedMessages}
             renderItem={renderMessage}
             keyExtractor={(item, index) => String(item.id || index)}
             ItemSeparatorComponent={splitter}
