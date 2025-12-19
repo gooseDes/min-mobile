@@ -2,11 +2,15 @@ import * as Keychain from "react-native-keychain";
 import { SERVER } from "@env";
 
 export default class Auth {
+    static id: number | null;
     static username: string | null;
 
     static init() {
         Auth.getFromStorage("username").then(username => {
             Auth.username = username;
+        });
+        Auth.getFromStorage("id").then(id => {
+            Auth.id = parseInt(id);
         });
     }
 

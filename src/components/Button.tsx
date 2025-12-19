@@ -1,5 +1,6 @@
 import { Colors, Constants, Styles } from "@/Style";
-import { StyleSheet, Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, ViewProps } from "react-native";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
     button: {
@@ -11,6 +12,7 @@ const styles = StyleSheet.create({
         borderRadius: Constants.rounding,
         borderWidth: Constants.borderWidth,
         borderColor: Colors.borderColor,
+        paddingHorizontal: 10,
     },
     text: {
         textAlign: "center",
@@ -18,16 +20,20 @@ const styles = StyleSheet.create({
     },
 });
 
-interface ButtonProps extends TouchableOpacityProps {
+interface ButtonProps extends ViewProps {
     text?: string;
+    onPress?: () => void;
 }
 
 function Button(props: ButtonProps) {
-    const { text, ...rest } = props;
+    const { text, onPress, ...rest } = props;
+
     return (
-        <TouchableOpacity {...rest} style={styles.button}>
-            <Text style={[Styles.primaryText, styles.text]}>{text || "Button"}</Text>
-        </TouchableOpacity>
+        <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} {...rest}>
+            <TouchableOpacity style={styles.button} onPress={onPress}>
+                <Text style={[Styles.primaryText, styles.text]}>{text || "Button"}</Text>
+            </TouchableOpacity>
+        </Animated.View>
     );
 }
 

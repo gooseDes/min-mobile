@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { LinearTransition } from "react-native-reanimated";
 
 export class Colors {
     static backgroundColor = "#131317";
@@ -12,6 +13,7 @@ export class Colors {
 export class Constants {
     static rounding = 16;
     static borderWidth = 2;
+    static layoutTransition = LinearTransition.springify(500);
 }
 
 export const Styles = StyleSheet.create({

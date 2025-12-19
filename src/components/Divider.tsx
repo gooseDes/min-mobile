@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth / 2,
         borderRadius: 999,
+        width: "100%",
     },
 });
 

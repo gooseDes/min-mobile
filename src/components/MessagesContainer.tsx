@@ -2,6 +2,7 @@ import { FlatList, StyleSheet, View } from "react-native";
 import Message from "./Message";
 import Auth from "@/Auth";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import Animated, { FadeOut } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
     messagesContainer: {
@@ -14,11 +15,12 @@ const styles = StyleSheet.create({
 export interface MessagesContainerHandle {
     setMessages: (newMessages: MessageData[]) => void;
     show: () => void;
+    hide: () => void;
 }
 
 const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) => {
     const messagesRef = useRef<MessageData[]>([]);
-    const [showProgress, setShowProgress] = useState(0);
+    const [animProgress, setAnimProgress] = useState<number>(0);
 
     const reversedMessages = [...messagesRef.current].reverse();
 
@@ -27,14 +29,17 @@ const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) 
             messagesRef.current = newMessages;
         },
         show: () => {
-            for (let i = 0; i < Math.min(messagesRef.current.length, 15); i++) {
+            for (let i = 0; i < Math.min(messagesRef.current.length + 2, 15); i++) {
                 setTimeout(() => {
-                    setShowProgress(i - 1);
+                    setAnimProgress(i - 1);
                 }, i * 100);
             }
             setTimeout(() => {
-                setShowProgress(messagesRef.current.length);
+                setAnimProgress(messagesRef.current.length);
             }, 16 * 100);
+        },
+        hide: () => {
+            setAnimProgress(0);
         },
     }));
 
@@ -48,7 +53,8 @@ const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) 
                 author_id={message.authorId}
                 side={Auth.username === message.authorName ? "right" : "left"}
                 show_avatar={showAvatar}
-                shown={showProgress > index}
+                show_author={showAvatar}
+                shown={animProgress > index || !(index <= 15)}
             >
                 {message.text}
             </Message>
@@ -60,16 +66,18 @@ const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) 
     };
 
     return (
-        <FlatList
-            style={styles.messagesContainer}
-            data={reversedMessages}
-            renderItem={renderMessage}
-            keyExtractor={(item, index) => String(item.id || index)}
-            ItemSeparatorComponent={splitter}
-            inverted={true}
-            initialNumToRender={15}
-            {...props}
-        />
+        <Animated.View exiting={FadeOut} style={styles.messagesContainer}>
+            <FlatList
+                style={styles.messagesContainer}
+                data={reversedMessages}
+                renderItem={renderMessage}
+                keyExtractor={(_, index) => index.toString()}
+                ItemSeparatorComponent={splitter}
+                inverted={true}
+                initialNumToRender={15}
+                {...props}
+            />
+        </Animated.View>
     );
 });
 

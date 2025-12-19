@@ -51,12 +51,14 @@ interface MessageProps extends React.PropsWithChildren {
     author_id?: number;
     side?: "left" | "right";
     show_avatar?: boolean;
+    show_author?: boolean;
     shown?: boolean;
 }
 
 function Message(props: MessageProps) {
     const isCurrentUser = props.author_name === Auth.username;
     const showAvatar = props.show_avatar === undefined ? true : props.show_avatar;
+    const showAuthor = props.show_author === undefined ? true : props.show_author;
     const shown = props.shown === undefined ? true : props.shown;
 
     const animatedStyle = useAnimatedStyle(() => {
@@ -88,7 +90,7 @@ function Message(props: MessageProps) {
             <Animated.View
                 style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}
             >
-                {props.author_name && (
+                {props.author_name && showAuthor && (
                     <Animated.Text style={[Styles.secondaryText, styles.authorText, { textAlign: props.side || "left" }]}>
                         {isCurrentUser ? "You" : props.author_name}
                     </Animated.Text>

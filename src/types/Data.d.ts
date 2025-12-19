@@ -4,3 +4,9 @@ interface MessageData {
     authorId: number;
     authorName: string;
 }
+
+interface ChatData {
+    id: number;
+    title: string;
+    participants: any[];
+}

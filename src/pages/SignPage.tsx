@@ -12,7 +12,8 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.backgroundPanelColor,
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
-        width: "100%",
+        maxHeight: "90%",
+        maxWidth: "100%",
         aspectRatio: 0.75,
         display: "flex",
         borderRadius: Constants.rounding,
@@ -49,7 +50,7 @@ function SignPage(props: PageProps) {
                 </View>
                 <Divider />
                 <View style={styles.buttonsContainer}>
-                    <Button text="Sign In" onPress={SignIn} />
+                    <Button text="Sign In" onPress={SignIn} style={{ flex: 1 }} />
                 </View>
             </View>
         </SafeAreaView>
