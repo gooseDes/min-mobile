@@ -1,5 +1,5 @@
 interface CommandData {
-    action: "go";
+    action: "go" | "changeLanguage";
     to?: "home" | "sign";
 }
 

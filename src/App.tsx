@@ -20,7 +20,9 @@ function PageWrapper({ children }: { children: JSX.Element }) {
 }
 
 function App() {
-    const [currentPage, setCurrentPage] = useState<string>("sign");
+    const [currentPage, setCurrentPage] = useState<string>("none");
+    const [, forceUpdate] = useState<number>(0);
+
     useEffect(() => {
         async function loadDefaultPage() {
             if (await Auth.getFromStorage("token")) {
@@ -39,11 +41,14 @@ function App() {
             case "go":
                 setCurrentPage(command.to || "home");
                 break;
+            case "changeLanguage":
+                forceUpdate(Date.now());
+                break;
         }
     }
 
     return (
-        <SafeAreaProvider style={{ backgroundColor: Colors.backgroundColor }}>
+        <SafeAreaProvider key={forceUpdate.toString()} style={{ backgroundColor: Colors.backgroundColor }}>
             <StatusBar barStyle={"light-content"} />
             {currentPage === "home" && (
                 <PageWrapper>

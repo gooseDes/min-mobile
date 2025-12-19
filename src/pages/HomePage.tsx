@@ -1,15 +1,15 @@
 import Auth from "@/Auth";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
-import Button from "@components/Button";
+import Translation, { t } from "@/Translation";
 import ChatsContainer, { ChatsContainerHandle } from "@components/ChatsContainer";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
 import IconButton from "@components/IconButton";
 import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet } from "react-native";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { StyleSheet, View } from "react-native";
+import Animated, { useAnimatedStyle, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function CreateMessage(obj: any): MessageData {
@@ -72,6 +72,14 @@ function HomePage(props: PageProps) {
     async function SignOut() {
         await Auth.clearStorage();
         props.handler({ action: "go", to: "sign" });
+    }
+
+    function changeLanguage() {
+        const current = Translation.getCurrentLanguage();
+        if (current === "en") Translation.setCurrentLanguage("ru");
+        if (current === "ru") Translation.setCurrentLanguage("ua");
+        if (current === "ua") Translation.setCurrentLanguage("en");
+        props.handler({ action: "changeLanguage" });
     }
 
     async function requestHistory() {
@@ -155,11 +163,11 @@ function HomePage(props: PageProps) {
                         onPress={() => setCurrentTab("chats")}
                     />
                 )}
-                {currentTab === "chat" && <Button text="Sign Out" onPress={SignOut} style={{ flex: 1 }} />}
+                {currentTab === "chat" && <View style={{ flex: 1 }} />}
 
                 {/* Chats Tab */}
-                {currentTab === "chats" && <FloatIslandButton icon="user" text="User" />}
-                {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text="Log Out" onPress={SignOut} />}
+                {currentTab === "chats" && <FloatIslandButton icon="language" text={t.language} onPress={changeLanguage} />}
+                {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
             </Animated.View>
             <Animated.View style={[styles.panel, styles.contentPanel]} layout={Constants.layoutTransition}>
                 {/* Chat Tab */}
@@ -167,8 +175,13 @@ function HomePage(props: PageProps) {
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (
-                    <Animated.Text style={[Styles.primaryText, { fontSize: 24, margin: 10, fontWeight: "bold" }]}>
-                        Chats
+                    <Animated.Text
+                        style={[Styles.primaryText, { fontSize: 24, margin: 10, fontWeight: "bold" }]}
+                        layout={Constants.layoutTransition}
+                        entering={ZoomIn}
+                        exiting={ZoomOut}
+                    >
+                        {t.chats}
                     </Animated.Text>
                 )}
                 {currentTab === "chats" && <Divider />}
