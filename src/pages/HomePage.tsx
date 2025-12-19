@@ -172,7 +172,7 @@ function HomePage(props: PageProps) {
                     </Animated.Text>
                 )}
                 {currentTab === "chats" && <Divider />}
-                {currentTab === "chats" && <ChatsContainer handler={handleChat} ref={chatsRef} />}
+                {currentTab === "chats" && <ChatsContainer bottomGap={70} handler={handleChat} ref={chatsRef} />}
             </Animated.View>
         </SafeAreaView>
     );

@@ -21,10 +21,11 @@ export interface ChatsContainerHandle {
 
 export interface ChatsContainerProps {
     handler?: (chat: ChatData) => void;
+    bottomGap?: number;
 }
 
 const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((props, ref) => {
-    const { handler } = props;
+    const { handler, bottomGap } = props;
     const chatsRef = useRef<ChatData[]>([]);
     const [animProgress, setAnimProgress] = useState<number>(0);
 
@@ -68,6 +69,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
         <Animated.View exiting={FadeOut} style={styles.chatsContainer}>
             <FlatList
                 style={styles.chatsContainer}
+                contentContainerStyle={{ paddingBottom: bottomGap }}
                 data={chatsRef.current}
                 renderItem={renderChat}
                 keyExtractor={(_, index) => index.toString()}
