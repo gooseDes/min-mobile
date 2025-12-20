@@ -3,6 +3,7 @@ import Message from "./Message";
 import Auth from "@/Auth";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import Animated, { FadeOut } from "react-native-reanimated";
+import { Constants } from "@/Style";
 
 const styles = StyleSheet.create({
     messagesContainer: {
@@ -14,11 +15,17 @@ const styles = StyleSheet.create({
 
 export interface MessagesContainerHandle {
     setMessages: (newMessages: MessageData[]) => void;
+    addMessage: (message: MessageData) => void;
     show: () => void;
     hide: () => void;
 }
 
-const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) => {
+export interface MessagesContainerProps {
+    bottomGap: number;
+}
+
+const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerProps>((props, ref) => {
+    const { bottomGap } = props;
     const messagesRef = useRef<MessageData[]>([]);
     const [animProgress, setAnimProgress] = useState<number>(0);
 
@@ -27,6 +34,10 @@ const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) 
     useImperativeHandle(ref, () => ({
         setMessages: (newMessages: MessageData[]) => {
             messagesRef.current = newMessages;
+        },
+        addMessage: (message: MessageData) => {
+            messagesRef.current.push(message);
+            setAnimProgress(messagesRef.current.length + 1);
         },
         show: () => {
             for (let i = 0; i < Math.min(messagesRef.current.length + 2, 15); i++) {
@@ -66,9 +77,10 @@ const MessagesContainer = forwardRef<MessagesContainerHandle>((props: any, ref) 
     };
 
     return (
-        <Animated.View exiting={FadeOut} style={styles.messagesContainer}>
+        <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
             <FlatList
                 style={styles.messagesContainer}
+                contentContainerStyle={{ paddingTop: bottomGap }}
                 data={reversedMessages}
                 renderItem={renderMessage}
                 keyExtractor={(_, index) => index.toString()}

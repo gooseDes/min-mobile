@@ -6,9 +6,10 @@ import ChatsContainer, { ChatsContainerHandle } from "@components/ChatsContainer
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
 import IconButton from "@components/IconButton";
+import MessageInput from "@components/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,8 +17,9 @@ function CreateMessage(obj: any): MessageData {
     return {
         id: obj.id || -1,
         text: obj.text || "",
-        authorId: obj.author || -1,
+        authorId: obj.authorId || -1,
         authorName: obj.authorName || "",
+        chatId: obj.chatId || -1,
     };
 }
 
@@ -59,15 +61,23 @@ function HomePage(props: PageProps) {
     const chatsRef = useRef<ChatsContainerHandle>(null);
     const [currentTab, setCurrentTab] = useState<string>("chat");
     const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
+    const currentChatRef = useRef<ChatData | null>(null);
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
 
     const topPanelStyle = useAnimatedStyle(() => {
         return {
             position: currentTab === "chat" ? "relative" : "absolute",
             width: currentTab === "chat" ? "100%" : "auto",
-            bottom: currentTab === "chat" ? 0 : 40,
+            bottom: currentTab === "chat" ? 0 : 30,
             borderRadius: currentTab === "chat" ? 16 : 999,
         };
     }, [currentTab]);
+
+    const contentPanelStyle = useAnimatedStyle(() => {
+        return {
+            marginBottom: keyboardHeight,
+        };
+    }, [keyboardHeight]);
 
     async function SignOut() {
         await Auth.clearStorage();
@@ -82,8 +92,9 @@ function HomePage(props: PageProps) {
                     CreateMessage({
                         id: msg.id,
                         text: msg.text,
-                        author: msg.author_id,
+                        authorId: msg.author_id,
                         authorName: msg.author,
+                        chatId: msg.chat,
                     }),
                 ),
             );
@@ -124,8 +135,42 @@ function HomePage(props: PageProps) {
             socket.on("error", data => {
                 console.error(data);
             });
+            socket.on("message", (message: any) => {
+                if (message.chat && parseInt(message.chat, 10) === currentChatRef.current?.id) {
+                    messagesRef.current?.addMessage(
+                        CreateMessage({
+                            id: message.id,
+                            text: message.text,
+                            authorId: message.author_id,
+                            authorName: message.author,
+                            chatId: message.chat,
+                        }),
+                    );
+                }
+            });
         }
         initSocket();
+
+        // Handling keyboard height
+        const showSubscription = Keyboard.addListener("keyboardDidShow", e => {
+            setKeyboardHeight(e.endCoordinates.height);
+        });
+        const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+            setKeyboardHeight(0);
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+            async function uninitSocket() {
+                const socket = await getSocket();
+                socket.off("message");
+                socket.off("connect");
+                socket.off("connect_error");
+                socket.off("error");
+            }
+            uninitSocket();
+        };
     }, []);
 
     useEffect(() => {
@@ -140,8 +185,16 @@ function HomePage(props: PageProps) {
 
     function handleChat(chat: ChatData) {
         setCurrentChat(chat);
+        currentChatRef.current = chat;
         setCurrentTab("chat");
         messagesRef.current?.show();
+    }
+
+    async function sendMessage(message: string) {
+        if (!currentChatRef.current) return;
+        const chatId = currentChatRef.current.id;
+        const socket = await getSocket();
+        socket.emit("msg", { text: message, chat: chatId });
     }
 
     return (
@@ -163,9 +216,10 @@ function HomePage(props: PageProps) {
                 )}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
             </Animated.View>
-            <Animated.View style={[styles.panel, styles.contentPanel]} layout={Constants.layoutTransition}>
+            <Animated.View style={[styles.panel, styles.contentPanel, contentPanelStyle]} layout={Constants.layoutTransition}>
                 {/* Chat Tab */}
-                {currentTab === "chat" && <MessagesContainer ref={messagesRef} />}
+                {currentTab === "chat" && <MessagesContainer bottomGap={60} ref={messagesRef} />}
+                {currentTab === "chat" && <MessageInput style={{ position: "absolute", bottom: 10 }} onSend={sendMessage} />}
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (

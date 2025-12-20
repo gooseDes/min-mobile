@@ -12,6 +12,7 @@ export interface Language {
     password?: string;
     confirm_password?: string;
     you?: string;
+    your_message?: string;
 }
 
 class Translation {
@@ -31,6 +32,7 @@ class Translation {
         password: "Password",
         confirm_password: "Confirm Password",
         you: "You",
+        your_message: "Your Message",
     };
 
     static ru: Language = {
@@ -47,6 +49,7 @@ class Translation {
         password: "Пароль",
         confirm_password: "Подтвердите пароль",
         you: "Вы",
+        your_message: "Ваше сообщение",
     };
 
     static ua: Language = {
@@ -63,6 +66,7 @@ class Translation {
         password: "Пароль",
         confirm_password: "Підтвердіть пароль",
         you: "Ви",
+        your_message: "Ваше повідомлення",
     };
 
     static getCurrentTranslation(): Language {

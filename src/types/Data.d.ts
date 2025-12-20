@@ -3,6 +3,7 @@ interface MessageData {
     text: string;
     authorId: number;
     authorName: string;
+    chatId: number;
 }
 
 interface ChatData {

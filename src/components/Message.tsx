@@ -4,6 +4,7 @@ import Auth from "@/Auth";
 import { SERVER } from "@env";
 import Animated, { useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 import { t } from "@/Translation";
+import React from "react";
 
 const styles = StyleSheet.create({
     messageContainer: {
@@ -96,7 +97,7 @@ function Message(props: MessageProps) {
                         {isCurrentUser ? t.you : props.author_name}
                     </Animated.Text>
                 )}
-                <Animated.Text style={[Styles.primaryText, { textAlign: props.side || "left" }]}>
+                <Animated.Text selectable={true} style={[Styles.primaryText, { textAlign: props.side || "left" }]}>
                     {props.children}
                 </Animated.Text>
             </Animated.View>
