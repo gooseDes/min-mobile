@@ -1,7 +1,7 @@
 import Auth from "@/Auth";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
-import Translation, { t } from "@/Translation";
+import { changeLanguage, t } from "@/Translation";
 import ChatsContainer, { ChatsContainerHandle } from "@components/ChatsContainer";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
@@ -72,14 +72,6 @@ function HomePage(props: PageProps) {
     async function SignOut() {
         await Auth.clearStorage();
         props.handler({ action: "go", to: "sign" });
-    }
-
-    function changeLanguage() {
-        const current = Translation.getCurrentLanguage();
-        if (current === "en") Translation.setCurrentLanguage("ru");
-        if (current === "ru") Translation.setCurrentLanguage("ua");
-        if (current === "ua") Translation.setCurrentLanguage("en");
-        props.handler({ action: "changeLanguage" });
     }
 
     async function requestHistory() {
@@ -166,7 +158,9 @@ function HomePage(props: PageProps) {
                 {currentTab === "chat" && <View style={{ flex: 1 }} />}
 
                 {/* Chats Tab */}
-                {currentTab === "chats" && <FloatIslandButton icon="language" text={t.language} onPress={changeLanguage} />}
+                {currentTab === "chats" && (
+                    <FloatIslandButton icon="language" text={t.language} onPress={() => changeLanguage(props.handler)} />
+                )}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
             </Animated.View>
             <Animated.View style={[styles.panel, styles.contentPanel]} layout={Constants.layoutTransition}>

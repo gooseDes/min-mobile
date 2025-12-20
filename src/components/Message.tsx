@@ -3,6 +3,7 @@ import { Colors, Constants, Styles } from "@/Style";
 import Auth from "@/Auth";
 import { SERVER } from "@env";
 import Animated, { useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import { t } from "@/Translation";
 
 const styles = StyleSheet.create({
     messageContainer: {
@@ -92,7 +93,7 @@ function Message(props: MessageProps) {
             >
                 {props.author_name && showAuthor && (
                     <Animated.Text style={[Styles.secondaryText, styles.authorText, { textAlign: props.side || "left" }]}>
-                        {isCurrentUser ? "You" : props.author_name}
+                        {isCurrentUser ? t.you : props.author_name}
                     </Animated.Text>
                 )}
                 <Animated.Text style={[Styles.primaryText, { textAlign: props.side || "left" }]}>

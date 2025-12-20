@@ -2,6 +2,16 @@ export interface Language {
     chats?: string;
     log_out?: string;
     language?: string;
+    sign_in?: string;
+    have_account?: string;
+    sign_up?: string;
+    no_account?: string;
+    welcome?: string;
+    login?: string;
+    email?: string;
+    password?: string;
+    confirm_password?: string;
+    you?: string;
 }
 
 class Translation {
@@ -11,18 +21,48 @@ class Translation {
         chats: "Chats",
         log_out: "Log Out",
         language: "Language",
+        sign_in: "Sign In",
+        have_account: "Have Account?",
+        sign_up: "Sign Up",
+        no_account: "No Account?",
+        welcome: "Welcome, Master!",
+        login: "Login",
+        email: "Email",
+        password: "Password",
+        confirm_password: "Confirm Password",
+        you: "You",
     };
 
     static ru: Language = {
         chats: "Чаты",
         log_out: "Выйти",
         language: "Язык",
+        sign_in: "Войти",
+        have_account: "Уже есть аккаунт?",
+        sign_up: "Зарегистрироваться",
+        no_account: "Нет аккаунта?",
+        welcome: "Здарова!",
+        login: "Логин",
+        email: "Почта",
+        password: "Пароль",
+        confirm_password: "Подтвердите пароль",
+        you: "Вы",
     };
 
     static ua: Language = {
         chats: "Чати",
         log_out: "Вийти",
         language: "Мова",
+        sign_in: "Увійти",
+        have_account: "Вже є акаунт?",
+        sign_up: "Зареєструватися",
+        no_account: "Немає акаунту?",
+        welcome: "Здоровенькі були!",
+        login: "Логін",
+        email: "Пошта",
+        password: "Пароль",
+        confirm_password: "Підтвердіть пароль",
+        you: "Ви",
     };
 
     static getCurrentTranslation(): Language {
@@ -49,3 +89,11 @@ export const t: Language = new Proxy(
         },
     },
 );
+
+export function changeLanguage(handler: PageProps["handler"] | null = null) {
+    const current = Translation.getCurrentLanguage();
+    if (current === "en") Translation.setCurrentLanguage("ru");
+    if (current === "ru") Translation.setCurrentLanguage("ua");
+    if (current === "ua") Translation.setCurrentLanguage("en");
+    if (handler) handler({ action: "changeLanguage" });
+}

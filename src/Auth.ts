@@ -10,7 +10,7 @@ export default class Auth {
             Auth.username = username;
         });
         Auth.getFromStorage("id").then(id => {
-            Auth.id = parseInt(id);
+            Auth.id = parseInt(id, 10);
         });
     }
 
@@ -27,11 +27,36 @@ export default class Auth {
             await this.setInStorage("username", json.username);
             await this.setInStorage("email", email);
             await this.setInStorage("id", json.id.toString());
+            Auth.username = json.username;
+            Auth.id = json.id;
         } else {
-            console.error(`Faliled :( \n${response.statusText}`);
+            console.error(`Faliled :( ${json.msg || ""}`);
             return false;
         }
         console.log("Logined!");
+        return true;
+    }
+
+    static async register(login: string, email: string, password: string) {
+        const response = await fetch(`${SERVER}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: login, email: email, password: password }),
+        });
+        const json = await response.json();
+        if (response.ok) {
+            console.log(json);
+            await this.setInStorage("token", json.token);
+            await this.setInStorage("username", json.username);
+            await this.setInStorage("email", email);
+            await this.setInStorage("id", json.id.toString());
+            Auth.username = json.username;
+            Auth.id = json.id;
+        } else {
+            console.error(`Faliled :( ${json.msg || ""}`);
+            return false;
+        }
+        console.log("Registered!");
         return true;
     }
 
