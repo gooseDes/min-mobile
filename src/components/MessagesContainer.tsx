@@ -87,6 +87,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
                 ItemSeparatorComponent={splitter}
                 inverted={true}
                 initialNumToRender={15}
+                windowSize={10}
                 {...props}
             />
         </Animated.View>

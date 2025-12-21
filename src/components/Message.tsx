@@ -1,10 +1,10 @@
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { Colors, Constants, Styles } from "@/Style";
 import Auth from "@/Auth";
 import { SERVER } from "@env";
-import Animated, { useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { t } from "@/Translation";
-import React from "react";
+import React, { useEffect } from "react";
 
 const styles = StyleSheet.create({
     messageContainer: {
@@ -19,10 +19,6 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
-        shadowColor: Colors.messageBackgroundColor,
-        shadowOffset: { width: 0, height: 0 },
-        shadowRadius: 0,
-        elevation: 1,
         maxWidth: "80%",
     },
     authorText: {
@@ -57,52 +53,49 @@ interface MessageProps extends React.PropsWithChildren {
     shown?: boolean;
 }
 
-function Message(props: MessageProps) {
+function MessageBase(props: MessageProps) {
     const isCurrentUser = props.author_name === Auth.username;
     const showAvatar = props.show_avatar === undefined ? true : props.show_avatar;
     const showAuthor = props.show_author === undefined ? true : props.show_author;
     const shown = props.shown === undefined ? true : props.shown;
+    const side = props.side || "left";
 
-    const animatedStyle = useAnimatedStyle(() => {
-        const springConfig = {
-            damping: 12,
-            stiffness: 150,
-            mass: 1,
-            overshootClamping: false,
-        };
-        return {
-            opacity: withTiming(shown ? 1 : 0, { duration: 400 }),
-            transform: [
-                {
-                    translateX: withSpring(shown ? 0 : props.side === "left" ? "-100%" : "100%", springConfig),
-                },
-                {
-                    translateY: withSpring(shown ? 0 : 100, springConfig),
-                },
-                { scale: withTiming(shown ? 1 : 0, { duration: 400 }) },
-            ],
-        };
-    }, [shown]);
+    const opacity = useSharedValue(shown ? 1 : 0);
+    const translateX = useSharedValue(shown ? 0 : side === "left" ? -100 : 100);
+    const translateY = useSharedValue(shown ? 0 : 100);
+    const scale = useSharedValue(shown ? 1 : 0);
+
+    useEffect(() => {
+        opacity.value = withTiming(shown ? 1 : 0, { duration: 400 });
+        translateX.value = withSpring(shown ? 0 : side === "left" ? -100 : 100, { damping: 12, stiffness: 150, mass: 1 });
+        translateY.value = withSpring(shown ? 0 : 100, { damping: 12, stiffness: 150, mass: 1 });
+        scale.value = withTiming(shown ? 1 : 0, { duration: 400 });
+    }, [shown, side]);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: opacity.value,
+        transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }],
+    }));
 
     return (
         <Animated.View
             style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
         >
             {showAvatar && <Image source={{ uri: `${SERVER}/avatars/${props.author_id || ""}.webp` }} style={styles.avatar} />}
-            <Animated.View
-                style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}
-            >
+            <View style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}>
                 {props.author_name && showAuthor && (
-                    <Animated.Text style={[Styles.secondaryText, styles.authorText, { textAlign: props.side || "left" }]}>
+                    <Text style={[Styles.secondaryText, styles.authorText, { textAlign: props.side || "left" }]}>
                         {isCurrentUser ? t.you : props.author_name}
-                    </Animated.Text>
+                    </Text>
                 )}
-                <Animated.Text selectable={true} style={[Styles.primaryText, { textAlign: props.side || "left" }]}>
+                <Text selectable={true} style={[Styles.primaryText, { textAlign: props.side || "left" }]}>
                     {props.children}
-                </Animated.Text>
-            </Animated.View>
+                </Text>
+            </View>
         </Animated.View>
     );
 }
+
+const Message = React.memo(MessageBase);
 
 export default Message;
