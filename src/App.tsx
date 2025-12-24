@@ -17,6 +17,7 @@ import {
 import notifee from "@notifee/react-native";
 import { getSocket } from "./Socket";
 import Notification, { NotificationHandle } from "@components/Notification";
+import Translation from "./Translation";
 
 function PageWrapper({ children }: { children: JSX.Element }) {
     return (
@@ -86,6 +87,7 @@ function App() {
         }
 
         Auth.init();
+        Translation.init();
         loadDefaultPage();
 
         requestUserPermission();

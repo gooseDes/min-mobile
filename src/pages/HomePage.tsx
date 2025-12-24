@@ -5,6 +5,7 @@ import { changeLanguage, t } from "@/Translation";
 import ChatsContainer, { ChatsContainerHandle } from "@components/ChatsContainer";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
+import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import MessageInput from "@components/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
@@ -236,14 +237,17 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (
-                    <Animated.Text
-                        style={[Styles.primaryText, { fontSize: 24, margin: 10, fontWeight: "bold" }]}
+                    <Animated.View
+                        style={[{ display: "flex", flexDirection: "row", alignItems: "center" }]}
                         layout={Constants.layoutTransition}
                         entering={ZoomIn}
                         exiting={ZoomOut}
                     >
-                        {t.chats}
-                    </Animated.Text>
+                        <Icon name="comments" size={24} color={Colors.primaryTextColor} />
+                        <Animated.Text style={[Styles.primaryText, { fontSize: 24, margin: 10, fontWeight: "bold" }]}>
+                            {t.chats}
+                        </Animated.Text>
+                    </Animated.View>
                 )}
                 {currentTab === "chats" && <Divider />}
                 {currentTab === "chats" && <ChatsContainer bottomGap={70} handler={handleChat} ref={chatsRef} />}

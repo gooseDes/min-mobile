@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export interface Language {
     chats?: string;
     log_out?: string;
@@ -80,6 +82,13 @@ class Translation {
     static setCurrentLanguage(lang: string): void {
         Translation.lang = lang;
     }
+
+    static async init() {
+        const storedLang = await AsyncStorage.getItem("language");
+        if (storedLang) {
+            Translation.setCurrentLanguage(storedLang);
+        }
+    }
 }
 
 export default Translation;
@@ -96,8 +105,11 @@ export const t: Language = new Proxy(
 
 export function changeLanguage(handler: PageProps["handler"] | null = null) {
     const current = Translation.getCurrentLanguage();
-    if (current === "en") Translation.setCurrentLanguage("ru");
-    if (current === "ru") Translation.setCurrentLanguage("ua");
-    if (current === "ua") Translation.setCurrentLanguage("en");
+    let newLang: string = "";
+    if (current === "en") newLang = "ru";
+    if (current === "ru") newLang = "ua";
+    if (current === "ua") newLang = "en";
+    AsyncStorage.setItem("language", newLang);
+    Translation.setCurrentLanguage(newLang);
     if (handler) handler({ action: "changeLanguage" });
 }
