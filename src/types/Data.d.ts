@@ -11,3 +11,10 @@ interface ChatData {
     title: string;
     participants: any[];
 }
+
+interface RemoteMessageAdditionalData {
+    chatId: number;
+    authorId: number;
+    messageId: number;
+    sentAt: number;
+}

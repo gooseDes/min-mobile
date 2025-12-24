@@ -8,7 +8,7 @@ import FloatIslandButton from "@components/FloatIslandButton";
 import IconButton from "@components/IconButton";
 import MessageInput from "@components/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -56,13 +56,21 @@ const styles = StyleSheet.create({
     },
 });
 
-function HomePage(props: PageProps) {
+export interface HomePageHandler {
+    getCurrentChat: () => ChatData;
+}
+
+const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const messagesRef = useRef<MessagesContainerHandle>(null);
     const chatsRef = useRef<ChatsContainerHandle>(null);
     const [currentTab, setCurrentTab] = useState<string>("chat");
     const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
     const currentChatRef = useRef<ChatData | null>(null);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+    useImperativeHandle(ref, () => ({
+        getCurrentChat: () => currentChatRef.current || CreateChat({}),
+    }));
 
     const topPanelStyle = useAnimatedStyle(() => {
         return {
@@ -206,7 +214,11 @@ function HomePage(props: PageProps) {
                     <IconButton
                         icon="list-ul"
                         style={{ aspectRatio: 1, height: "100%" }}
-                        onPress={() => setCurrentTab("chats")}
+                        onPress={() => {
+                            setCurrentTab("chats");
+                            setCurrentChat(null);
+                            currentChatRef.current = null;
+                        }}
                     />
                 )}
                 {currentTab === "chat" && <View style={{ flex: 1 }} />}
@@ -238,6 +250,6 @@ function HomePage(props: PageProps) {
             </Animated.View>
         </SafeAreaView>
     );
-}
+});
 
 export default HomePage;

@@ -1,9 +1,9 @@
 import { StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import SignPage from "./pages/SignPage";
 import Auth from "./Auth";
-import HomePage from "./pages/HomePage";
+import HomePage, { HomePageHandler } from "./pages/HomePage";
 import Animated, { Easing, ZoomInDown, ZoomOutUp } from "react-native-reanimated";
 import { Colors } from "./Style";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@react-native-firebase/messaging";
 import notifee from "@notifee/react-native";
 import { getSocket } from "./Socket";
+import Notification, { NotificationHandle } from "@components/Notification";
 
 function PageWrapper({ children }: { children: JSX.Element }) {
     return (
@@ -29,10 +30,21 @@ function PageWrapper({ children }: { children: JSX.Element }) {
     );
 }
 
+function CreateRemoteMessageAdditionalData(obj: any): RemoteMessageAdditionalData {
+    return {
+        chatId: parseInt(obj.chatId, 10) || -1,
+        authorId: parseInt(obj.userId, 10) || -1,
+        messageId: parseInt(obj.messageId, 10) || -1,
+        sentAt: parseInt(obj.sentAt, 10) || -1,
+    };
+}
+
 function App() {
     const [currentPage, setCurrentPage] = useState<string>("none");
     const [, forceUpdate] = useState<number>(0);
     const [channelId, setChannelId] = useState<string | null>(null);
+    const notificationRef = useRef<NotificationHandle | null>(null);
+    const homePageRef = useRef<HomePageHandler | null>(null);
 
     async function requestUserPermission() {
         // Request user permission for Firebase notifications
@@ -82,7 +94,12 @@ function App() {
 
         // Foreground Message Handler
         const unsubscribe = onMessage(messaging, async remoteMessage => {
-            console.log(`Message: ${JSON.stringify(remoteMessage)}`);
+            notificationRef.current?.setTitle(remoteMessage.notification?.title || "Title");
+            notificationRef.current?.setText(remoteMessage.notification?.body || "Body");
+            const additional = CreateRemoteMessageAdditionalData(remoteMessage.data);
+            if (homePageRef.current?.getCurrentChat().id !== additional.chatId) {
+                notificationRef.current?.show();
+            }
         });
 
         // Background Message Handler
@@ -116,9 +133,10 @@ function App() {
     return (
         <SafeAreaProvider key={forceUpdate.toString()} style={{ backgroundColor: Colors.backgroundColor }}>
             <StatusBar barStyle={"light-content"} />
+            <Notification ref={notificationRef} title="Default Title" text="Default Text" />
             {currentPage === "home" && (
                 <PageWrapper>
-                    <HomePage handler={commandHandler} />
+                    <HomePage ref={homePageRef} handler={commandHandler} />
                 </PageWrapper>
             )}
             {currentPage === "sign" && (
