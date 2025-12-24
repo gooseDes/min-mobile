@@ -133,6 +133,7 @@ function HomePage(props: PageProps) {
                 console.log("Connection Error:", err);
             });
             socket.on("error", data => {
+                if (data.hidden) return;
                 console.error(data);
             });
             socket.on("message", (message: any) => {

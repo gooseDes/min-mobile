@@ -22,7 +22,6 @@ export default class Auth {
         });
         const json = await response.json();
         if (response.ok) {
-            console.log(json);
             await this.setInStorage("token", json.token);
             await this.setInStorage("username", json.username);
             await this.setInStorage("email", email);
