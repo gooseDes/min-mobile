@@ -14,11 +14,12 @@ import {
     requestPermission,
     setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
-import notifee from "@notifee/react-native";
+import notifee, { AndroidCategory, AndroidStyle } from "@notifee/react-native";
 import { getSocket } from "./Socket";
 import Notification, { NotificationHandle } from "@components/Notification";
 import Translation from "./Translation";
 import { SERVER } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function PageWrapper({ children }: { children: JSX.Element }) {
     return (
@@ -32,8 +33,10 @@ function PageWrapper({ children }: { children: JSX.Element }) {
     );
 }
 
-function CreateRemoteMessageAdditionalData(obj: any): RemoteMessageAdditionalData {
+function CreateRemoteMessagePayload(obj: any): RemoteMessagePayload {
     return {
+        authorName: obj.authorName || "",
+        text: obj.text || "",
         chatId: parseInt(obj.chatId, 10) || -1,
         authorId: parseInt(obj.authorId, 10) || -1,
         messageId: parseInt(obj.messageId, 10) || -1,
@@ -44,7 +47,6 @@ function CreateRemoteMessageAdditionalData(obj: any): RemoteMessageAdditionalDat
 function App() {
     const [currentPage, setCurrentPage] = useState<string>("none");
     const [, forceUpdate] = useState<number>(0);
-    const [channelId, setChannelId] = useState<string | null>(null);
     const notificationRef = useRef<NotificationHandle | null>(null);
     const homePageRef = useRef<HomePageHandler | null>(null);
 
@@ -63,10 +65,11 @@ function App() {
 
         // Create a default channel for notifications
         const channel = await notifee.createChannel({
-            id: "default",
-            name: "Default Channel",
+            id: "min",
+            name: "Min Channel",
+            importance: 4,
         });
-        setChannelId(channel);
+        await AsyncStorage.setItem("channelId", channel);
     }
 
     const sendFirebaseToken = async () => {
@@ -97,25 +100,47 @@ function App() {
 
         // Foreground Message Handler
         const unsubscribe = onMessage(messaging, async remoteMessage => {
-            const additional = CreateRemoteMessageAdditionalData(remoteMessage.data);
-            notificationRef.current?.setTitle(remoteMessage.notification?.title || "Title");
-            notificationRef.current?.setText(remoteMessage.notification?.body || "Body");
-            notificationRef.current?.setImage(`${SERVER}/avatars/${additional.authorId}.webp` || null);
-            if (homePageRef.current?.getCurrentChat().id !== additional.chatId) {
+            const data = CreateRemoteMessagePayload(remoteMessage.data);
+            notificationRef.current?.setTitle(data.authorName);
+            notificationRef.current?.setText(data.text);
+            notificationRef.current?.setImage(`${SERVER}/avatars/${data.authorId}.webp` || null);
+            if (homePageRef.current?.getCurrentChat().id !== data.chatId) {
                 notificationRef.current?.show();
             }
         });
 
         // Background Message Handler
         setBackgroundMessageHandler(messaging, async remoteMessage => {
+            if (!remoteMessage.data) return;
+            const data = CreateRemoteMessagePayload(remoteMessage.data);
             await notifee.displayNotification({
-                title: remoteMessage.notification?.title || "Title",
-                body: remoteMessage.notification?.body || "Body",
+                title: data.authorName,
+                body: data.text,
                 android: {
-                    channelId: channelId || "",
+                    smallIcon: "ic_notification",
+                    //largeIcon: `${SERVER}/avatars/${data.authorId}.webp`,
+                    channelId: (await AsyncStorage.getItem("channelId")) || "min",
+                    circularLargeIcon: true,
                     pressAction: {
                         id: "default",
                     },
+                    style: {
+                        type: AndroidStyle.MESSAGING,
+                        person: {
+                            name: "me",
+                        },
+                        messages: [
+                            {
+                                text: data.text,
+                                timestamp: data.sentAt,
+                                person: {
+                                    name: data.authorName,
+                                    icon: `${SERVER}/avatars/${data.authorId}.webp`,
+                                },
+                            },
+                        ],
+                    },
+                    category: AndroidCategory.MESSAGE,
                 },
             });
         });

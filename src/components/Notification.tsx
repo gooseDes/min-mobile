@@ -66,7 +66,6 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
             setText(newText);
         },
         setImage: (newImage: string | null) => {
-            console.log(newImage);
             setImage(newImage);
         },
         show: () => {

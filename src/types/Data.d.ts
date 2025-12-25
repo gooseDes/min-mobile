@@ -12,7 +12,9 @@ interface ChatData {
     participants: any[];
 }
 
-interface RemoteMessageAdditionalData {
+interface RemoteMessagePayload {
+    authorName: string;
+    text: string;
     chatId: number;
     authorId: number;
     messageId: number;
