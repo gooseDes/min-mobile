@@ -18,6 +18,7 @@ import notifee from "@notifee/react-native";
 import { getSocket } from "./Socket";
 import Notification, { NotificationHandle } from "@components/Notification";
 import Translation from "./Translation";
+import { SERVER } from "@env";
 
 function PageWrapper({ children }: { children: JSX.Element }) {
     return (
@@ -34,7 +35,7 @@ function PageWrapper({ children }: { children: JSX.Element }) {
 function CreateRemoteMessageAdditionalData(obj: any): RemoteMessageAdditionalData {
     return {
         chatId: parseInt(obj.chatId, 10) || -1,
-        authorId: parseInt(obj.userId, 10) || -1,
+        authorId: parseInt(obj.authorId, 10) || -1,
         messageId: parseInt(obj.messageId, 10) || -1,
         sentAt: parseInt(obj.sentAt, 10) || -1,
     };
@@ -96,9 +97,10 @@ function App() {
 
         // Foreground Message Handler
         const unsubscribe = onMessage(messaging, async remoteMessage => {
+            const additional = CreateRemoteMessageAdditionalData(remoteMessage.data);
             notificationRef.current?.setTitle(remoteMessage.notification?.title || "Title");
             notificationRef.current?.setText(remoteMessage.notification?.body || "Body");
-            const additional = CreateRemoteMessageAdditionalData(remoteMessage.data);
+            notificationRef.current?.setImage(`${SERVER}/avatars/${additional.authorId}.webp` || null);
             if (homePageRef.current?.getCurrentChat().id !== additional.chatId) {
                 notificationRef.current?.show();
             }

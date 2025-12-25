@@ -1,6 +1,6 @@
 import { Colors, Constants, Styles } from "@/Style";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { StyleSheet, Text, useWindowDimensions } from "react-native";
+import { Image, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -14,10 +14,14 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         position: "absolute",
-        justifyContent: "center",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-start",
         alignItems: "center",
         zIndex: 9999,
         transformOrigin: "center",
+        padding: 8,
+        gap: 16,
     },
     title: {
         fontSize: 16,
@@ -26,11 +30,17 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 14,
     },
+    image: {
+        aspectRatio: 1,
+        height: "100%",
+        borderRadius: 999,
+    },
 });
 
 export interface NotificationHandle {
     setText: (newText: string) => void;
     setTitle: (newTitle: string) => void;
+    setImage: (newImage: string | null) => void;
     show: () => void;
 }
 
@@ -44,6 +54,7 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
     const [shown, setShown] = useState<boolean>(false);
     const [title, setTitle] = useState<string>(props.title || "");
     const [text, setText] = useState<string>(props.text || "");
+    const [image, setImage] = useState<string | null>(null);
     const closeTimeout = useRef<number | null>(null);
     const { width } = useWindowDimensions();
 
@@ -53,6 +64,10 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
         },
         setText: (newText: string) => {
             setText(newText);
+        },
+        setImage: (newImage: string | null) => {
+            console.log(newImage);
+            setImage(newImage);
         },
         show: () => {
             setShown(true);
@@ -68,6 +83,11 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
     const top = useSharedValue<number>(0);
     const scale = useSharedValue<number>(0);
     const left = useSharedValue<number>(width / 2 - width * 0.4);
+    const [textWidth, setTextWidth] = useState<number>(width * 0.8 - 16);
+
+    useEffect(() => {
+        setTextWidth(width * 0.5);
+    }, [width]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -84,8 +104,13 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
 
     return (
         <Animated.View style={[styles.container, animatedStyle]}>
-            <Text style={[styles.title, Styles.primaryText]}>{title}</Text>
-            <Text style={[styles.text, Styles.secondaryText]}>{text}</Text>
+            {image && <Image source={{ uri: image }} style={styles.image} />}
+            <View>
+                <Text style={[styles.title, Styles.primaryText]}>{title}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.text, Styles.secondaryText, { width: textWidth }]}>
+                    {text}
+                </Text>
+            </View>
         </Animated.View>
     );
 });

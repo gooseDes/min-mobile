@@ -37,7 +37,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
         },
         addMessage: (message: MessageData) => {
             messagesRef.current.push(message);
-            setAnimProgress(messagesRef.current.length + 1);
+            setAnimProgress(messagesRef.current.length);
         },
         show: () => {
             for (let i = 0; i < Math.min(messagesRef.current.length + 2, 15); i++) {
