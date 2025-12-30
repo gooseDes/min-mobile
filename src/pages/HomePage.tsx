@@ -59,18 +59,29 @@ const styles = StyleSheet.create({
 
 export interface HomePageHandler {
     getCurrentChat: () => ChatData;
+    back: () => boolean; // Back button/gesture handler
 }
 
 const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const messagesRef = useRef<MessagesContainerHandle>(null);
     const chatsRef = useRef<ChatsContainerHandle>(null);
     const [currentTab, setCurrentTab] = useState<string>("chat");
+    const currentTabRef = useRef<string>(currentTab);
     const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
     const currentChatRef = useRef<ChatData | null>(null);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
 
     useImperativeHandle(ref, () => ({
         getCurrentChat: () => currentChatRef.current || CreateChat({}),
+        back: () => {
+            // Close chat if opened or else exit app
+            if (currentTabRef.current === "chat") {
+                setCurrentTab("chats");
+                currentTabRef.current = "chats";
+                return true;
+            }
+            return false;
+        },
     }));
 
     const topPanelStyle = useAnimatedStyle(() => {
@@ -197,6 +208,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
         setCurrentChat(chat);
         currentChatRef.current = chat;
         setCurrentTab("chat");
+        currentTabRef.current = "chat";
         messagesRef.current?.show();
     }
 
@@ -217,6 +229,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         style={{ aspectRatio: 1, height: "100%" }}
                         onPress={() => {
                             setCurrentTab("chats");
+                            currentTabRef.current = "chats";
                             setCurrentChat(null);
                             currentChatRef.current = null;
                         }}

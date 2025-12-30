@@ -1,4 +1,4 @@
-import { StatusBar } from "react-native";
+import { BackHandler, StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { JSX, useEffect, useRef, useState } from "react";
 import SignPage from "./pages/SignPage";
@@ -49,6 +49,7 @@ function App() {
     const [, forceUpdate] = useState<number>(0);
     const notificationRef = useRef<NotificationHandle | null>(null);
     const homePageRef = useRef<HomePageHandler | null>(null);
+    const currentPageRef = useRef<string>(currentPage);
 
     async function requestUserPermission() {
         // Request user permission for Firebase notifications
@@ -99,7 +100,7 @@ function App() {
         const messaging = getMessaging();
 
         // Foreground Message Handler
-        const unsubscribe = onMessage(messaging, async remoteMessage => {
+        const ForegroundMessageHandlerUnsubscribe = onMessage(messaging, async remoteMessage => {
             const data = CreateRemoteMessagePayload(remoteMessage.data);
             notificationRef.current?.setTitle(data.authorName);
             notificationRef.current?.setText(data.text);
@@ -145,8 +146,23 @@ function App() {
             });
         });
 
-        return unsubscribe;
+        // Back button/gesture handler
+        const BackButtonHandler = BackHandler.addEventListener("hardwareBackPress", () => {
+            if (currentPageRef.current === "home") {
+                return homePageRef.current?.back();
+            }
+            return false;
+        });
+
+        return () => {
+            ForegroundMessageHandlerUnsubscribe();
+            BackButtonHandler.remove();
+        };
     }, []);
+
+    useEffect(() => {
+        currentPageRef.current = currentPage;
+    }, [currentPage]);
 
     function commandHandler(command: CommandData) {
         switch (command.action) {
