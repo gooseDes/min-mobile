@@ -5,6 +5,7 @@ import { SERVER } from "@env";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { t } from "@/Translation";
 import React, { useEffect } from "react";
+import Markdown, { MarkedStyles } from "react-native-marked";
 
 const styles = StyleSheet.create({
     messageContainer: {
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
     },
     messageContent: {
         backgroundColor: Colors.messageBackgroundColor,
-        padding: 10,
+        paddingHorizontal: 10,
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
@@ -23,6 +24,7 @@ const styles = StyleSheet.create({
     },
     authorText: {
         fontSize: 12,
+        marginBottom: -8,
     },
     leftSide: {
         alignItems: "flex-start",
@@ -43,6 +45,17 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
 });
+
+const markdownStyles: MarkedStyles = {
+    table: { borderWidth: Constants.borderWidth, borderColor: Colors.borderColor },
+    blockquote: { marginVertical: 8 },
+};
+
+const markdownFlatListProps: any = {
+    style: {
+        backgroundColor: "transparent",
+    },
+};
 
 interface MessageProps extends React.PropsWithChildren {
     author_name?: string;
@@ -88,9 +101,11 @@ function MessageBase(props: MessageProps) {
                         {isCurrentUser ? t.you : props.author_name}
                     </Text>
                 )}
-                <Text selectable={true} style={[Styles.primaryText, { textAlign: props.side || "left" }]}>
-                    {props.children}
-                </Text>
+                <Markdown
+                    styles={markdownStyles}
+                    flatListProps={markdownFlatListProps}
+                    value={props.children?.toString() || ""}
+                />
             </View>
         </Animated.View>
     );

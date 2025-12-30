@@ -13,6 +13,7 @@ export class Colors {
 export class Constants {
     static rounding = 16;
     static borderWidth = 2;
+    static fontFamily = "Rubik";
     static layoutTransition = LinearTransition.springify(500);
 }
 
