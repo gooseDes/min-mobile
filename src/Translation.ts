@@ -15,6 +15,8 @@ export interface Language {
     confirm_password?: string;
     you?: string;
     your_message?: string;
+    private_chat?: string;
+    group_chat?: string;
 }
 
 class Translation {
@@ -35,6 +37,8 @@ class Translation {
         confirm_password: "Confirm Password",
         you: "You",
         your_message: "Your Message",
+        private_chat: "Private Chat",
+        group_chat: "Group Chat",
     };
 
     static ru: Language = {
@@ -52,6 +56,8 @@ class Translation {
         confirm_password: "Подтвердите пароль",
         you: "Вы",
         your_message: "Ваше сообщение",
+        private_chat: "Личный чат",
+        group_chat: "Групповой чат",
     };
 
     static ua: Language = {
@@ -69,6 +75,8 @@ class Translation {
         confirm_password: "Підтвердіть пароль",
         you: "Ви",
         your_message: "Ваше повідомлення",
+        private_chat: "Особистий чат",
+        group_chat: "Груповий чат",
     };
 
     static getCurrentTranslation(): Language {

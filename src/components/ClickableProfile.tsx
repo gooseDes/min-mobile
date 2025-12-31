@@ -1,9 +1,10 @@
 import { Styles } from "@/Style";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Animated, { useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, withSpring, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
 
 interface ClickableProfileProps {
     text?: string;
+    bottomText?: string;
     image?: string;
     onPress?: () => void;
     shown?: boolean;
@@ -24,12 +25,17 @@ const styles = StyleSheet.create({
         marginRight: 10,
         aspectRatio: 1,
     },
+    textContainer: {
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+        gap: 0,
+        height: 20,
+    },
 });
 
 function ClickableProfile(props: ClickableProfileProps) {
-    const { text, image, onPress } = props;
-    const shown = props.shown === undefined ? true : props.shown;
-    const anim = props.anim === undefined ? "none" : props.anim;
+    const { text, bottomText, image, onPress, anim = "none", shown = true } = props;
 
     const animatedStyle = useAnimatedStyle(() => {
         if (anim === "none") return {};
@@ -54,13 +60,18 @@ function ClickableProfile(props: ClickableProfileProps) {
     }, [shown]);
 
     return (
-        <Animated.View style={animatedStyle}>
-            <TouchableOpacity onPress={onPress}>
-                <View style={styles.container}>
-                    <Image source={{ uri: image }} style={styles.image} />
-                    <Text style={Styles.primaryText}>{text}</Text>
-                </View>
-            </TouchableOpacity>
+        <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+            <Animated.View style={animatedStyle}>
+                <TouchableOpacity onPress={onPress}>
+                    <View style={styles.container}>
+                        <Image source={{ uri: image }} style={styles.image} /* Avatar */ />
+                        <View style={styles.textContainer}>
+                            {text && <Text style={Styles.primaryText}>{text}</Text> /* Name */}
+                            {bottomText && <Text style={Styles.secondaryText}>{bottomText}</Text> /* Status */}
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </Animated.View>
         </Animated.View>
     );
 }

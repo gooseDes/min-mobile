@@ -3,12 +3,14 @@ import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { changeLanguage, t } from "@/Translation";
 import ChatsContainer, { ChatsContainerHandle } from "@components/ChatsContainer";
+import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import MessageInput from "@components/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
+import { SERVER } from "@env";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, ZoomIn, ZoomOut } from "react-native-reanimated";
@@ -65,7 +67,7 @@ export interface HomePageHandler {
 const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const messagesRef = useRef<MessagesContainerHandle>(null);
     const chatsRef = useRef<ChatsContainerHandle>(null);
-    const [currentTab, setCurrentTab] = useState<string>("chat");
+    const [currentTab, setCurrentTab] = useState<string>("chats");
     const currentTabRef = useRef<string>(currentTab);
     const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
     const currentChatRef = useRef<ChatData | null>(null);
@@ -221,6 +223,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
 
     return (
         <SafeAreaView style={Styles.container}>
+            {/* Top Panel */}
             <Animated.View style={[styles.panel, styles.topPanel, topPanelStyle]} layout={Constants.layoutTransition}>
                 {/* Chat Tab */}
                 {currentTab === "chat" && (
@@ -235,7 +238,16 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         }}
                     />
                 )}
-                {currentTab === "chat" && <View style={{ flex: 1 }} />}
+                {currentTab === "chat" && (
+                    <ClickableProfile
+                        image={`${SERVER}/avatars/${
+                            (currentChat?.participants.find(p => p.id !== Auth.id) || { id: -1 }).id
+                        }.webp`}
+                        text={currentChat?.title}
+                        bottomText={currentChat?.participants.length === 2 ? t.private_chat : t.group_chat}
+                    />
+                )}
+                {currentTab === "chat" && <View style={{ flex: 1 }} /> /*Filler*/}
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (
@@ -243,6 +255,8 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                 )}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
             </Animated.View>
+
+            {/* Content Panel */}
             <Animated.View style={[styles.panel, styles.contentPanel, contentPanelStyle]} layout={Constants.layoutTransition}>
                 {/* Chat Tab */}
                 {currentTab === "chat" && <MessagesContainer bottomGap={60} ref={messagesRef} />}
