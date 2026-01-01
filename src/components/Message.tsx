@@ -4,8 +4,10 @@ import Auth from "@/Auth";
 import { SERVER } from "@env";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { t } from "@/Translation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Markdown, { MarkedStyles } from "react-native-marked";
+import { getSocket } from "@/Socket";
+import Icon from "./Icon";
 
 const styles = StyleSheet.create({
     messageContainer: {
@@ -17,14 +19,19 @@ const styles = StyleSheet.create({
     messageContent: {
         backgroundColor: Colors.messageBackgroundColor,
         paddingHorizontal: 10,
+        paddingTop: 4,
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
         maxWidth: "80%",
     },
     authorText: {
-        fontSize: 12,
-        marginBottom: -8,
+        fontSize: 13,
+        marginBottom: -6,
+    },
+    replyText: {
+        fontSize: 11,
+        marginBottom: -4,
     },
     leftSide: {
         alignItems: "flex-start",
@@ -54,6 +61,7 @@ const markdownStyles: MarkedStyles = {
 const markdownFlatListProps: any = {
     style: {
         backgroundColor: "transparent",
+        marginTop: -4,
     },
 };
 
@@ -72,6 +80,27 @@ function MessageBase(props: MessageProps) {
     const showAuthor = props.show_author === undefined ? true : props.show_author;
     const shown = props.shown === undefined ? true : props.shown;
     const side = props.side || "left";
+
+    const text = props.children?.toString() || "";
+    const is_reply = text.startsWith("/reply");
+    const [replyText, setReplyText] = useState<string>("");
+
+    async function getReplyText() {
+        const replyId = parseInt(text.split("\n")[0].split(" ")[1], 10);
+        const socket = await getSocket();
+        socket.on("requestedMessage", (msgData: any) => {
+            socket.on("userInfo", (userData: any) => {
+                setReplyText(`${userData.user.name}: ${msgData.message.content}`);
+                socket.off("requestedMessage");
+            });
+            socket.emit("getUserInfo", { id: msgData.message.sender_id });
+        });
+        socket.emit("getMessage", { messageId: replyId });
+    }
+
+    useEffect(() => {
+        if (is_reply) getReplyText();
+    }, [is_reply]);
 
     const opacity = useSharedValue(shown ? 1 : 0);
     const translateX = useSharedValue(shown ? 0 : side === "left" ? -100 : 100);
@@ -97,14 +126,18 @@ function MessageBase(props: MessageProps) {
             {showAvatar && <Image source={{ uri: `${SERVER}/avatars/${props.author_id || ""}.webp` }} style={styles.avatar} />}
             <View style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}>
                 {props.author_name && showAuthor && (
-                    <Text style={[Styles.secondaryText, styles.authorText, { textAlign: props.side || "left" }]}>
-                        {isCurrentUser ? t.you : props.author_name}
+                    <Text style={[Styles.secondaryText, styles.authorText]}>{isCurrentUser ? t.you : props.author_name}</Text>
+                )}
+                {is_reply && replyText && (
+                    <Text style={[Styles.secondaryText, styles.replyText]}>
+                        <Icon name="reply" size={10} /> {replyText}
                     </Text>
                 )}
+
                 <Markdown
                     styles={markdownStyles}
                     flatListProps={markdownFlatListProps}
-                    value={props.children?.toString() || ""}
+                    value={is_reply ? text.replace(/^.*\n/, "") : text}
                 />
             </View>
         </Animated.View>
