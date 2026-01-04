@@ -1,6 +1,6 @@
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { Colors, Constants, Styles } from "@/Style";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import Icon from "./Icon";
 
 interface FloatIslandButtonProps {

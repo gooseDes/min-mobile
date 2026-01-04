@@ -1,5 +1,5 @@
 import { Styles } from "@/Style";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { useAnimatedStyle, withSpring, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
 
 interface ClickableProfileProps {
@@ -64,7 +64,7 @@ function ClickableProfile(props: ClickableProfileProps) {
             <Animated.View style={animatedStyle}>
                 <TouchableOpacity onPress={onPress}>
                     <View style={styles.container}>
-                        <Image source={{ uri: image }} style={styles.image} /* Avatar */ />
+                        <Animated.Image source={{ uri: image }} style={styles.image} />
                         <View style={styles.textContainer}>
                             {text && <Text style={Styles.primaryText}>{text}</Text> /* Name */}
                             {bottomText && <Text style={Styles.secondaryText}>{bottomText}</Text> /* Status */}

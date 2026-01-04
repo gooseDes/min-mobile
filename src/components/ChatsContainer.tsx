@@ -1,9 +1,9 @@
+import Auth from "@/Auth";
+import { SERVER } from "@env";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
 import Animated, { FadeOut } from "react-native-reanimated";
 import ClickableProfile from "./ClickableProfile";
-import { SERVER } from "@env";
-import Auth from "@/Auth";
 
 const styles = StyleSheet.create({
     chatsContainer: {

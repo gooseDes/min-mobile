@@ -1,5 +1,5 @@
-import { io, Socket } from "socket.io-client";
 import { SERVER } from "@env";
+import { io, Socket } from "socket.io-client";
 import Auth from "./Auth";
 
 var socket: Socket | null = null;

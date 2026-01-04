@@ -1,5 +1,5 @@
-import * as Keychain from "react-native-keychain";
 import { SERVER } from "@env";
+import * as Keychain from "react-native-keychain";
 
 export default class Auth {
     static id: number | null;

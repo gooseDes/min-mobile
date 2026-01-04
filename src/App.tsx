@@ -1,11 +1,7 @@
-import { BackHandler, StatusBar } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { JSX, useEffect, useRef, useState } from "react";
-import SignPage from "./pages/SignPage";
-import Auth from "./Auth";
-import HomePage, { HomePageHandler } from "./pages/HomePage";
-import Animated, { Easing, ZoomInDown, ZoomOutUp } from "react-native-reanimated";
-import { Colors } from "./Style";
+import Notification, { NotificationHandle } from "@components/Notification";
+import { SERVER } from "@env";
+import notifee, { AndroidCategory, AndroidStyle } from "@notifee/react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     AuthorizationStatus,
     getMessaging,
@@ -14,24 +10,21 @@ import {
     requestPermission,
     setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
-import notifee, { AndroidCategory, AndroidStyle } from "@notifee/react-native";
+import { createNavigationContainerRef, NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import { useEffect, useRef, useState } from "react";
+import { StatusBar } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { enableScreens } from "react-native-screens";
+import Auth from "./Auth";
+import HomePage, { HomePageHandler } from "./pages/HomePage";
+import ProfilePage, { ProfilePageHandler } from "./pages/ProfilePage";
+import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
-import Notification, { NotificationHandle } from "@components/Notification";
+import { Colors } from "./Style";
 import Translation from "./Translation";
-import { SERVER } from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-function PageWrapper({ children }: { children: JSX.Element }) {
-    return (
-        <Animated.View
-            style={{ flex: 1 }}
-            entering={ZoomInDown.duration(600).easing(Easing.out(Easing.cubic))}
-            exiting={ZoomOutUp.duration(600).easing(Easing.out(Easing.cubic))}
-        >
-            {children}
-        </Animated.View>
-    );
-}
+enableScreens();
 
 function CreateRemoteMessagePayload(obj: any): RemoteMessagePayload {
     return {
@@ -44,12 +37,28 @@ function CreateRemoteMessagePayload(obj: any): RemoteMessagePayload {
     };
 }
 
+const Stack = createNativeStackNavigator();
+
+const stackOptions: NativeStackNavigationOptions = {
+    headerShown: false,
+    headerBackButtonMenuEnabled: false,
+    gestureEnabled: false,
+};
+
+type RootStackParamList = {
+    Home: undefined;
+    Sign: undefined;
+    Profile: undefined;
+};
+
 function App() {
     const [currentPage, setCurrentPage] = useState<string>("none");
     const [, forceUpdate] = useState<number>(0);
     const notificationRef = useRef<NotificationHandle | null>(null);
     const homePageRef = useRef<HomePageHandler | null>(null);
+    const profilePageRef = useRef<ProfilePageHandler | null>(null);
     const currentPageRef = useRef<string>(currentPage);
+    const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
     async function requestUserPermission() {
         // Request user permission for Firebase notifications
@@ -146,17 +155,8 @@ function App() {
             });
         });
 
-        // Back button/gesture handler
-        const BackButtonHandler = BackHandler.addEventListener("hardwareBackPress", () => {
-            if (currentPageRef.current === "home") {
-                return homePageRef.current?.back();
-            }
-            return false;
-        });
-
         return () => {
             ForegroundMessageHandlerUnsubscribe();
-            BackButtonHandler.remove();
         };
     }, []);
 
@@ -167,7 +167,14 @@ function App() {
     function commandHandler(command: CommandData) {
         switch (command.action) {
             case "go":
-                setCurrentPage(command.to || "home");
+                if (command.to === "Home" || command.to === "Sign") {
+                    navigationRef.reset({
+                        index: 0,
+                        routes: [{ name: command.to }],
+                    });
+                } else {
+                    navigationRef.navigate(command.to as any);
+                }
                 break;
             case "changeLanguage":
                 forceUpdate(Date.now());
@@ -178,17 +185,20 @@ function App() {
     return (
         <SafeAreaProvider key={forceUpdate.toString()} style={{ backgroundColor: Colors.backgroundColor }}>
             <StatusBar barStyle={"light-content"} />
+            <NavigationContainer ref={navigationRef}>
+                <Stack.Navigator initialRouteName="Home">
+                    <Stack.Screen name="Home" options={stackOptions}>
+                        {() => <HomePage ref={homePageRef} handler={commandHandler} />}
+                    </Stack.Screen>
+                    <Stack.Screen name="Sign" options={stackOptions}>
+                        {() => <SignPage handler={commandHandler} />}
+                    </Stack.Screen>
+                    <Stack.Screen name="Profile" options={stackOptions}>
+                        {() => <ProfilePage ref={profilePageRef} handler={commandHandler} />}
+                    </Stack.Screen>
+                </Stack.Navigator>
+            </NavigationContainer>
             <Notification ref={notificationRef} title="Default Title" text="Default Text" />
-            {currentPage === "home" && (
-                <PageWrapper>
-                    <HomePage ref={homePageRef} handler={commandHandler} />
-                </PageWrapper>
-            )}
-            {currentPage === "sign" && (
-                <PageWrapper>
-                    <SignPage handler={commandHandler} />
-                </PageWrapper>
-            )}
         </SafeAreaProvider>
     );
 }

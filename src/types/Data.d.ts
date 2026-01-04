@@ -12,11 +12,12 @@ interface ChatData {
     participants: any[];
 }
 
-interface RemoteMessagePayload {
-    authorName: string;
-    text: string;
-    chatId: number;
-    authorId: number;
-    messageId: number;
-    sentAt: number;
+interface UserData {
+    id: number;
+    name: string;
+}
+
+interface CommandData {
+    action: "go" | "changeLanguage" | "openPopup";
+    to?: "Home" | "Sign" | "Profile";
 }

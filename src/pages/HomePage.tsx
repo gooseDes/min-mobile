@@ -11,8 +11,9 @@ import IconButton from "@components/IconButton";
 import MessageInput from "@components/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
 import { SERVER } from "@env";
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { Keyboard, StyleSheet, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { BackHandler, Keyboard, StyleSheet, ToastAndroid, View } from "react-native";
 import Animated, { useAnimatedStyle, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -61,7 +62,6 @@ const styles = StyleSheet.create({
 
 export interface HomePageHandler {
     getCurrentChat: () => ChatData;
-    back: () => boolean; // Back button/gesture handler
 }
 
 const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
@@ -72,19 +72,39 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
     const currentChatRef = useRef<ChatData | null>(null);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
+    const lastBackButtonPress = useRef<number>(0);
 
     useImperativeHandle(ref, () => ({
         getCurrentChat: () => currentChatRef.current || CreateChat({}),
-        back: () => {
-            // Close chat if opened or else exit app
-            if (currentTabRef.current === "chat") {
-                setCurrentTab("chats");
-                currentTabRef.current = "chats";
-                return true;
-            }
-            return false;
-        },
     }));
+
+    // Back button/gesture handler
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                if (currentTabRef.current === "chat") {
+                    setCurrentTab("chats");
+                    currentTabRef.current = "chats";
+                    return true;
+                }
+
+                const now = Date.now();
+                if (lastBackButtonPress.current && now - lastBackButtonPress.current < 2000) {
+                    BackHandler.exitApp();
+                    return true;
+                }
+
+                lastBackButtonPress.current = now;
+                ToastAndroid.show("Press back again to exit", ToastAndroid.SHORT);
+
+                return true;
+            };
+
+            const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+            return () => backHandler.remove();
+        }, []),
+    );
 
     const topPanelStyle = useAnimatedStyle(() => {
         return {
@@ -103,7 +123,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
 
     async function SignOut() {
         await Auth.clearStorage();
-        props.handler({ action: "go", to: "sign" });
+        props.handler({ action: "go", to: "Sign" });
     }
 
     async function requestHistory() {

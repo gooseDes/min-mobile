@@ -1,9 +1,9 @@
-import { FlatList, StyleSheet, View } from "react-native";
-import Message from "./Message";
 import Auth from "@/Auth";
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import Animated, { FadeOut } from "react-native-reanimated";
 import { Constants } from "@/Style";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
+import Animated, { FadeOut } from "react-native-reanimated";
+import Message from "./Message";
 
 const styles = StyleSheet.create({
     messagesContainer: {

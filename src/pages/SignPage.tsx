@@ -57,7 +57,7 @@ function SignPage(props: PageProps) {
 
     async function SignIn() {
         if (await Auth.login(emailValue, passwordValue)) {
-            props.handler({ action: "go", to: "home" });
+            props.handler({ action: "go", to: "Home" });
         }
     }
 
@@ -67,7 +67,7 @@ function SignPage(props: PageProps) {
             return;
         }
         if (await Auth.register(loginValue, emailValue, passwordValue)) {
-            props.handler({ action: "go", to: "home" });
+            props.handler({ action: "go", to: "Home" });
         }
     }
 
