@@ -91,9 +91,10 @@ function MessageBase(props: MessageProps) {
         socket.on("requestedMessage", (msgData: any) => {
             socket.on("userInfo", (userData: any) => {
                 setReplyText(`${userData.user.name}: ${msgData.message.content}`);
-                socket.off("requestedMessage");
+                socket.off("userInfo");
             });
             socket.emit("getUserInfo", { id: msgData.message.sender_id });
+            socket.off("requestedMessage");
         });
         socket.emit("getMessage", { messageId: replyId });
     }

@@ -18,7 +18,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
 import Auth from "./Auth";
 import HomePage, { HomePageHandler } from "./pages/HomePage";
-import ProfilePage, { ProfilePageHandler } from "./pages/ProfilePage";
 import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
 import { Colors } from "./Style";
@@ -48,7 +47,6 @@ const stackOptions: NativeStackNavigationOptions = {
 type RootStackParamList = {
     Home: undefined;
     Sign: undefined;
-    Profile: undefined;
 };
 
 function App() {
@@ -56,7 +54,6 @@ function App() {
     const [, forceUpdate] = useState<number>(0);
     const notificationRef = useRef<NotificationHandle | null>(null);
     const homePageRef = useRef<HomePageHandler | null>(null);
-    const profilePageRef = useRef<ProfilePageHandler | null>(null);
     const currentPageRef = useRef<string>(currentPage);
     const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
@@ -192,9 +189,6 @@ function App() {
                     </Stack.Screen>
                     <Stack.Screen name="Sign" options={stackOptions}>
                         {() => <SignPage handler={commandHandler} />}
-                    </Stack.Screen>
-                    <Stack.Screen name="Profile" options={stackOptions}>
-                        {() => <ProfilePage ref={profilePageRef} handler={commandHandler} />}
                     </Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>

@@ -10,11 +10,12 @@ import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import MessageInput from "@components/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
+import Profile from "@components/Profile";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { BackHandler, Keyboard, StyleSheet, ToastAndroid, View } from "react-native";
-import Animated, { useAnimatedStyle, ZoomIn, ZoomOut } from "react-native-reanimated";
+import { BackHandler, Keyboard, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function CreateMessage(obj: any): MessageData {
@@ -49,7 +50,6 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     topPanel: {
-        height: 60,
         gap: 20,
         flexDirection: "row",
         zIndex: 1,
@@ -64,14 +64,20 @@ export interface HomePageHandler {
     getCurrentChat: () => ChatData;
 }
 
+type Tabs = "chat" | "chats" | "profile";
+type TabStyles = {
+    [K in keyof ViewStyle]?: Record<Tabs, ViewStyle[K]>;
+};
+
 const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const messagesRef = useRef<MessagesContainerHandle>(null);
     const chatsRef = useRef<ChatsContainerHandle>(null);
-    const [currentTab, setCurrentTab] = useState<string>("chats");
+    const [currentTab, setCurrentTab] = useState<Tabs>("chats");
     const currentTabRef = useRef<string>(currentTab);
     const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
     const currentChatRef = useRef<ChatData | null>(null);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
+    const [profileId, setProfileId] = useState<number>(-1);
     const lastBackButtonPress = useRef<number>(0);
 
     useImperativeHandle(ref, () => ({
@@ -85,6 +91,12 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                 if (currentTabRef.current === "chat") {
                     setCurrentTab("chats");
                     currentTabRef.current = "chats";
+                    return true;
+                }
+
+                if (currentTabRef.current === "profile") {
+                    setCurrentTab("chat");
+                    currentTabRef.current = "chat";
                     return true;
                 }
 
@@ -106,20 +118,34 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
         }, []),
     );
 
-    const topPanelStyle = useAnimatedStyle(() => {
-        return {
-            position: currentTab === "chat" ? "relative" : "absolute",
-            width: currentTab === "chat" ? "100%" : "auto",
-            bottom: currentTab === "chat" ? 0 : 30,
-            borderRadius: currentTab === "chat" ? 16 : 999,
-        };
-    }, [currentTab]);
+    const topPanelStyles: TabStyles = {
+        position: { chat: "relative", chats: "absolute", profile: "absolute" },
+        width: { chat: "100%", chats: "auto", profile: "100%" },
+        height: { chat: 60, chats: 60, profile: "100%" },
+        bottom: { chat: 0, chats: 30, profile: 10 },
+        borderRadius: { chat: 16, chats: 999, profile: 16 },
+    };
+
+    function tabStylesToAnimatedStyle(style: TabStyles) {
+        "worklet";
+        let to_return: ViewStyle = {};
+        Object.entries(style).forEach(([key_, value]) => {
+            const key = key_ as keyof ViewStyle;
+            (to_return as any)[key] = value[currentTab];
+        });
+        return to_return;
+    }
+
+    const topPanelStyle = useAnimatedStyle(() => tabStylesToAnimatedStyle(topPanelStyles), [currentTab]);
+
+    const contentPanelScale = useSharedValue(1);
 
     const contentPanelStyle = useAnimatedStyle(() => {
         return {
             marginBottom: keyboardHeight,
+            transform: [{ scale: withSpring(contentPanelScale.value) }],
         };
-    }, [keyboardHeight]);
+    }, [keyboardHeight, contentPanelScale]);
 
     async function SignOut() {
         await Auth.clearStorage();
@@ -224,6 +250,12 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
         if (currentTab === "chat") {
             requestHistory();
         }
+        if (currentTab === "profile") {
+            contentPanelScale.value = 0;
+        } else {
+            contentPanelScale.value = 1;
+        }
+        currentTabRef.current = currentTab;
     }, [currentTab]);
 
     function handleChat(chat: ChatData) {
@@ -239,6 +271,12 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
         const chatId = currentChatRef.current.id;
         const socket = await getSocket();
         socket.emit("msg", { text: message, chat: chatId });
+    }
+
+    function openProfile(id: number) {
+        setProfileId(id);
+        setCurrentTab("profile");
+        currentTabRef.current = "profile";
     }
 
     return (
@@ -258,15 +296,20 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         }}
                     />
                 )}
-                {currentTab === "chat" && (
-                    <ClickableProfile
-                        image={`${SERVER}/avatars/${
-                            (currentChat?.participants.find(p => p.id !== Auth.id) || { id: -1 }).id
-                        }.webp`}
-                        text={currentChat?.title}
-                        bottomText={currentChat?.participants.length === 2 ? t.private_chat : t.group_chat}
-                    />
-                )}
+                {currentTab === "chat" &&
+                    (() => {
+                        const isPrivate = currentChat?.participants.length === 2;
+                        const otherParticipant = currentChat?.participants.find(p => p.id !== Auth.id) || { id: -1 };
+
+                        return (
+                            <ClickableProfile
+                                image={`${SERVER}/avatars/${otherParticipant.id}.webp`}
+                                text={currentChat?.title}
+                                bottomText={isPrivate ? t.private_chat : t.group_chat}
+                                onPress={isPrivate ? () => openProfile(otherParticipant.id) : () => {}}
+                            />
+                        );
+                    })()}
                 {currentTab === "chat" && <View style={{ flex: 1 }} /> /*Filler*/}
 
                 {/* Chats Tab */}
@@ -274,6 +317,9 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                     <FloatIslandButton icon="language" text={t.language} onPress={() => changeLanguage(props.handler)} />
                 )}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
+
+                {/* Profile Tab */}
+                {currentTab === "profile" && <Profile id={profileId} />}
             </Animated.View>
 
             {/* Content Panel */}

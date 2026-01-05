@@ -19,5 +19,5 @@ interface UserData {
 
 interface CommandData {
     action: "go" | "changeLanguage" | "openPopup";
-    to?: "Home" | "Sign" | "Profile";
+    to?: "Home" | "Sign";
 }
