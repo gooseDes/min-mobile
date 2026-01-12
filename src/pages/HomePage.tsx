@@ -14,7 +14,7 @@ import Profile from "@components/Profile";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { BackHandler, Keyboard, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
+import { Alert, BackHandler, Keyboard, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -198,7 +198,13 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                 console.log("Connected to server");
             });
             socket.on("connect_error", err => {
-                console.log("Connection Error:", err);
+                if (err.message.includes("Invalid token")) {
+                    Alert.alert(t.relogin || "", t.relogin_msg, [
+                        { text: t.ok, onPress: () => props.handler({ action: "go", to: "Sign" }) },
+                    ]);
+                } else {
+                    console.log("Connection Error:", err);
+                }
             });
             socket.on("error", data => {
                 if (data.hidden) return;

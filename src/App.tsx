@@ -1,7 +1,6 @@
 import Notification, { NotificationHandle } from "@components/Notification";
 import { SERVER } from "@env";
 import notifee, { AndroidCategory, AndroidStyle } from "@notifee/react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     AuthorizationStatus,
     getMessaging,
@@ -20,6 +19,7 @@ import Auth from "./Auth";
 import HomePage, { HomePageHandler } from "./pages/HomePage";
 import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
+import Storage, { Keys } from "./Storage";
 import { Colors } from "./Style";
 import Translation from "./Translation";
 
@@ -76,7 +76,7 @@ function App() {
             name: "Min Channel",
             importance: 4,
         });
-        await AsyncStorage.setItem("channelId", channel);
+        Storage.set(Keys.channelId, channel);
     }
 
     const sendFirebaseToken = async () => {
@@ -126,7 +126,7 @@ function App() {
                 android: {
                     smallIcon: "ic_notification",
                     //largeIcon: `${SERVER}/avatars/${data.authorId}.webp`,
-                    channelId: (await AsyncStorage.getItem("channelId")) || "min",
+                    channelId: Storage.getString(Keys.channelId) || "min",
                     circularLargeIcon: true,
                     pressAction: {
                         id: "default",

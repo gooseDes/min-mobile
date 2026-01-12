@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import Storage, { Keys } from "./Storage";
 
 export interface Language {
     chats?: string;
@@ -17,6 +17,9 @@ export interface Language {
     your_message?: string;
     private_chat?: string;
     group_chat?: string;
+    relogin?: string;
+    relogin_msg?: string;
+    ok?: string;
 }
 
 class Translation {
@@ -39,6 +42,9 @@ class Translation {
         your_message: "Your Message",
         private_chat: "Private Chat",
         group_chat: "Group Chat",
+        relogin: "Relogin",
+        relogin_msg: "Please relogin.",
+        ok: "OK",
     };
 
     static ru: Language = {
@@ -58,6 +64,9 @@ class Translation {
         your_message: "Ваше сообщение",
         private_chat: "Личный чат",
         group_chat: "Групповой чат",
+        relogin: "Перелогинтесь",
+        relogin_msg: "Пожалуйста, зайдите в свой аккаунт снова.",
+        ok: "OK",
     };
 
     static ua: Language = {
@@ -77,6 +86,9 @@ class Translation {
         your_message: "Ваше повідомлення",
         private_chat: "Особистий чат",
         group_chat: "Груповий чат",
+        relogin: "Перелогинтесь",
+        relogin_msg: "Будь ласка, зайдіть в свій акаунт повторно.",
+        ok: "OK",
     };
 
     static getCurrentTranslation(): Language {
@@ -91,8 +103,8 @@ class Translation {
         Translation.lang = lang;
     }
 
-    static async init() {
-        const storedLang = await AsyncStorage.getItem("language");
+    static init() {
+        const storedLang = Storage.getString(Keys.language);
         if (storedLang) {
             Translation.setCurrentLanguage(storedLang);
         }
@@ -104,7 +116,7 @@ export default Translation;
 export const t: Language = new Proxy(
     {},
     {
-        get(_, key: string) {
+        get(_, key: string): string {
             const current = Translation.getCurrentTranslation();
             return (current as any)[key] || (Translation.en as any)[key] || key;
         },
@@ -117,7 +129,7 @@ export function changeLanguage(handler: PageProps["handler"] | null = null) {
     if (current === "en") newLang = "ru";
     if (current === "ru") newLang = "ua";
     if (current === "ua") newLang = "en";
-    AsyncStorage.setItem("language", newLang);
+    Storage.set(Keys.language, newLang);
     Translation.setCurrentLanguage(newLang);
     if (handler) handler({ action: "changeLanguage" });
 }

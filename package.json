@@ -11,7 +11,6 @@
     },
     "dependencies": {
         "@notifee/react-native": "^9.1.8",
-        "@react-native-async-storage/async-storage": "^1.24.0",
         "@react-native-firebase/app": "^23.7.0",
         "@react-native-firebase/messaging": "^23.7.0",
         "@react-native/new-app-screen": "0.82.1",
@@ -23,6 +22,8 @@
         "react-native-dotenv": "^3.4.11",
         "react-native-keychain": "^10.0.0",
         "react-native-marked": "^7.1.1",
+        "react-native-mmkv": "^4.1.1",
+        "react-native-nitro-modules": "^0.33.0",
         "react-native-reanimated": "^4.2.0",
         "react-native-safe-area-context": "^5.5.2",
         "react-native-screens": "^4.19.0",
