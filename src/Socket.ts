@@ -2,21 +2,29 @@ import { SERVER } from "@env";
 import { io, Socket } from "socket.io-client";
 import Auth from "./Auth";
 
-var socket: Socket | null = null;
-var promise: Promise<string>;
+let socketPromise: Promise<Socket> | null = null;
 
 export async function getSocket(): Promise<Socket> {
-    if (!socket) {
-        if (!promise) {
-            console.log("Fetching token from storage");
-            console.log(`Connecting to ${SERVER}`);
-            promise = Auth.getFromStorage("token");
-        }
-        socket = io(SERVER, {
-            auth: {
-                token: await promise,
-            },
-        });
+    if (socketPromise) {
+        return socketPromise;
     }
-    return socket;
+
+    socketPromise = (async () => {
+        try {
+            console.log("Fetching token from storage");
+            const token = await Auth.getFromStorage("token");
+
+            console.log(`Connecting to ${SERVER}`);
+            const socket = io(SERVER, {
+                auth: { token },
+            });
+
+            return socket;
+        } catch (error) {
+            socketPromise = null;
+            throw error;
+        }
+    })();
+
+    return socketPromise;
 }

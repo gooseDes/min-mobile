@@ -1,4 +1,4 @@
-import Auth from "@/Auth";
+import { useStorage } from "@/Storage";
 import { Constants } from "@/Style";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
 export interface MessagesContainerHandle {
     setMessages: (newMessages: MessageData[]) => void;
     addMessage: (message: MessageData) => void;
+    changeMessageNumberBy: (amount: number) => void;
     show: () => void;
     hide: () => void;
 }
@@ -28,6 +29,8 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
     const { bottomGap } = props;
     const messagesRef = useRef<MessageData[]>([]);
     const [animProgress, setAnimProgress] = useState<number>(0);
+    const [newlyAddedMessages, setNewlyAddedMessages] = useState<number>(0);
+    const [userId] = useStorage<number>("user.id", -1);
 
     const reversedMessages = [...messagesRef.current].reverse();
 
@@ -47,7 +50,11 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
             }
             setTimeout(() => {
                 setAnimProgress(messagesRef.current.length);
+                setNewlyAddedMessages(0);
             }, 16 * 100);
+        },
+        changeMessageNumberBy: (amount: number) => {
+            setNewlyAddedMessages(amount);
         },
         hide: () => {
             setAnimProgress(0);
@@ -56,16 +63,16 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
 
     const renderMessage = ({ item: message, index }: { item: MessageData; index: number }) => {
         const prevMessage = reversedMessages[index + 1];
-        const showAvatar = prevMessage ? prevMessage.authorId !== message.authorId : true;
+        const showAvatar = prevMessage ? prevMessage.sender.id !== message.sender.id : true;
 
         return (
             <Message
-                author_name={message.authorName}
-                author_id={message.authorId}
-                side={Auth.username === message.authorName ? "right" : "left"}
+                author_name={message.sender.username}
+                author_id={message.sender.id}
+                side={userId === message.sender.id ? "right" : "left"}
                 show_avatar={showAvatar}
                 show_author={showAvatar}
-                shown={animProgress > index || !(index <= 15)}
+                shown={animProgress > index || !(index <= 15) || index < newlyAddedMessages}
             >
                 {message.text}
             </Message>

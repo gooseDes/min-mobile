@@ -1,4 +1,4 @@
-import Auth from "@/Auth";
+import { useStorage } from "@/Storage";
 import { SERVER } from "@env";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
 export interface ChatsContainerHandle {
     setChats: (chats: ChatData[]) => void;
     show: () => void;
+    showWithoutAnimation: () => void;
 }
 
 export interface ChatsContainerProps {
@@ -28,6 +29,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
     const { handler, bottomGap } = props;
     const chatsRef = useRef<ChatData[]>([]);
     const [animProgress, setAnimProgress] = useState<number>(0);
+    const [userId] = useStorage<number>("user.id", -1);
 
     useImperativeHandle(ref, () => ({
         setChats: (newChats: ChatData[]) => {
@@ -43,13 +45,16 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
                 setAnimProgress(chatsRef.current.length);
             }, 16 * 50);
         },
+        showWithoutAnimation: () => {
+            setAnimProgress(chatsRef.current.length);
+        },
     }));
 
     const renderChat = ({ item: chat, index }: { item: ChatData; index: number }) => (
         <ClickableProfile
             text={chat.title}
             image={`${SERVER}/avatars/${
-                chat.participants.find(participant => participant.id !== Auth.id)?.id || "default"
+                chat.participants?.find(participant => (participant?.id || -1) !== userId)?.id || "default"
             }.webp`}
             anim={index % 2 === 0 ? "left" : "right"}
             shown={animProgress >= index}

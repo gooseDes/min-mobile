@@ -9,6 +9,7 @@ module.exports = {
                     "@components": "./src/components",
                     "@pages": "./src/pages",
                     "@types": "./src/types",
+                    "@drizzle": "./drizzle",
                     "@": "./src",
                 },
             },
@@ -23,5 +24,6 @@ module.exports = {
             },
         ],
         "react-native-worklets/plugin",
+        ["inline-import", { extensions: [".sql"] }],
     ],
 };

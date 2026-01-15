@@ -1,5 +1,6 @@
 import { SERVER } from "@env";
 import * as Keychain from "react-native-keychain";
+import Storage from "./Storage";
 
 export default class Auth {
     static id: number | null;
@@ -8,9 +9,12 @@ export default class Auth {
     static init() {
         Auth.getFromStorage("username").then(username => {
             Auth.username = username;
+            Storage.set("user.username", username);
         });
         Auth.getFromStorage("id").then(id => {
-            Auth.id = parseInt(id, 10);
+            const idNum = parseInt(id, 10);
+            Auth.id = idNum;
+            Storage.set("user.id", idNum);
         });
     }
 

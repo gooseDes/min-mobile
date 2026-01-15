@@ -52,7 +52,7 @@ function Profile(props: ProfileProps) {
                 <View>
                     <Image source={{ uri: `${SERVER}/avatars/${user.id}.webp` }} style={styles.avatar} />
                     <Text style={[Styles.primaryText, styles.name]} selectable={true}>
-                        {user.name}
+                        {user.username}
                     </Text>
                 </View>
             )}

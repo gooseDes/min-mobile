@@ -1,8 +1,7 @@
 interface MessageData {
     id: number;
     text: string;
-    authorId: number;
-    authorName: string;
+    sender: UserData;
     chatId: number;
 }
 
@@ -14,7 +13,7 @@ interface ChatData {
 
 interface UserData {
     id: number;
-    name: string;
+    username: string;
 }
 
 interface CommandData {

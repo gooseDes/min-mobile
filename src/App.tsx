@@ -1,4 +1,5 @@
 import Notification, { NotificationHandle } from "@components/Notification";
+import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
 import notifee, { AndroidCategory, AndroidStyle } from "@notifee/react-native";
 import {
@@ -11,17 +12,20 @@ import {
 } from "@react-native-firebase/messaging";
 import { createNavigationContainerRef, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { useEffect, useRef, useState } from "react";
 import { StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
 import Auth from "./Auth";
+import db from "./db/Client";
 import HomePage, { HomePageHandler } from "./pages/HomePage";
 import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
-import Storage, { Keys } from "./Storage";
+import Storage from "./Storage";
 import { Colors } from "./Style";
 import Translation from "./Translation";
+import { CreateDatabase } from "./Utils";
 
 enableScreens();
 
@@ -76,7 +80,7 @@ function App() {
             name: "Min Channel",
             importance: 4,
         });
-        Storage.set(Keys.channelId, channel);
+        Storage.set("channelId", channel);
     }
 
     const sendFirebaseToken = async () => {
@@ -89,7 +93,22 @@ function App() {
     };
 
     useEffect(() => {
-        async function loadDefaultPage() {
+        async function migrateDatabaseAndLoadDefaultPage() {
+            if (Storage.getBoolean("createNewDB")) {
+                try {
+                    await migrate(db, migrations);
+                } catch (e) {
+                    console.warn("Standard migration failed:", e);
+                    await CreateDatabase();
+                }
+                Storage.remove("createNewDB");
+            } else {
+                try {
+                    await migrate(db, migrations);
+                } catch (e) {
+                    console.warn("Standard migration failed:", e);
+                }
+            }
             if (await Auth.getFromStorage("token")) {
                 setCurrentPage("home");
             } else {
@@ -99,7 +118,7 @@ function App() {
 
         Auth.init();
         Translation.init();
-        loadDefaultPage();
+        migrateDatabaseAndLoadDefaultPage();
 
         requestUserPermission();
 
@@ -126,7 +145,7 @@ function App() {
                 android: {
                     smallIcon: "ic_notification",
                     //largeIcon: `${SERVER}/avatars/${data.authorId}.webp`,
-                    channelId: Storage.getString(Keys.channelId) || "min",
+                    channelId: Storage.getString("channelId") || "min",
                     circularLargeIcon: true,
                     pressAction: {
                         id: "default",

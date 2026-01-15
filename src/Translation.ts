@@ -1,4 +1,4 @@
-import Storage, { Keys } from "./Storage";
+import Storage from "./Storage";
 
 export interface Language {
     chats?: string;
@@ -104,7 +104,7 @@ class Translation {
     }
 
     static init() {
-        const storedLang = Storage.getString(Keys.language);
+        const storedLang = Storage.getString("language");
         if (storedLang) {
             Translation.setCurrentLanguage(storedLang);
         }
@@ -129,7 +129,7 @@ export function changeLanguage(handler: PageProps["handler"] | null = null) {
     if (current === "en") newLang = "ru";
     if (current === "ru") newLang = "ua";
     if (current === "ua") newLang = "en";
-    Storage.set(Keys.language, newLang);
+    Storage.set("language", newLang);
     Translation.setCurrentLanguage(newLang);
     if (handler) handler({ action: "changeLanguage" });
 }

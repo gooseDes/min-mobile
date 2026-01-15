@@ -1,7 +1,10 @@
 import Auth from "@/Auth";
+import db from "@/db/Client";
+import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { changeLanguage, t } from "@/Translation";
+import { ClearCache, CreateUserData } from "@/Utils";
 import ChatsContainer, { ChatsContainerHandle } from "@components/ChatsContainer";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
@@ -13,17 +16,17 @@ import MessagesContainer, { MessagesContainerHandle } from "@components/Messages
 import Profile from "@components/Profile";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
+import { count, eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Alert, BackHandler, Keyboard, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-function CreateMessage(obj: any): MessageData {
+function CreateMessage(obj: any = {}): MessageData {
     return {
         id: obj.id || -1,
         text: obj.text || "",
-        authorId: obj.authorId || -1,
-        authorName: obj.authorName || "",
+        sender: CreateUserData(obj.sender || {}),
         chatId: obj.chatId || -1,
     };
 }
@@ -153,39 +156,154 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     }
 
     async function requestHistory() {
+        // Initialize messages from database
+        db.query.messagesTable
+            .findMany({
+                with: {
+                    sender: true,
+                    chat: true,
+                },
+                where: (table, { eq: eq_ }) => eq_(table.chatId, currentChatRef.current?.id || -1),
+            })
+            .then(messages_db => {
+                const messages = messages_db.slice().map(message => {
+                    return CreateMessage({
+                        id: message.id,
+                        text: message.content,
+                        sender: { id: message.sender?.id, name: message.sender?.username },
+                        chatId: message.chatId,
+                    });
+                });
+                messagesRef.current?.setMessages(messages);
+                messagesRef.current?.show();
+            });
+
+        // Initialize messages from socket
         const socket = await getSocket();
         socket.on("history", async data => {
+            const oldCountOfMessages = await db
+                .select({ count: count() })
+                .from(messagesTable)
+                .where(eq(messagesTable.chatId, data.messages[0].chat_id));
             messagesRef.current?.setMessages(
-                data.messages.slice().map((msg: any) =>
-                    CreateMessage({
-                        id: msg.id,
-                        text: msg.text,
-                        authorId: msg.author_id,
-                        authorName: msg.author,
-                        chatId: msg.chat,
+                await Promise.all(
+                    data.messages.slice().map(async (msg: any) => {
+                        await db
+                            .insert(usersTable)
+                            .values({
+                                id: msg.author_id,
+                                username: msg.author,
+                            })
+                            .onConflictDoUpdate({
+                                target: [usersTable.id],
+                                set: {
+                                    username: msg.author,
+                                },
+                            });
+                        await db
+                            .insert(messagesTable)
+                            .values({
+                                id: msg.id,
+                                content: msg.text,
+                                senderId: msg.author_id,
+                                chatId: msg.chat_id,
+                            })
+                            .onConflictDoUpdate({
+                                target: [messagesTable.id],
+                                set: {
+                                    content: msg.text,
+                                    senderId: msg.author_id,
+                                    chatId: msg.chat_id,
+                                },
+                            });
+                        return CreateMessage({
+                            id: msg.id,
+                            text: msg.text,
+                            sender: { id: msg.author_id, username: msg.author },
+                            chatId: msg.chat_id,
+                        });
                     }),
                 ),
             );
-            messagesRef.current?.show();
+            if (oldCountOfMessages[0].count > 0) {
+                const diff = oldCountOfMessages[0].count - data.messages.length;
+                messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
+            } else {
+                messagesRef.current?.show();
+            }
             socket.off("history");
         });
         socket.emit("getChatHistory", { chat: currentChat?.id || 1 });
     }
 
     async function requestChats() {
+        // Initialize chats from database
+        db.query.chatsTable
+            .findMany({
+                with: {
+                    chatUsers: {
+                        with: {
+                            user: true,
+                        },
+                    },
+                },
+            })
+            .then(chats_db => {
+                const chats = chats_db.slice().map(chat => {
+                    return CreateChat({
+                        id: chat.id,
+                        title: chat.title,
+                        participants: chat.chatUsers.map(chatUser => chatUser.user),
+                    });
+                });
+                chatsRef.current?.setChats(chats);
+                chatsRef.current?.show();
+            });
+
+        // Initialize chats from socket
         const socket = await getSocket();
         socket.on("chats", async data => {
+            // Clear db
+            try {
+                await db.delete(chatsTable);
+            } catch {}
+            try {
+                await db.delete(chatUsersTable);
+            } catch {}
+            try {
+                await db.delete(usersTable);
+            } catch {}
+
+            // Default chat
+            await db.insert(chatsTable).values({ id: 1, title: "Default Chat" }).onConflictDoNothing();
             const chats: ChatData[] = [CreateChat({ id: 1, title: "Default Chat", participants: [] })];
-            const chats2 = data.chats.slice().map((chat: any) =>
-                CreateChat({
+
+            // Read chats from db
+            let chats2 = data.chats.slice().map(async (chat: any) => {
+                await db.insert(chatsTable).values({ id: chat.id, title: chat.name });
+                chat.participants.forEach(async (user: any) => {
+                    await db
+                        .insert(usersTable)
+                        .values({ id: user.id, username: user.name })
+                        .onConflictDoUpdate({ target: usersTable.id, set: { username: user.name } });
+                    await db.insert(chatUsersTable).values({ chatId: chat.id, userId: user.id }).onConflictDoNothing();
+                });
+                return CreateChat({
                     id: chat.id,
                     title: chat.name,
-                    participants: chat.participants,
-                }),
-            );
+                    participants: chat.participants.map((user: any) => {
+                        user.username = user.name;
+                        delete user.name;
+                        return user;
+                    }),
+                });
+            });
+
+            // Show them
+            chats2 = await Promise.all(chats2);
             chats.push(...chats2);
             chatsRef.current?.setChats(chats);
-            chatsRef.current?.show();
+            chatsRef.current?.showWithoutAnimation();
             socket.off("chats");
         });
         socket.emit("getChats", {});
@@ -323,6 +441,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                     <FloatIslandButton icon="language" text={t.language} onPress={() => changeLanguage(props.handler)} />
                 )}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
+                {currentTab === "chats" && <FloatIslandButton icon="trash" text="Clear Cache" onPress={ClearCache} />}
 
                 {/* Profile Tab */}
                 {currentTab === "profile" && <Profile id={profileId} />}
