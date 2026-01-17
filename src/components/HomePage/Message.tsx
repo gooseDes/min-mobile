@@ -2,12 +2,12 @@ import Auth from "@/Auth";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { t } from "@/Translation";
+import Icon from "@components/Icon";
 import { SERVER } from "@env";
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Markdown, { MarkedStyles } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
-import Icon from "./Icon";
 
 const styles = StyleSheet.create({
     messageContainer: {

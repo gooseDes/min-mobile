@@ -15,8 +15,3 @@ interface UserData {
     id: number;
     username: string;
 }
-
-interface CommandData {
-    action: "go" | "changeLanguage" | "openPopup";
-    to?: "Home" | "Sign";
-}

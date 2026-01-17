@@ -1,6 +1,7 @@
 import Storage from "./Storage";
 
 export interface Language {
+    language_name?: string;
     chats?: string;
     log_out?: string;
     language?: string;
@@ -20,12 +21,22 @@ export interface Language {
     relogin?: string;
     relogin_msg?: string;
     ok?: string;
+    settings?: string;
+    now?: string;
+    change_language?: string;
+    clear_cache?: string;
+
+    // Settings
+    settings_general?: string;
+    settings_language?: string;
+    settings_cache?: string;
 }
 
 class Translation {
     static lang: string = "en";
 
     static en: Language = {
+        language_name: "English",
         chats: "Chats",
         log_out: "Log Out",
         language: "Language",
@@ -33,7 +44,7 @@ class Translation {
         have_account: "Have Account?",
         sign_up: "Sign Up",
         no_account: "No Account?",
-        welcome: "Welcome, Master!",
+        welcome: "Welcome!",
         login: "Login",
         email: "Email",
         password: "Password",
@@ -45,9 +56,19 @@ class Translation {
         relogin: "Relogin",
         relogin_msg: "Please relogin.",
         ok: "OK",
+        settings: "Settings",
+        now: "Now",
+        change_language: "Change Language",
+        clear_cache: "Clear Cache",
+
+        // Settings
+        settings_general: "General",
+        settings_language: "Language",
+        settings_cache: "Cache",
     };
 
     static ru: Language = {
+        language_name: "Русский",
         chats: "Чаты",
         log_out: "Выйти",
         language: "Язык",
@@ -67,9 +88,19 @@ class Translation {
         relogin: "Перелогинтесь",
         relogin_msg: "Пожалуйста, зайдите в свой аккаунт снова.",
         ok: "OK",
+        settings: "Настройки",
+        now: "Сейчас",
+        change_language: "Сменить язык",
+        clear_cache: "Очистить кэш",
+
+        // Settings
+        settings_general: "Общие",
+        settings_language: "Язык",
+        settings_cache: "Кэш",
     };
 
     static ua: Language = {
+        language_name: "Українська",
         chats: "Чати",
         log_out: "Вийти",
         language: "Мова",
@@ -89,6 +120,15 @@ class Translation {
         relogin: "Перелогинтесь",
         relogin_msg: "Будь ласка, зайдіть в свій акаунт повторно.",
         ok: "OK",
+        settings: "Налаштування",
+        now: "Зараз",
+        change_language: "Змінити мову",
+        clear_cache: "Очистити кеш",
+
+        // Settings
+        settings_general: "Загальні",
+        settings_language: "Мова",
+        settings_cache: "Кеш",
     };
 
     static getCurrentTranslation(): Language {

@@ -1,9 +1,9 @@
 import { useStorage } from "@/Storage";
+import ClickableProfile from "@components/ClickableProfile";
 import { SERVER } from "@env";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
 import Animated, { FadeOut } from "react-native-reanimated";
-import ClickableProfile from "./ClickableProfile";
 
 const styles = StyleSheet.create({
     chatsContainer: {

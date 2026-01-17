@@ -4,6 +4,7 @@ import { LinearTransition } from "react-native-reanimated";
 export class Colors {
     static backgroundColor = "#131317";
     static backgroundPanelColor = "#1f1f23dd";
+    static backgroundPanelColorOpaque = "#1e1e20";
     static borderColor = "#2d2d32dd";
     static messageBackgroundColor = "#1f1f23c2";
     static primaryTextColor = "#ffffff";
@@ -30,9 +31,19 @@ export const Styles = StyleSheet.create({
         color: Colors.primaryTextColor,
         fontFamily: "Rubik",
     },
+    primaryCenter: {
+        color: Colors.primaryTextColor,
+        fontFamily: "Rubik",
+        textAlign: "center",
+    },
     secondaryText: {
         color: Colors.secondaryTextColor,
         fontFamily: "Rubik",
+    },
+    secondaryCenter: {
+        color: Colors.secondaryTextColor,
+        fontFamily: "Rubik",
+        textAlign: "center",
     },
     titleText: {
         color: Colors.primaryTextColor,
@@ -48,5 +59,11 @@ export const Styles = StyleSheet.create({
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
+    },
+    header: {
+        color: Colors.primaryTextColor,
+        fontSize: 24,
+        fontFamily: "Rubik",
+        textAlign: "center",
     },
 });

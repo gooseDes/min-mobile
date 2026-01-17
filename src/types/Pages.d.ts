@@ -1,3 +1,12 @@
+interface PageHandler {
+    (command: CommandData): void;
+}
+
 interface PageProps {
-    handler: (command: CommandData) => void;
+    handler: PageHandler;
+}
+
+interface CommandData {
+    action: "go" | "changeLanguage" | "back";
+    to?: "Home" | "Sign" | "Settings";
 }

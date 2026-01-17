@@ -2,6 +2,7 @@ import Notification, { NotificationHandle } from "@components/Notification";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
 import notifee, { AndroidCategory, AndroidStyle } from "@notifee/react-native";
+import SettingsPage from "@pages/SettingsPage";
 import {
     AuthorizationStatus,
     getMessaging,
@@ -51,6 +52,7 @@ const stackOptions: NativeStackNavigationOptions = {
 type RootStackParamList = {
     Home: undefined;
     Sign: undefined;
+    Settings: undefined;
 };
 
 function App() {
@@ -192,6 +194,9 @@ function App() {
                     navigationRef.navigate(command.to as any);
                 }
                 break;
+            case "back":
+                navigationRef.goBack();
+                break;
             case "changeLanguage":
                 forceUpdate(Date.now());
                 break;
@@ -208,6 +213,9 @@ function App() {
                     </Stack.Screen>
                     <Stack.Screen name="Sign" options={stackOptions}>
                         {() => <SignPage handler={commandHandler} />}
+                    </Stack.Screen>
+                    <Stack.Screen name="Settings" options={stackOptions}>
+                        {() => <SettingsPage handler={commandHandler} />}
                     </Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>

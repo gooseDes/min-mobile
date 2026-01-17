@@ -3,22 +3,22 @@ import db from "@/db/Client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
-import { changeLanguage, t } from "@/Translation";
-import { ClearCache, CreateUserData } from "@/Utils";
-import ChatsContainer, { ChatsContainerHandle } from "@components/ChatsContainer";
+import { t } from "@/Translation";
+import { CreateUserData } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
+import ChatsContainer, { ChatsContainerHandle } from "@components/HomePage/ChatsContainer";
+import MessageInput from "@components/HomePage/MessageInput";
+import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
-import MessageInput from "@components/MessageInput";
-import MessagesContainer, { MessagesContainerHandle } from "@components/MessagesContainer";
 import Profile from "@components/Profile";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
 import { count, eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { Alert, BackHandler, Keyboard, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
+import { Alert, BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -170,7 +170,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                     return CreateMessage({
                         id: message.id,
                         text: message.content,
-                        sender: { id: message.sender?.id, name: message.sender?.username },
+                        sender: { id: message.sender?.id, username: message.sender?.username },
                         chatId: message.chatId,
                     });
                 });
@@ -438,10 +438,13 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (
-                    <FloatIslandButton icon="language" text={t.language} onPress={() => changeLanguage(props.handler)} />
+                    <FloatIslandButton
+                        icon="gear"
+                        text={t.settings}
+                        onPress={() => props.handler({ action: "go", to: "Settings" })}
+                    />
                 )}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
-                {currentTab === "chats" && <FloatIslandButton icon="trash" text="Clear Cache" onPress={ClearCache} />}
 
                 {/* Profile Tab */}
                 {currentTab === "profile" && <Profile id={profileId} />}
@@ -456,15 +459,15 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                 {/* Chats Tab */}
                 {currentTab === "chats" && (
                     <Animated.View
-                        style={[{ display: "flex", flexDirection: "row", alignItems: "center" }]}
+                        style={[{ display: "flex", flexDirection: "row", alignItems: "center", margin: 10, marginTop: 4 }]}
                         layout={Constants.layoutTransition}
                         entering={ZoomIn}
                         exiting={ZoomOut}
                     >
                         <Icon name="comments" size={24} color={Colors.primaryTextColor} />
-                        <Animated.Text style={[Styles.primaryText, { fontSize: 24, margin: 10, fontWeight: "bold" }]}>
+                        <Text style={[Styles.primaryText, { fontSize: 24, marginLeft: 10, fontWeight: "bold" }]}>
                             {t.chats}
-                        </Animated.Text>
+                        </Text>
                     </Animated.View>
                 )}
                 {currentTab === "chats" && <Divider />}

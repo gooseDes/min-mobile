@@ -12,12 +12,6 @@ export function CreateUserData(obj: any = {}): UserData {
     };
 }
 
-export async function ClearCache() {
-    sqliteClient.delete();
-    Storage.set("createNewDB", true);
-    Alert.alert("Cache Cleared", "Now we need you to restart the app");
-}
-
 export async function CreateDatabase() {
     console.log("Creating Database");
     const migrationEntries = Object.entries(migrations.migrations || {});
@@ -45,4 +39,10 @@ export async function CreateDatabase() {
     }
 
     console.log("Database created successfully");
+}
+
+export async function ClearCache() {
+    sqliteClient.delete();
+    Storage.set("createNewDB", true);
+    Alert.alert("Cache Cleared", "Now we need you to restart the app");
 }

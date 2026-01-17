@@ -1,9 +1,9 @@
 import { Colors, Constants } from "@/Style";
 import { t } from "@/Translation";
+import IconButton from "@components/IconButton";
 import { useState } from "react";
 import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
-import IconButton from "./IconButton";
 
 const styles = StyleSheet.create({
     container: {

@@ -1,7 +1,10 @@
+import db from "@/db/Client";
+import { usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Constants, Styles } from "@/Style";
 import { CreateUserData } from "@/Utils";
 import { SERVER } from "@env";
+import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
@@ -36,9 +39,14 @@ function Profile(props: ProfileProps) {
 
     useEffect(() => {
         async function fetchUser() {
+            // Get user info from db
+            const userData = await db.select().from(usersTable).where(eq(usersTable.id, props.id)).limit(1);
+            setUser(CreateUserData(userData[0]));
+
+            // Get user info from socket
             const socket = await getSocket();
             socket.on("userInfo", data => {
-                setUser(CreateUserData(data.user));
+                setUser(CreateUserData({ id: data.user?.id, username: data.user?.name }));
                 socket.off("userInfo");
             });
             socket.emit("getUserInfo", { id: props.id });

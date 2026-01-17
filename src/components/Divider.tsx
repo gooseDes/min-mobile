@@ -11,8 +11,12 @@ const styles = StyleSheet.create({
     },
 });
 
-function Divider() {
-    return <View style={styles.divider} />;
+interface DividerProps {
+    style?: any;
+}
+
+function Divider(props: DividerProps) {
+    return <View style={[styles.divider, props.style]} />;
 }
 
 export default Divider;
