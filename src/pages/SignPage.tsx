@@ -1,6 +1,6 @@
 import Auth from "@/Auth";
 import { Colors, Constants, Styles } from "@/Style";
-import { changeLanguage, t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import Button from "@components/Button";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
@@ -54,6 +54,7 @@ function SignPage(props: PageProps) {
     const [passwordValue, setPasswordValue] = useState<string>("");
     const [confirmPasswordValue, setConfirmPasswordValue] = useState<string>("");
     const [state, setState] = useState<"sign_in" | "sign_up">("sign_in");
+    const { t, changeLanguage } = useTranslation();
 
     async function SignIn() {
         if (await Auth.login(emailValue, passwordValue)) {
@@ -142,7 +143,7 @@ function SignPage(props: PageProps) {
 
             {/* Language Change Button */}
             <Animated.View style={styles.languageButtonContainer} layout={Constants.layoutTransition}>
-                <TouchableOpacity style={styles.languageButton} onPress={() => changeLanguage(props.handler)}>
+                <TouchableOpacity style={styles.languageButton} onPress={changeLanguage}>
                     <Icon name="language" size={24} color="#fff" />
                     <Text style={Styles.primaryText}>{t.language}</Text>
                 </TouchableOpacity>

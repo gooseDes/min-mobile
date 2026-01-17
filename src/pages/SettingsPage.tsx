@@ -1,6 +1,6 @@
 import settings from "@/Settings";
 import { Colors, Constants, Styles } from "@/Style";
-import { t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
@@ -57,6 +57,8 @@ const styles = StyleSheet.create({
 });
 
 function SettingsPage(props: PageProps) {
+    const { t } = useTranslation();
+
     return (
         <SafeAreaView style={Styles.container}>
             <View style={styles.panel}>

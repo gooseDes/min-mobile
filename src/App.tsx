@@ -26,6 +26,7 @@ import { getSocket } from "./Socket";
 import Storage from "./Storage";
 import { Colors } from "./Style";
 import Translation from "./Translation";
+import { TranslationProvider } from "./TranslationContext";
 import { CreateDatabase } from "./Utils";
 
 enableScreens();
@@ -57,7 +58,6 @@ type RootStackParamList = {
 
 function App() {
     const [currentPage, setCurrentPage] = useState<string>("none");
-    const [, forceUpdate] = useState<number>(0);
     const notificationRef = useRef<NotificationHandle | null>(null);
     const homePageRef = useRef<HomePageHandler | null>(null);
     const currentPageRef = useRef<string>(currentPage);
@@ -112,9 +112,9 @@ function App() {
                 }
             }
             if (await Auth.getFromStorage("token")) {
-                setCurrentPage("home");
+                setCurrentPage("Home");
             } else {
-                setCurrentPage("sign");
+                setCurrentPage("Sign");
             }
         }
 
@@ -197,30 +197,29 @@ function App() {
             case "back":
                 navigationRef.goBack();
                 break;
-            case "changeLanguage":
-                forceUpdate(Date.now());
-                break;
         }
     }
 
     return (
-        <SafeAreaProvider key={forceUpdate.toString()} style={{ backgroundColor: Colors.backgroundColor }}>
-            <StatusBar barStyle={"light-content"} />
-            <NavigationContainer ref={navigationRef}>
-                <Stack.Navigator initialRouteName="Home">
-                    <Stack.Screen name="Home" options={stackOptions}>
-                        {() => <HomePage ref={homePageRef} handler={commandHandler} />}
-                    </Stack.Screen>
-                    <Stack.Screen name="Sign" options={stackOptions}>
-                        {() => <SignPage handler={commandHandler} />}
-                    </Stack.Screen>
-                    <Stack.Screen name="Settings" options={stackOptions}>
-                        {() => <SettingsPage handler={commandHandler} />}
-                    </Stack.Screen>
-                </Stack.Navigator>
-            </NavigationContainer>
-            <Notification ref={notificationRef} title="Default Title" text="Default Text" />
-        </SafeAreaProvider>
+        <TranslationProvider>
+            <SafeAreaProvider style={{ backgroundColor: Colors.backgroundColor }}>
+                <StatusBar barStyle={"light-content"} />
+                <NavigationContainer ref={navigationRef}>
+                    <Stack.Navigator initialRouteName="Home">
+                        <Stack.Screen name="Home" options={stackOptions}>
+                            {() => <HomePage ref={homePageRef} handler={commandHandler} />}
+                        </Stack.Screen>
+                        <Stack.Screen name="Sign" options={stackOptions}>
+                            {() => <SignPage handler={commandHandler} />}
+                        </Stack.Screen>
+                        <Stack.Screen name="Settings" options={stackOptions}>
+                            {() => <SettingsPage handler={commandHandler} />}
+                        </Stack.Screen>
+                    </Stack.Navigator>
+                </NavigationContainer>
+                <Notification ref={notificationRef} title="Default Title" text="Default Text" />
+            </SafeAreaProvider>
+        </TranslationProvider>
     );
 }
 

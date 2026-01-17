@@ -1,5 +1,5 @@
 import { Colors, Constants } from "@/Style";
-import { t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import IconButton from "@components/IconButton";
 import { useState } from "react";
 import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native";
@@ -41,6 +41,7 @@ interface MessageInputProps {
 }
 
 function MessageInput(props: MessageInputProps) {
+    const { t } = useTranslation();
     const [value, setValue] = useState<string>("");
 
     function onChangeText(text: string) {

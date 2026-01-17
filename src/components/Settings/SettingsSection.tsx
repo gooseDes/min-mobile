@@ -1,5 +1,5 @@
 import { Colors, Constants, Styles } from "@/Style";
-import { changeLanguage, t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import { ClearCache } from "@/Utils";
 import Icon from "@components/Icon";
 import { JSX, useEffect, useRef, useState } from "react";
@@ -87,6 +87,8 @@ function SettingsSection(props: SettingsSectionProps) {
     const contentBgColor = useSharedValue<string>("#ffffff00");
     const contentBorderWidth = useSharedValue<number>(0);
     const contentZIndex = useSharedValue<number>(0);
+
+    const { t, changeLanguage } = useTranslation();
 
     useEffect(() => {
         contentPosition.value = expanded ? "absolute" : "relative";

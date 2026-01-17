@@ -163,7 +163,7 @@ export const t: Language = new Proxy(
     },
 );
 
-export function changeLanguage(handler: PageProps["handler"] | null = null) {
+export function changeLanguage() {
     const current = Translation.getCurrentLanguage();
     let newLang: string = "";
     if (current === "en") newLang = "ru";
@@ -171,5 +171,4 @@ export function changeLanguage(handler: PageProps["handler"] | null = null) {
     if (current === "ua") newLang = "en";
     Storage.set("language", newLang);
     Translation.setCurrentLanguage(newLang);
-    if (handler) handler({ action: "changeLanguage" });
 }

@@ -3,7 +3,7 @@ import db from "@/db/Client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
-import { t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import { CreateUserData } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
@@ -82,6 +82,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [profileId, setProfileId] = useState<number>(-1);
     const lastBackButtonPress = useRef<number>(0);
+    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
         getCurrentChat: () => currentChatRef.current || CreateChat({}),

@@ -1,7 +1,7 @@
 import Auth from "@/Auth";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
-import { t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import Icon from "@components/Icon";
 import { SERVER } from "@env";
 import React, { useEffect, useState } from "react";
@@ -84,6 +84,8 @@ function MessageBase(props: MessageProps) {
     const text = props.children?.toString() || "";
     const is_reply = text.startsWith("/reply");
     const [replyText, setReplyText] = useState<string>("");
+
+    const { t } = useTranslation();
 
     async function getReplyText() {
         const replyId = parseInt(text.split("\n")[0].split(" ")[1], 10);

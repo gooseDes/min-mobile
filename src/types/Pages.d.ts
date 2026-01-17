@@ -7,6 +7,6 @@ interface PageProps {
 }
 
 interface CommandData {
-    action: "go" | "changeLanguage" | "back";
+    action: "go" | "back";
     to?: "Home" | "Sign" | "Settings";
 }
