@@ -9,7 +9,7 @@ import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
 import ChatsContainer, { ChatsContainerHandle } from "@components/HomePage/ChatsContainer";
-import MessageInput from "@components/HomePage/MessageInput";
+import MessageInput, { MessageInputHandle } from "@components/HomePage/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
@@ -82,6 +82,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [profileId, setProfileId] = useState<number>(-1);
     const lastBackButtonPress = useRef<number>(0);
+    const messageInputRef = useRef<MessageInputHandle>(null);
     const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
@@ -373,6 +374,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
             messagesRef.current?.hide();
         }
         if (currentTab === "chat") {
+            messageInputRef.current?.fixBlur();
             requestHistory();
         }
         if (currentTab === "profile") {
@@ -455,7 +457,9 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
             <Animated.View style={[styles.panel, styles.contentPanel, contentPanelStyle]} layout={Constants.layoutTransition}>
                 {/* Chat Tab */}
                 {currentTab === "chat" && <MessagesContainer bottomGap={60} ref={messagesRef} />}
-                {currentTab === "chat" && <MessageInput style={{ position: "absolute", bottom: 10 }} onSend={sendMessage} />}
+                {currentTab === "chat" && (
+                    <MessageInput ref={messageInputRef} style={{ position: "absolute", bottom: 10 }} onSend={sendMessage} />
+                )}
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (

@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
 const markdownStyles: MarkedStyles = {
     table: { borderWidth: Constants.borderWidth, borderColor: Colors.borderColor },
     blockquote: { marginVertical: 8 },
+    text: { color: Colors.primaryTextColor },
 };
 
 const markdownFlatListProps: any = {

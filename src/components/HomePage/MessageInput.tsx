@@ -1,9 +1,10 @@
 import { Colors, Constants } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
-import IconButton from "@components/IconButton";
-import { useState } from "react";
-import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import Icon from "@components/Icon";
+import { BlurView } from "@react-native-community/blur";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
     container: {
@@ -17,6 +18,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderColor,
         borderRadius: Constants.rounding,
         backgroundColor: Colors.backgroundPanelColor,
+        overflow: "hidden",
     },
     input: {
         flex: 1,
@@ -26,23 +28,47 @@ const styles = StyleSheet.create({
         color: Colors.primaryTextColor,
     },
     sendButton: {
-        aspectRatio: 1,
         height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
     },
+    blur: {
+        display: "flex",
+    },
+    actualContent: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+        width: "100%",
+    },
 });
 
-interface MessageInputProps {
+export interface MessageInputProps {
     onTextChanged?: (text: string) => void;
     onSend?: (text: string) => void;
     style?: StyleProp<ViewStyle>;
 }
 
-function MessageInput(props: MessageInputProps) {
+export interface MessageInputHandle {
+    fixBlur: () => void;
+}
+
+const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, ref) => {
     const { t } = useTranslation();
     const [value, setValue] = useState<string>("");
+    const [sendButtonAspectRatio, setSendButtonAspectRatio] = useState<number>(1);
+
+    useImperativeHandle(ref, () => ({
+        fixBlur: () => {
+            // Rerendering the sendButton
+            setSendButtonAspectRatio(0.9);
+            setTimeout(() => {
+                setSendButtonAspectRatio(1);
+            }, 0);
+        },
+    }));
 
     function onChangeText(text: string) {
         setValue(text);
@@ -56,23 +82,36 @@ function MessageInput(props: MessageInputProps) {
 
     return (
         <Animated.View
-            entering={ZoomIn}
-            exiting={ZoomOut}
+            entering={SlideInDown}
+            exiting={SlideOutDown}
             layout={Constants.layoutTransition}
             style={[styles.container, props.style]}
         >
-            <TextInput
-                style={styles.input}
-                placeholder={t.your_message}
-                multiline={true}
-                onChangeText={onChangeText}
-                value={value}
-            />
-            <View style={styles.sendButton}>
-                <IconButton icon="paper-plane" onPress={onSend} />
-            </View>
+            <BlurView
+                style={[StyleSheet.absoluteFill, styles.blur]}
+                blurType="light"
+                blurAmount={8}
+                overlayColor="transparent"
+                reducedTransparencyFallbackColor="black"
+            >
+                <View style={styles.actualContent}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t.your_message}
+                        placeholderTextColor={Colors.secondaryTextColor}
+                        multiline={true}
+                        onChangeText={onChangeText}
+                        value={value}
+                    />
+                    <View style={[styles.sendButton, { aspectRatio: sendButtonAspectRatio }]}>
+                        <TouchableOpacity onPress={onSend}>
+                            <Icon name="paper-plane" size={24} color={Colors.primaryTextColor} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </BlurView>
         </Animated.View>
     );
-}
+});
 
 export default MessageInput;
