@@ -1,8 +1,9 @@
 import { Colors, Constants } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import Icon from "@components/Icon";
-import { BlurView } from "@react-native-community/blur";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import SurelyAnimatedView from "@components/SurelyAnimatedView";
+import { BlurView } from "@danielsaraldi/react-native-blur-view";
+import { forwardRef, useState } from "react";
 import { StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
@@ -13,7 +14,6 @@ const styles = StyleSheet.create({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        flexDirection: "row",
         borderWidth: Constants.borderWidth,
         borderColor: Colors.borderColor,
         borderRadius: Constants.rounding,
@@ -32,16 +32,15 @@ const styles = StyleSheet.create({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-    },
-    blur: {
-        display: "flex",
+        overflow: "hidden",
+        marginRight: 10,
     },
     actualContent: {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        width: "100%",
+        flex: 1,
     },
 });
 
@@ -51,24 +50,11 @@ export interface MessageInputProps {
     style?: StyleProp<ViewStyle>;
 }
 
-export interface MessageInputHandle {
-    fixBlur: () => void;
-}
+export interface MessageInputHandle {}
 
-const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, ref) => {
+const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, _ref) => {
     const { t } = useTranslation();
     const [value, setValue] = useState<string>("");
-    const [sendButtonAspectRatio, setSendButtonAspectRatio] = useState<number>(1);
-
-    useImperativeHandle(ref, () => ({
-        fixBlur: () => {
-            // Rerendering the sendButton
-            setSendButtonAspectRatio(0.9);
-            setTimeout(() => {
-                setSendButtonAspectRatio(1);
-            }, 0);
-        },
-    }));
 
     function onChangeText(text: string) {
         setValue(text);
@@ -81,20 +67,15 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
     }
 
     return (
-        <Animated.View
+        <SurelyAnimatedView
+            style={props.style}
             entering={SlideInDown}
             exiting={SlideOutDown}
             layout={Constants.layoutTransition}
-            style={[styles.container, props.style]}
         >
-            <BlurView
-                style={[StyleSheet.absoluteFill, styles.blur]}
-                blurType="light"
-                blurAmount={8}
-                overlayColor="transparent"
-                reducedTransparencyFallbackColor="black"
-            >
-                <View style={styles.actualContent}>
+            <Animated.View style={styles.container}>
+                <BlurView style={StyleSheet.absoluteFill} targetId="chat-blur-target" type="dark" />
+                <View style={[StyleSheet.absoluteFill, styles.actualContent]}>
                     <TextInput
                         style={styles.input}
                         placeholder={t.your_message}
@@ -103,14 +84,14 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                         onChangeText={onChangeText}
                         value={value}
                     />
-                    <View style={[styles.sendButton, { aspectRatio: sendButtonAspectRatio }]}>
+                    <View style={styles.sendButton}>
                         <TouchableOpacity onPress={onSend}>
                             <Icon name="paper-plane" size={24} color={Colors.primaryTextColor} />
                         </TouchableOpacity>
                     </View>
                 </View>
-            </BlurView>
-        </Animated.View>
+            </Animated.View>
+        </SurelyAnimatedView>
     );
 });
 

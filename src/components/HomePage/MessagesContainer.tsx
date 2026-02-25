@@ -1,11 +1,16 @@
 import { useStorage } from "@/Storage";
 import { Constants } from "@/Style";
+import { BlurTarget } from "@danielsaraldi/react-native-blur-view";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import Animated, { FadeOut } from "react-native-reanimated";
 import Message from "./Message";
 
 const styles = StyleSheet.create({
+    blurTarget: {
+        width: "100%",
+        flex: 1,
+    },
     messagesContainer: {
         flex: 1,
         width: "100%",
@@ -84,20 +89,22 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
     };
 
     return (
-        <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
-            <FlatList
-                style={styles.messagesContainer}
-                contentContainerStyle={{ paddingTop: bottomGap }}
-                data={reversedMessages}
-                renderItem={renderMessage}
-                keyExtractor={(_, index) => index.toString()}
-                ItemSeparatorComponent={splitter}
-                inverted={true}
-                initialNumToRender={15}
-                windowSize={10}
-                {...props}
-            />
-        </Animated.View>
+        <BlurTarget id="chat-blur-target" style={styles.blurTarget}>
+            <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
+                <FlatList
+                    style={styles.messagesContainer}
+                    contentContainerStyle={{ paddingTop: bottomGap }}
+                    data={reversedMessages}
+                    renderItem={renderMessage}
+                    keyExtractor={(_, index) => index.toString()}
+                    ItemSeparatorComponent={splitter}
+                    inverted={true}
+                    initialNumToRender={15}
+                    windowSize={10}
+                    {...props}
+                />
+            </Animated.View>
+        </BlurTarget>
     );
 });
 

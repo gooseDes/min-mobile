@@ -14,6 +14,7 @@ import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import Profile from "@components/Profile";
+import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
 import { count, eq } from "drizzle-orm";
@@ -280,7 +281,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
             await db.insert(chatsTable).values({ id: 1, title: "Default Chat" }).onConflictDoNothing();
             const chats: ChatData[] = [CreateChat({ id: 1, title: "Default Chat", participants: [] })];
 
-            // Read chats from db
+            // Saving chats to db
             let chats2 = data.chats.slice().map(async (chat: any) => {
                 await db.insert(chatsTable).values({ id: chat.id, title: chat.name });
                 chat.participants.forEach(async (user: any) => {
@@ -336,9 +337,8 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         CreateMessage({
                             id: message.id,
                             text: message.text,
-                            authorId: message.author_id,
-                            authorName: message.author,
-                            chatId: message.chat,
+                            sender: { id: message.author_id, username: message.author },
+                            chatId: message.chat_id,
                         }),
                     );
                 }
@@ -374,7 +374,6 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
             messagesRef.current?.hide();
         }
         if (currentTab === "chat") {
-            messageInputRef.current?.fixBlur();
             requestHistory();
         }
         if (currentTab === "profile") {
@@ -458,12 +457,16 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                 {/* Chat Tab */}
                 {currentTab === "chat" && <MessagesContainer bottomGap={60} ref={messagesRef} />}
                 {currentTab === "chat" && (
-                    <MessageInput ref={messageInputRef} style={{ position: "absolute", bottom: 10 }} onSend={sendMessage} />
+                    <MessageInput
+                        ref={messageInputRef}
+                        style={{ position: "absolute", bottom: 10, width: "100%" }}
+                        onSend={sendMessage}
+                    />
                 )}
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (
-                    <Animated.View
+                    <SurelyAnimatedView
                         style={[{ display: "flex", flexDirection: "row", alignItems: "center", margin: 10, marginTop: 4 }]}
                         layout={Constants.layoutTransition}
                         entering={ZoomIn}
@@ -473,7 +476,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         <Text style={[Styles.primaryText, { fontSize: 24, marginLeft: 10, fontWeight: "bold" }]}>
                             {t.chats}
                         </Text>
-                    </Animated.View>
+                    </SurelyAnimatedView>
                 )}
                 {currentTab === "chats" && <Divider />}
                 {currentTab === "chats" && <ChatsContainer bottomGap={70} handler={handleChat} ref={chatsRef} />}
