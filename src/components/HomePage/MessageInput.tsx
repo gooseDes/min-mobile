@@ -1,4 +1,4 @@
-import { Colors, Constants } from "@/Style";
+import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import Icon from "@components/Icon";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
         paddingHorizontal: 16,
-        color: Colors.primaryTextColor,
+        ...Styles.primaryText,
     },
     sendButton: {
         height: "100%",

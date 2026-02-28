@@ -1,10 +1,11 @@
 import Auth from "@/Auth";
 import db from "@/db/Client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Schema";
+import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/Utils";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
-import { CreateUserData } from "@/Utils";
+import { CreateChat, CreateMessage } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
@@ -22,23 +23,6 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 import { Alert, BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-function CreateMessage(obj: any = {}): MessageData {
-    return {
-        id: obj.id || -1,
-        text: obj.text || "",
-        sender: CreateUserData(obj.sender || {}),
-        chatId: obj.chatId || -1,
-    };
-}
-
-function CreateChat(obj: any): ChatData {
-    return {
-        id: obj.id || -1,
-        title: obj.title || "",
-        participants: obj.participants || [],
-    };
-}
 
 const styles = StyleSheet.create({
     panel: {
@@ -184,50 +168,12 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
         // Initialize messages from socket
         const socket = await getSocket();
         socket.on("history", async data => {
+            console.log(data);
             const oldCountOfMessages = await db
                 .select({ count: count() })
                 .from(messagesTable)
                 .where(eq(messagesTable.chatId, data.messages[0].chat_id));
-            messagesRef.current?.setMessages(
-                await Promise.all(
-                    data.messages.slice().map(async (msg: any) => {
-                        await db
-                            .insert(usersTable)
-                            .values({
-                                id: msg.author_id,
-                                username: msg.author,
-                            })
-                            .onConflictDoUpdate({
-                                target: [usersTable.id],
-                                set: {
-                                    username: msg.author,
-                                },
-                            });
-                        await db
-                            .insert(messagesTable)
-                            .values({
-                                id: msg.id,
-                                content: msg.text,
-                                senderId: msg.author_id,
-                                chatId: msg.chat_id,
-                            })
-                            .onConflictDoUpdate({
-                                target: [messagesTable.id],
-                                set: {
-                                    content: msg.text,
-                                    senderId: msg.author_id,
-                                    chatId: msg.chat_id,
-                                },
-                            });
-                        return CreateMessage({
-                            id: msg.id,
-                            text: msg.text,
-                            sender: { id: msg.author_id, username: msg.author },
-                            chatId: msg.chat_id,
-                        });
-                    }),
-                ),
-            );
+            messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
             if (oldCountOfMessages[0].count > 0) {
                 const diff = oldCountOfMessages[0].count - data.messages.length;
                 messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
@@ -277,35 +223,8 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                 await db.delete(usersTable);
             } catch {}
 
-            // Default chat
-            await db.insert(chatsTable).values({ id: 1, title: "Default Chat" }).onConflictDoNothing();
-            const chats: ChatData[] = [CreateChat({ id: 1, title: "Default Chat", participants: [] })];
-
-            // Saving chats to db
-            let chats2 = data.chats.slice().map(async (chat: any) => {
-                await db.insert(chatsTable).values({ id: chat.id, title: chat.name });
-                chat.participants.forEach(async (user: any) => {
-                    await db
-                        .insert(usersTable)
-                        .values({ id: user.id, username: user.name })
-                        .onConflictDoUpdate({ target: usersTable.id, set: { username: user.name } });
-                    await db.insert(chatUsersTable).values({ chatId: chat.id, userId: user.id }).onConflictDoNothing();
-                });
-                return CreateChat({
-                    id: chat.id,
-                    title: chat.name,
-                    participants: chat.participants.map((user: any) => {
-                        user.username = user.name;
-                        delete user.name;
-                        return user;
-                    }),
-                });
-            });
-
-            // Show them
-            chats2 = await Promise.all(chats2);
-            chats.push(...chats2);
-            chatsRef.current?.setChats(chats);
+            // Save chats to db, reformat and show them
+            chatsRef.current?.setChats(await ProcessChatsAndReturn(data));
             chatsRef.current?.showWithoutAnimation();
             socket.off("chats");
         });
@@ -473,9 +392,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         exiting={ZoomOut}
                     >
                         <Icon name="comments" size={24} color={Colors.primaryTextColor} />
-                        <Text style={[Styles.primaryText, { fontSize: 24, marginLeft: 10, fontWeight: "bold" }]}>
-                            {t.chats}
-                        </Text>
+                        <Text style={[Styles.primaryBoldText, { fontSize: 24, marginLeft: 10 }]}>{t.chats}</Text>
                     </SurelyAnimatedView>
                 )}
                 {currentTab === "chats" && <Divider />}

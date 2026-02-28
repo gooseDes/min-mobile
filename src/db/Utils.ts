@@ -1,0 +1,82 @@
+import { CreateChat, CreateMessage } from "@/Utils";
+import db from "./Client";
+import { chatsTable, chatUsersTable, messagesTable, usersTable } from "./Schema";
+
+export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageData[]> {
+    return Promise.all(
+        history_payload.messages.slice().map(async (msg: any) => {
+            await db
+                .insert(usersTable)
+                .values({
+                    id: msg.author_id,
+                    username: msg.author,
+                })
+                .onConflictDoUpdate({
+                    target: [usersTable.id],
+                    set: {
+                        username: msg.author,
+                    },
+                });
+            await db
+                .insert(messagesTable)
+                .values({
+                    id: msg.id,
+                    content: msg.text,
+                    senderId: msg.author_id,
+                    chatId: msg.chat_id,
+                })
+                .onConflictDoUpdate({
+                    target: [messagesTable.id],
+                    set: {
+                        content: msg.text,
+                        senderId: msg.author_id,
+                        chatId: msg.chat_id,
+                    },
+                });
+            return CreateMessage({
+                id: msg.id,
+                text: msg.text,
+                sender: { id: msg.author_id, username: msg.author },
+                chatId: msg.chat_id,
+            });
+        }),
+    );
+}
+
+export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
+    const promises: Promise<any>[] = [];
+
+    // Default chat
+    const defaultChatPromise = async (): Promise<ChatData> => {
+        await db.insert(chatsTable).values({ id: 1, title: "Default Chat" }).onConflictDoNothing();
+        return CreateChat({ id: 1, title: "Default Chat", participants: [] });
+    };
+    promises.push(defaultChatPromise());
+
+    // Saving chats to db
+    promises.push(
+        ...chats_payload.chats.slice().map(async (chat: any) => {
+            await db.insert(chatsTable).values({ id: chat.id, title: chat.name });
+            await Promise.all(
+                chat.participants.map(async (user: any) => {
+                    await db
+                        .insert(usersTable)
+                        .values({ id: user.id, username: user.name })
+                        .onConflictDoUpdate({ target: usersTable.id, set: { username: user.name } });
+                    await db.insert(chatUsersTable).values({ chatId: chat.id, userId: user.id }).onConflictDoNothing();
+                }),
+            );
+            return CreateChat({
+                id: chat.id,
+                title: chat.name,
+                participants: chat.participants.map((user: any) => {
+                    user.username = user.name;
+                    delete user.name;
+                    return user;
+                }),
+            });
+        }),
+    );
+
+    return Promise.all(promises);
+}

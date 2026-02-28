@@ -43,7 +43,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 24,
-        fontWeight: "bold",
     },
     popupContent: {
         flex: 1,
@@ -161,7 +160,6 @@ function SettingsSection(props: SettingsSectionProps) {
                                     <TouchableOpacity
                                         onPress={() => {
                                             changeLanguage();
-                                            props.handler({ action: "changeLanguage" });
                                         }}
                                     >
                                         <Text

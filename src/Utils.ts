@@ -12,6 +12,23 @@ export function CreateUserData(obj: any = {}): UserData {
     };
 }
 
+export function CreateMessage(obj: any = {}): MessageData {
+    return {
+        id: obj.id || -1,
+        text: obj.text || "",
+        sender: CreateUserData(obj.sender || {}),
+        chatId: obj.chatId || -1,
+    };
+}
+
+export function CreateChat(obj: any): ChatData {
+    return {
+        id: obj.id || -1,
+        title: obj.title || "",
+        participants: obj.participants || [],
+    };
+}
+
 export async function CreateDatabase() {
     console.log("Creating Database");
     const migrationEntries = Object.entries(migrations.migrations || {});

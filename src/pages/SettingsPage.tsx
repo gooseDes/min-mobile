@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 24,
         marginLeft: 10,
-        fontWeight: "bold",
     },
     content: {
         display: "flex",
@@ -70,7 +69,7 @@ function SettingsPage(props: PageProps) {
                     {/* Title */}
                     <View style={styles.title}>
                         <Icon name="gear" size={24} color={Colors.primaryTextColor} />
-                        <Text style={[Styles.primaryText, styles.titleText]}>{t.settings}</Text>
+                        <Text style={[Styles.primaryBoldText, styles.titleText]}>{t.settings}</Text>
                     </View>
 
                     {/* Spacer */}

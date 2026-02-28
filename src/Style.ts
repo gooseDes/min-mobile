@@ -31,6 +31,10 @@ export const Styles = StyleSheet.create({
         color: Colors.primaryTextColor,
         fontFamily: "Rubik",
     },
+    primaryBoldText: {
+        color: Colors.primaryTextColor,
+        fontFamily: "Rubik-Medium",
+    },
     primaryCenter: {
         color: Colors.primaryTextColor,
         fontFamily: "Rubik",
