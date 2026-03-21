@@ -104,7 +104,7 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
     return (
         <Animated.View style={[styles.container, animatedStyle]}>
             {image && <Image source={{ uri: image }} style={styles.image} />}
-            <View>
+            <View style={{ marginLeft: image ? 0 : 16 }}>
                 <Text style={[styles.title, Styles.primaryText]}>{title}</Text>
                 <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.text, Styles.secondaryText, { width: textWidth }]}>
                     {text}

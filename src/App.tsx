@@ -1,10 +1,11 @@
 import Notification, { NotificationHandle } from "@components/Notification";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
-import notifee, { AndroidCategory, AndroidStyle } from "@notifee/react-native";
+import notifee, { AndroidImportance, AndroidStyle } from "@notifee/react-native";
 import SettingsPage from "@pages/SettingsPage";
 import {
     AuthorizationStatus,
+    FirebaseMessagingTypes,
     getMessaging,
     getToken,
     onMessage,
@@ -63,14 +64,14 @@ function App() {
     const currentPageRef = useRef<string>(currentPage);
     const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
-    async function requestUserPermission() {
+    async function requestUserPermission(messaging: FirebaseMessagingTypes.Module) {
         // Request user permission for Firebase notifications
-        const authStatus = await requestPermission(getMessaging());
+        const authStatus = await requestPermission(messaging);
         const enabled = authStatus === AuthorizationStatus.AUTHORIZED || authStatus === AuthorizationStatus.PROVISIONAL;
 
         // Send Firebase token to server
         if (enabled) {
-            sendFirebaseToken();
+            sendFirebaseToken(messaging);
         }
 
         // Request user permission for Notifee notifications
@@ -85,9 +86,9 @@ function App() {
         Storage.set("channelId", channel);
     }
 
-    const sendFirebaseToken = async () => {
+    const sendFirebaseToken = async (messaging: FirebaseMessagingTypes.Module) => {
         // Get Firebase token
-        const token = await getToken(getMessaging());
+        const token = await getToken(messaging);
 
         // Send Firebase token to server
         const socket = await getSocket();
@@ -122,9 +123,9 @@ function App() {
         Translation.init();
         migrateDatabaseAndLoadDefaultPage();
 
-        requestUserPermission();
-
         const messaging = getMessaging();
+
+        requestUserPermission(messaging);
 
         // Foreground Message Handler
         const ForegroundMessageHandlerUnsubscribe = onMessage(messaging, async remoteMessage => {
@@ -146,12 +147,10 @@ function App() {
                 body: data.text,
                 android: {
                     smallIcon: "ic_notification",
-                    //largeIcon: `${SERVER}/avatars/${data.authorId}.webp`,
+                    largeIcon: `${SERVER}/avatars/${data.authorId}.png`,
                     channelId: Storage.getString("channelId") || "min",
-                    circularLargeIcon: true,
-                    pressAction: {
-                        id: "default",
-                    },
+                    //circularLargeIcon: true,
+                    importance: AndroidImportance.HIGH,
                     style: {
                         type: AndroidStyle.MESSAGING,
                         person: {
@@ -163,12 +162,15 @@ function App() {
                                 timestamp: data.sentAt,
                                 person: {
                                     name: data.authorName,
-                                    icon: `${SERVER}/avatars/${data.authorId}.webp`,
+                                    icon: `${SERVER}/avatars/${data.authorId}.png`,
                                 },
                             },
                         ],
                     },
-                    category: AndroidCategory.MESSAGE,
+                    pressAction: {
+                        id: "default",
+                    },
+                    //category: AndroidCategory.MESSAGE,
                 },
             });
         });
@@ -196,6 +198,12 @@ function App() {
                 break;
             case "back":
                 navigationRef.goBack();
+                break;
+            case "notify":
+                notificationRef.current?.setText(command.text ?? "");
+                notificationRef.current?.setTitle(command.title ?? "");
+                notificationRef.current?.setImage(command.image ?? null);
+                notificationRef.current?.show();
                 break;
         }
     }

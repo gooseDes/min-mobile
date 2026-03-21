@@ -1,6 +1,6 @@
 import { CreateChat, CreateMessage } from "@/Utils";
 import db from "./Client";
-import { chatsTable, chatUsersTable, messagesTable, usersTable } from "./Schema";
+import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./Schema";
 
 export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageData[]> {
     return Promise.all(
@@ -48,7 +48,7 @@ export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
 
     // Default chat
     const defaultChatPromise = async (): Promise<ChatData> => {
-        await db.insert(chatsTable).values({ id: 1, title: "Default Chat" }).onConflictDoNothing();
+        await db.insert(chatsTable).values({ id: 1, type: chatTypes.group, title: "Default Chat" }).onConflictDoNothing();
         return CreateChat({ id: 1, title: "Default Chat", participants: [] });
     };
     promises.push(defaultChatPromise());
@@ -56,7 +56,7 @@ export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
     // Saving chats to db
     promises.push(
         ...chats_payload.chats.slice().map(async (chat: any) => {
-            await db.insert(chatsTable).values({ id: chat.id, title: chat.name });
+            await db.insert(chatsTable).values({ id: chat.id, type: chatTypes.private, title: chat.name });
             await Promise.all(
                 chat.participants.map(async (user: any) => {
                     await db

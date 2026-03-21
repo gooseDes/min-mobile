@@ -9,6 +9,7 @@ import { CreateChat, CreateMessage } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
+import AddChatButton from "@components/HomePage/AddChatButton";
 import ChatsContainer, { ChatsContainerHandle } from "@components/HomePage/ChatsContainer";
 import MessageInput, { MessageInputHandle } from "@components/HomePage/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
@@ -168,16 +169,21 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
         // Initialize messages from socket
         const socket = await getSocket();
         socket.on("history", async data => {
-            console.log(data);
-            const oldCountOfMessages = await db
-                .select({ count: count() })
-                .from(messagesTable)
-                .where(eq(messagesTable.chatId, data.messages[0].chat_id));
-            messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
-            if (oldCountOfMessages[0].count > 0) {
-                const diff = oldCountOfMessages[0].count - data.messages.length;
-                messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
+            //console.log(data);
+            if (data.messages.length > 0) {
+                const oldCountOfMessages = await db
+                    .select({ count: count() })
+                    .from(messagesTable)
+                    .where(eq(messagesTable.chatId, data.messages[0].chat_id));
+                messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
+                if (oldCountOfMessages[0].count > 0) {
+                    const diff = oldCountOfMessages[0].count - data.messages.length;
+                    messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
+                } else {
+                    messagesRef.current?.show();
+                }
             } else {
+                messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
                 messagesRef.current?.show();
             }
             socket.off("history");
@@ -211,6 +217,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
 
         // Initialize chats from socket
         const socket = await getSocket();
+        socket.off("chats");
         socket.on("chats", async data => {
             // Clear db
             try {
@@ -226,7 +233,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
             // Save chats to db, reformat and show them
             chatsRef.current?.setChats(await ProcessChatsAndReturn(data));
             chatsRef.current?.showWithoutAnimation();
-            socket.off("chats");
+            //socket.off("chats");
         });
         socket.emit("getChats", {});
     }
@@ -392,11 +399,12 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         exiting={ZoomOut}
                     >
                         <Icon name="comments" size={24} color={Colors.primaryTextColor} />
-                        <Text style={[Styles.primaryBoldText, { fontSize: 24, marginLeft: 10 }]}>{t.chats}</Text>
+                        <Text style={[Styles.titleText, { marginLeft: 10 }]}>{t.chats}</Text>
                     </SurelyAnimatedView>
                 )}
                 {currentTab === "chats" && <Divider />}
                 {currentTab === "chats" && <ChatsContainer bottomGap={70} handler={handleChat} ref={chatsRef} />}
+                {currentTab === "chats" && <AddChatButton handler={props.handler} />}
             </Animated.View>
         </SafeAreaView>
     );

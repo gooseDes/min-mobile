@@ -6,6 +6,7 @@ import Icon from "./Icon";
 interface IconButtonProps extends TouchableOpacityProps {
     icon: string;
     onPress?: () => void;
+    layoutTransition?: boolean;
 }
 
 const styles = StyleSheet.create({
@@ -17,10 +18,10 @@ const styles = StyleSheet.create({
 });
 
 function IconButton(props: IconButtonProps) {
-    const { icon, onPress, style, ...rest } = props;
+    const { icon, onPress, layoutTransition, style, ...rest } = props;
 
     return (
-        <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut}>
+        <Animated.View layout={layoutTransition ? Constants.layoutTransition : undefined} entering={ZoomIn} exiting={ZoomOut}>
             <TouchableOpacity onPress={onPress} style={[styles.iconButton, style]} {...rest}>
                 <Icon name={icon} size={24} color="#fff" />
             </TouchableOpacity>

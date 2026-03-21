@@ -51,8 +51,8 @@ export const Styles = StyleSheet.create({
     },
     titleText: {
         color: Colors.primaryTextColor,
-        fontSize: 32,
-        fontFamily: "Rubik",
+        fontSize: 26,
+        fontFamily: "Rubik-Medium",
         textAlign: "center",
     },
     textInput: {
@@ -69,5 +69,12 @@ export const Styles = StyleSheet.create({
         fontSize: 24,
         fontFamily: "Rubik",
         textAlign: "center",
+    },
+    bgAndBorder: {
+        backgroundColor: Colors.backgroundPanelColor,
+        borderColor: Colors.borderColor,
+        borderWidth: Constants.borderWidth,
+        borderRadius: Constants.rounding,
+        padding: 8,
     },
 });

@@ -2,14 +2,16 @@ import { Colors, Styles } from "@/Style";
 import { TextInput, TextInputProps } from "react-native";
 
 function InputField(props: TextInputProps) {
+    const { style, children, ...rest } = props;
+
     return (
         <TextInput
             placeholderTextColor={Colors.secondaryTextColor}
             cursorColor={Colors.primaryTextColor}
-            style={Styles.textInput}
-            {...props}
+            style={[Styles.textInput, style]}
+            {...rest}
         >
-            {props.children}
+            {children}
         </TextInput>
     );
 }

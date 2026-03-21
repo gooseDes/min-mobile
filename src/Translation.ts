@@ -26,6 +26,11 @@ export interface Language {
     change_language?: string;
     clear_cache?: string;
 
+    // Create Chat popup
+    create_chat?: string;
+    enter_username?: string;
+    username_placeholder?: string;
+
     // Settings
     settings_general?: string;
     settings_language?: string;
@@ -61,6 +66,11 @@ class Translation {
         change_language: "Change Language",
         clear_cache: "Clear Cache",
 
+        // Create Chat popup
+        create_chat: "Create Chat",
+        enter_username: "Enter username of the person you want to chat with:",
+        username_placeholder: "Username",
+
         // Settings
         settings_general: "General",
         settings_language: "Language",
@@ -93,6 +103,11 @@ class Translation {
         change_language: "Сменить язык",
         clear_cache: "Очистить кэш",
 
+        // Create Chat popup
+        create_chat: "Создать чат",
+        enter_username: "Введите имя пользователя, с которым хотите начать чат:",
+        username_placeholder: "Имя пользователя",
+
         // Settings
         settings_general: "Общие",
         settings_language: "Язык",
@@ -124,6 +139,11 @@ class Translation {
         now: "Зараз",
         change_language: "Змінити мову",
         clear_cache: "Очистити кеш",
+
+        // Create Chat popup
+        create_chat: "Створити чат",
+        enter_username: "Введіть ім'я користувача, з яким ви хочете почати чат:",
+        username_placeholder: "Ім'я користувача",
 
         // Settings
         settings_general: "Загальні",

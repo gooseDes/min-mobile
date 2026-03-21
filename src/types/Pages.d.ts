@@ -7,6 +7,9 @@ interface PageProps {
 }
 
 interface CommandData {
-    action: "go" | "back";
+    action: "go" | "back" | "notify";
     to?: "Home" | "Sign" | "Settings";
+    title?: string;
+    text?: string;
+    image?: string | null;
 }
