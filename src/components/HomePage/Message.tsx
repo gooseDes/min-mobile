@@ -1,9 +1,12 @@
 import Auth from "@/Auth";
+import db from "@/db/Client";
+import { messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import Icon from "@components/Icon";
 import { SERVER } from "@env";
+import { eq } from "drizzle-orm";
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Markdown, { MarkedStyles } from "react-native-marked";
@@ -75,6 +78,15 @@ interface MessageProps extends React.PropsWithChildren {
     shown?: boolean;
 }
 
+function withoutCommand(text: string): string {
+    if (text.startsWith("/reply")) {
+        const lines = text.split("\n");
+        lines.shift();
+        return lines.join("\n");
+    }
+    return text;
+}
+
 function MessageBase(props: MessageProps) {
     const isCurrentUser = props.author_name === Auth.username;
     const showAvatar = props.show_avatar === undefined ? true : props.show_avatar;
@@ -99,7 +111,13 @@ function MessageBase(props: MessageProps) {
             socket.emit("getUserInfo", { id: msgData.message.sender_id });
             socket.off("requestedMessage");
         });
-        socket.emit("getMessage", { messageId: replyId });
+        const replyMessage = await db.query.messagesTable.findFirst({ where: eq(messagesTable.id, replyId) });
+        if (replyMessage) {
+            const sender = await db.query.usersTable.findFirst({ where: eq(usersTable.id, replyMessage.senderId) });
+            setReplyText(`${sender?.username || replyMessage.senderId}: ${withoutCommand(replyMessage.content || "")}`);
+        } else {
+            socket.emit("getMessage", { messageId: replyId });
+        }
     }
 
     useEffect(() => {
@@ -133,7 +151,7 @@ function MessageBase(props: MessageProps) {
                     <Text style={[Styles.secondaryText, styles.authorText]}>{isCurrentUser ? t.you : props.author_name}</Text>
                 )}
                 {is_reply && replyText && (
-                    <Text style={[Styles.secondaryText, styles.replyText]}>
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={[Styles.secondaryText, styles.replyText]}>
                         <Icon name="reply" size={10} /> {replyText}
                     </Text>
                 )}
