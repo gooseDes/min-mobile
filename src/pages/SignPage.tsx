@@ -57,8 +57,11 @@ function SignPage(props: PageProps) {
     const { t, changeLanguage } = useTranslation();
 
     async function SignIn() {
-        if (await Auth.login(emailValue, passwordValue)) {
+        const result = await Auth.login(emailValue, passwordValue);
+        if (result.success) {
             props.handler({ action: "go", to: "Home" });
+        } else {
+            props.handler({ action: "notify", title: "Failed :(", text: result.message });
         }
     }
 
@@ -67,8 +70,11 @@ function SignPage(props: PageProps) {
             Alert.alert("Passwords do not match");
             return;
         }
-        if (await Auth.register(loginValue, emailValue, passwordValue)) {
+        const result = await Auth.register(loginValue, emailValue, passwordValue);
+        if (result.success) {
             props.handler({ action: "go", to: "Home" });
+        } else {
+            props.handler({ action: "notify", title: "Failed :(", text: result.message });
         }
     }
 

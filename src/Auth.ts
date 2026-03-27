@@ -2,6 +2,10 @@ import { SERVER } from "@env";
 import * as Keychain from "react-native-keychain";
 import Storage from "./Storage";
 
+export class AuthResult {
+    constructor(public success: boolean, public message: string = "") {}
+}
+
 export default class Auth {
     static id: number | null;
     static username: string | null;
@@ -18,7 +22,7 @@ export default class Auth {
         });
     }
 
-    static async login(email: string, password: string): Promise<boolean> {
+    static async login(email: string, password: string): Promise<AuthResult> {
         const response = await fetch(`${SERVER}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -33,14 +37,15 @@ export default class Auth {
             Auth.username = json.username;
             Auth.id = json.id;
         } else {
-            console.error(`Faliled :( ${json.msg || ""}`);
-            return false;
+            const error = new AuthResult(false, json.msg || "");
+            console.error(`Faliled :( ${error.message}`);
+            return error;
         }
         console.log("Logined!");
-        return true;
+        return new AuthResult(true);
     }
 
-    static async register(login: string, email: string, password: string) {
+    static async register(login: string, email: string, password: string): Promise<AuthResult> {
         const response = await fetch(`${SERVER}/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -56,11 +61,12 @@ export default class Auth {
             Auth.username = json.username;
             Auth.id = json.id;
         } else {
-            console.error(`Faliled :( ${json.msg || ""}`);
-            return false;
+            const error = new AuthResult(false, json.msg || "");
+            console.error(`Faliled :( ${error.message}`);
+            return error;
         }
         console.log("Registered!");
-        return true;
+        return new AuthResult(true);
     }
 
     static async getAllFromStorage(): Promise<any> {
