@@ -207,12 +207,15 @@ export const t: Language = new Proxy(
     },
 );
 
-export function changeLanguage() {
+export function changeLanguage(lang?: string): string {
     const current = Translation.getCurrentLanguage();
     let newLang: string = "";
-    if (current === "en") newLang = "ru";
+    if (lang) {
+        newLang = lang;
+    } else if (current === "en") newLang = "ru";
     if (current === "ru") newLang = "ua";
     if (current === "ua") newLang = "en";
     Storage.set("language", newLang);
     Translation.setCurrentLanguage(newLang);
+    return newLang;
 }

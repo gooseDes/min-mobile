@@ -1,10 +1,10 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
-import Translation, { Language } from "./Translation";
+import Translation, { Language, changeLanguage as changeLanguageFn } from "./Translation";
 
 interface TranslationContextProps {
     lang: string;
     t: Language;
-    changeLanguage: () => void;
+    changeLanguage: (lang_code?: string) => void;
 }
 
 const TranslationContext = createContext<TranslationContextProps | undefined>(undefined);
@@ -12,14 +12,13 @@ const TranslationContext = createContext<TranslationContextProps | undefined>(un
 export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [lang, setLang] = useState(Translation.getCurrentLanguage());
 
-    const changeLanguage = useCallback(() => {
-        let newLang = "en";
-        if (lang === "en") newLang = "ru";
-        if (lang === "ru") newLang = "ua";
-        if (lang === "ua") newLang = "en";
-        Translation.setCurrentLanguage(newLang);
-        setLang(newLang);
-    }, [lang]);
+    const changeLanguage = useCallback(
+        (lang_code?: string) => {
+            const newLang = changeLanguageFn(lang_code);
+            setLang(newLang);
+        },
+        [lang],
+    );
 
     const t = useMemo(
         () =>

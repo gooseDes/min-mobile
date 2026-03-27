@@ -1,7 +1,7 @@
 import { Colors, Constants } from "@/Style";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import Animated, { cubicBezier } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 export interface SwitchProps {
     checked?: boolean;
@@ -53,7 +53,7 @@ function Switch(props: SwitchProps) {
                         styles.switchThumb,
                         {
                             transition: "all 0.3s",
-                            transitionTimingFunction: cubicBezier(0.4, 0, 0.2, 1),
+                            transitionTimingFunction: Constants.cubicBezier,
                             backgroundColor: isChecked ? Colors.primaryTextColor : Colors.secondaryTextColor,
                             transform: [{ translateX: isPressing ? 0 : isChecked ? 22.5 : -22.5 }],
                         },

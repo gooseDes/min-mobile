@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { LinearTransition } from "react-native-reanimated";
+import { cubicBezier, LinearTransition } from "react-native-reanimated";
 
 export class Colors {
     static backgroundColor = "#131317";
@@ -16,6 +16,7 @@ export class Constants {
     static borderWidth = 2;
     static fontFamily = "Rubik";
     static layoutTransition = LinearTransition.springify(500);
+    static cubicBezier = cubicBezier(0.4, 0, 0.2, 1);
 }
 
 export const Styles = StyleSheet.create({
