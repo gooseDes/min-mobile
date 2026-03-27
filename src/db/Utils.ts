@@ -1,4 +1,4 @@
-import { CreateChat, CreateMessage } from "@/Utils";
+import { CreateChat, CreateMessage, timestampToDate } from "@/Utils";
 import db from "./Client";
 import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./Schema";
 
@@ -24,6 +24,7 @@ export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageDa
                     content: msg.text,
                     senderId: msg.author_id,
                     chatId: msg.chat_id,
+                    sentAt: timestampToDate(msg.sent_at),
                 })
                 .onConflictDoUpdate({
                     target: [messagesTable.id],
@@ -31,6 +32,7 @@ export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageDa
                         content: msg.text,
                         senderId: msg.author_id,
                         chatId: msg.chat_id,
+                        sentAt: timestampToDate(msg.sent_at),
                     },
                 });
             return CreateMessage({
@@ -38,6 +40,7 @@ export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageDa
                 text: msg.text,
                 sender: { id: msg.author_id, username: msg.author },
                 chatId: msg.chat_id,
+                sentAt: timestampToDate(msg.sent_at),
             });
         }),
     );

@@ -2,8 +2,8 @@ import { useStorage } from "@/Storage";
 import { Constants } from "@/Style";
 import { BlurTarget } from "@danielsaraldi/react-native-blur-view";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-import Animated, { FadeOut } from "react-native-reanimated";
+import { StyleSheet, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import Message from "./Message";
 
 const styles = StyleSheet.create({
@@ -71,16 +71,19 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
         const showAvatar = prevMessage ? prevMessage.sender.id !== message.sender.id : true;
 
         return (
-            <Message
-                author_name={message.sender.username}
-                author_id={message.sender.id}
-                side={userId === message.sender.id ? "right" : "left"}
-                show_avatar={showAvatar}
-                show_author={showAvatar}
-                shown={animProgress > index || !(index <= 15) || index < newlyAddedMessages}
-            >
-                {message.text}
-            </Message>
+            <Animated.View layout={Constants.layoutTransition} entering={FadeIn} exiting={FadeOut}>
+                <Message
+                    author_name={message.sender.username}
+                    author_id={message.sender.id}
+                    side={userId === message.sender.id ? "right" : "left"}
+                    show_avatar={showAvatar}
+                    show_author={showAvatar}
+                    shown={animProgress > index || !(index <= 15) || index < newlyAddedMessages}
+                    sentAt={message.sentAt}
+                >
+                    {message.text}
+                </Message>
+            </Animated.View>
         );
     };
 
@@ -91,12 +94,12 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
     return (
         <BlurTarget id="chat-blur-target" style={styles.blurTarget}>
             <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
-                <FlatList
+                <Animated.FlatList
                     style={styles.messagesContainer}
                     contentContainerStyle={{ paddingTop: bottomGap }}
                     data={reversedMessages}
                     renderItem={renderMessage}
-                    keyExtractor={(_, index) => index.toString()}
+                    keyExtractor={msg => msg.id.toString()}
                     ItemSeparatorComponent={splitter}
                     inverted={true}
                     initialNumToRender={15}

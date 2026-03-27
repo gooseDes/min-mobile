@@ -25,7 +25,7 @@ export const messagesTable = sqliteTable("messages", {
     content: text("content").default(""),
     senderId: integer("sender").notNull(),
     chatId: integer("chat").notNull(),
-    createdAt: integer("created_at", { mode: "timestamp" })
+    sentAt: integer("sent_at", { mode: "timestamp" })
         .notNull()
         .default(sql`(CURRENT_TIMESTAMP)`),
 });

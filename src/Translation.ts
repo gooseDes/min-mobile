@@ -33,8 +33,14 @@ export interface Language {
 
     // Settings
     settings_general?: string;
-    settings_language?: string;
+    settings_language_time?: string;
     settings_cache?: string;
+    settings_language?: string;
+    settings_24_hour_time?: string;
+
+    // Time
+    code?: string;
+    yesterday?: string;
 }
 
 class Translation {
@@ -73,8 +79,14 @@ class Translation {
 
         // Settings
         settings_general: "General",
-        settings_language: "Language",
+        settings_language_time: "Language & Time",
         settings_cache: "Cache",
+        settings_language: "Language",
+        settings_24_hour_time: "Force 24-hour time",
+
+        // Time
+        code: "en",
+        yesterday: "Yesterday",
     };
 
     static ru: Language = {
@@ -110,8 +122,14 @@ class Translation {
 
         // Settings
         settings_general: "Общие",
-        settings_language: "Язык",
+        settings_language_time: "Язык и время",
         settings_cache: "Кэш",
+        settings_language: "Язык",
+        settings_24_hour_time: "Принудительный 24-часовой формат",
+
+        // Time
+        code: "ru",
+        yesterday: "Вчера",
     };
 
     static ua: Language = {
@@ -147,8 +165,14 @@ class Translation {
 
         // Settings
         settings_general: "Загальні",
-        settings_language: "Мова",
+        settings_language_time: "Мова та час",
         settings_cache: "Кеш",
+        settings_language: "Мова",
+        settings_24_hour_time: "Примусовий 24-годинний формат",
+
+        // Time
+        code: "uk",
+        yesterday: "Вчора",
     };
 
     static getCurrentTranslation(): Language {

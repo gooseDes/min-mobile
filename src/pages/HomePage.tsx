@@ -19,7 +19,7 @@ import Profile from "@components/Profile";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
-import { count, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Alert, BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
@@ -160,6 +160,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                         text: message.content,
                         sender: { id: message.sender?.id, username: message.sender?.username },
                         chatId: message.chatId,
+                        sentAt: message.sentAt,
                     });
                 });
                 messagesRef.current?.setMessages(messages);
@@ -171,15 +172,17 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
         socket.on("history", async data => {
             //console.log(data);
             if (data.messages.length > 0) {
-                const oldCountOfMessages = await db
-                    .select({ count: count() })
-                    .from(messagesTable)
-                    .where(eq(messagesTable.chatId, data.messages[0].chat_id));
-                messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
-                if (oldCountOfMessages[0].count > 0) {
-                    const diff = oldCountOfMessages[0].count - data.messages.length;
+                const lastMessage = await db.query.messagesTable.findFirst({
+                    where: eq(messagesTable.chatId, currentChat?.id || 0),
+                    orderBy: (messages, { desc }) => [desc(messages.id)],
+                });
+                const lastSocketMessage = data.messages.findIndex((msg: any) => msg.id === lastMessage?.id);
+                const diff = data.messages.length - ((lastSocketMessage || 0) + 1);
+                if (lastSocketMessage !== -1) {
+                    messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
                     messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
                 } else {
+                    messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
                     messagesRef.current?.show();
                 }
             } else {

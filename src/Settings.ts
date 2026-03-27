@@ -5,12 +5,23 @@ export const settings: Settings = {
             icon: "gear",
             items: [
                 {
+                    title: "cache",
+                    type: "cache",
+                },
+            ],
+        },
+        {
+            title: "language_time",
+            icon: "earth-americas",
+            items: [
+                {
                     title: "language",
                     type: "language",
                 },
                 {
-                    title: "cache",
-                    type: "cache",
+                    title: "24_hour_time",
+                    type: "switch",
+                    storageKey: "use24HourTime",
                 },
             ],
         },

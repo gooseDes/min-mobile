@@ -1,7 +1,9 @@
+import Storage from "@/Storage";
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { ClearCache } from "@/Utils";
 import Icon from "@components/Icon";
+import Switch from "@components/Switch";
 import { JSX, useEffect, useRef, useState } from "react";
 import { BackHandler, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -182,6 +184,18 @@ function SettingsSection(props: SettingsSectionProps) {
                                             {t.clear_cache}
                                         </Text>
                                     </TouchableOpacity>
+                                </View>
+                            );
+                        } else if (item.type === "switch") {
+                            component = (
+                                <View>
+                                    <View style={{ flexDirection: "column", alignItems: "center", gap: 8 }}>
+                                        <Text style={Styles.header}>{itemTitle(item.title)}</Text>
+                                        <Switch
+                                            checked={Storage.getBoolean(item.storageKey ?? "") ?? false}
+                                            onChange={value => Storage.set(item.storageKey ?? "", value)}
+                                        />
+                                    </View>
                                 </View>
                             );
                         }

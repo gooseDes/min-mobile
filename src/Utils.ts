@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { Alert } from "react-native";
 import db, { sqliteClient } from "./db/Client";
 import Storage from "./Storage";
+import { t } from "./Translation";
 
 export function CreateUserData(obj: any = {}): UserData {
     const o = obj || {};
@@ -18,6 +19,7 @@ export function CreateMessage(obj: any = {}): MessageData {
         text: obj.text || "",
         sender: CreateUserData(obj.sender || {}),
         chatId: obj.chatId || -1,
+        sentAt: obj.sentAt || "",
     };
 }
 
@@ -62,4 +64,36 @@ export async function ClearCache() {
     sqliteClient.delete();
     Storage.set("createNewDB", true);
     Alert.alert("Cache Cleared", "Now we need you to restart the app");
+}
+
+// Converts a Date object to a localized string representation
+export function dateToString(date: Date): string {
+    const timeFormat: Intl.LocalesArgument = t.code;
+    const force24Hour = Storage.getBoolean("use24HourTime") || false;
+    const now = new Date(Date.now());
+
+    const time = date.toLocaleTimeString(timeFormat, {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: force24Hour ? false : undefined,
+    });
+
+    // Show only time for today, otherwise show date
+    if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+        return time;
+    } else {
+        if (
+            date.getDate() === now.getDate() - 1 &&
+            date.getMonth() === now.getMonth() &&
+            date.getFullYear() === now.getFullYear()
+        ) {
+            return `${t.yesterday}, ${time}`;
+        }
+        return `${date.toLocaleDateString(timeFormat, { month: "short", day: "numeric" })}, ${time}`;
+    }
+}
+
+// Converts a unix timestamp to a Date object
+export function timestampToDate(timestamp: number): Date {
+    return new Date(timestamp * 1000);
 }

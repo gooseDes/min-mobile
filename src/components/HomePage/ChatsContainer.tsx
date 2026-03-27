@@ -77,7 +77,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
                 contentContainerStyle={{ paddingBottom: bottomGap }}
                 data={chatsRef.current}
                 renderItem={renderChat}
-                keyExtractor={(_, index) => index.toString()}
+                keyExtractor={chat => chat.id.toString()}
                 ItemSeparatorComponent={splitter}
                 initialNumToRender={15}
             />

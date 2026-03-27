@@ -4,6 +4,7 @@ import { messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
+import { dateToString } from "@/Utils";
 import Icon from "@components/Icon";
 import { SERVER } from "@env";
 import { eq } from "drizzle-orm";
@@ -54,6 +55,12 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginBottom: 5,
     },
+    sentAtText: {
+        fontSize: 11,
+        marginTop: -8,
+        marginBottom: 4,
+        textAlign: "right",
+    },
 });
 
 const markdownStyles: MarkedStyles = {
@@ -76,6 +83,7 @@ interface MessageProps extends React.PropsWithChildren {
     show_avatar?: boolean;
     show_author?: boolean;
     shown?: boolean;
+    sentAt?: Date;
 }
 
 function withoutCommand(text: string): string {
@@ -93,6 +101,7 @@ function MessageBase(props: MessageProps) {
     const showAuthor = props.show_author === undefined ? true : props.show_author;
     const shown = props.shown === undefined ? true : props.shown;
     const side = props.side || "left";
+    const sentAt = props.sentAt;
 
     const text = props.children?.toString() || "";
     const is_reply = text.startsWith("/reply");
@@ -161,6 +170,8 @@ function MessageBase(props: MessageProps) {
                     flatListProps={markdownFlatListProps}
                     value={is_reply ? text.replace(/^.*\n/, "") : text}
                 />
+
+                {sentAt && <Text style={[Styles.secondaryText, styles.sentAtText]}>{dateToString(sentAt)}</Text>}
             </View>
         </Animated.View>
     );

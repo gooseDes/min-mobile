@@ -3,6 +3,7 @@ interface MessageData {
     text: string;
     sender: UserData;
     chatId: number;
+    sentAt: Date;
 }
 
 interface ChatData {

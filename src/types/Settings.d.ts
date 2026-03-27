@@ -1,6 +1,7 @@
 interface SettingsItem {
     title: string;
-    type: "language" | "cache";
+    type: "language" | "cache" | "switch";
+    storageKey?: string;
 }
 
 interface SettingsSection {
