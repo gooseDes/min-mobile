@@ -213,8 +213,8 @@ export function changeLanguage(lang?: string): string {
     if (lang) {
         newLang = lang;
     } else if (current === "en") newLang = "ru";
-    if (current === "ru") newLang = "ua";
-    if (current === "ua") newLang = "en";
+    else if (current === "ru") newLang = "ua";
+    else if (current === "ua") newLang = "en";
     Storage.set("language", newLang);
     Translation.setCurrentLanguage(newLang);
     return newLang;

@@ -1,6 +1,6 @@
 import { Colors, Constants } from "@/Style";
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import Divider from "./Divider";
 import DropdownItem from "./DropdownItem";
@@ -27,6 +27,8 @@ const styles = StyleSheet.create({
 });
 
 const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
+    const { items } = props;
+
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
     const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -75,11 +77,11 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
                         },
                     ]}
                 >
-                    {props.items.map((item, index) => (
-                        <>
-                            {index > 0 && <Divider key={`divider-${index}`} />}
-                            <DropdownItem key={index} text={item.text} icon={item.icon} onClick={() => handleItemPress(item)} />
-                        </>
+                    {items.map((item, index) => (
+                        <View key={index}>
+                            {index > 0 && <Divider />}
+                            <DropdownItem text={item.text} icon={item.icon} onClick={() => handleItemPress(item)} />
+                        </View>
                     ))}
                 </Animated.View>
             )}

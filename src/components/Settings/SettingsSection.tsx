@@ -164,7 +164,6 @@ function SettingsSection(props: SettingsSectionProps) {
                                     <View style={{ height: 16 }} />
                                     <TouchableOpacity
                                         onPress={e => {
-                                            //changeLanguage();
                                             dropdownRef.current?.open({
                                                 x: e.nativeEvent.locationX,
                                                 y: e.nativeEvent.locationY,

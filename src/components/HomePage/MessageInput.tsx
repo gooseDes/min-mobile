@@ -1,5 +1,6 @@
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
+import { setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
@@ -74,22 +75,28 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, _
             layout={Constants.layoutTransition}
         >
             <Animated.View style={styles.container}>
-                <BlurView style={StyleSheet.absoluteFill} targetId="chat-blur-target" type="dark" />
-                <View style={[StyleSheet.absoluteFill, styles.actualContent]}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder={t.your_message}
-                        placeholderTextColor={Colors.secondaryTextColor}
-                        multiline={true}
-                        onChangeText={onChangeText}
-                        value={value}
-                    />
-                    <View style={styles.sendButton}>
-                        <TouchableOpacity onPress={onSend}>
-                            <Icon name="paper-plane" size={24} color={Colors.primaryTextColor} />
-                        </TouchableOpacity>
+                <BlurView
+                    style={StyleSheet.absoluteFill}
+                    targetId="chat-blur-target"
+                    type="dark"
+                    overlayColor={setAlphaForColor(Colors.backgroundPanelColor, 0.6)}
+                >
+                    <View style={[StyleSheet.absoluteFill, styles.actualContent]}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder={t.your_message}
+                            placeholderTextColor={Colors.secondaryTextColor}
+                            multiline={true}
+                            onChangeText={onChangeText}
+                            value={value}
+                        />
+                        <View style={styles.sendButton}>
+                            <TouchableOpacity onPress={onSend}>
+                                <Icon name="paper-plane" size={24} color={Colors.primaryTextColor} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
+                </BlurView>
             </Animated.View>
         </SurelyAnimatedView>
     );
