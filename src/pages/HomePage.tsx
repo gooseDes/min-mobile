@@ -234,8 +234,13 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
             } catch {}
 
             // Save chats to db, reformat and show them
+            const prevChats = chatsRef.current?.getChats();
             chatsRef.current?.setChats(await ProcessChatsAndReturn(data));
-            chatsRef.current?.showWithoutAnimation();
+            if (prevChats?.length) {
+                chatsRef.current?.showWithoutAnimation();
+            } else {
+                chatsRef.current?.show();
+            }
             //socket.off("chats");
         });
         socket.emit("getChats", {});

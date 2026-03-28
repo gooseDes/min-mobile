@@ -1,5 +1,6 @@
 import { SERVER } from "@env";
 import * as Keychain from "react-native-keychain";
+import { resetSocket } from "./Socket";
 import Storage from "./Storage";
 
 export class AuthResult {
@@ -13,12 +14,12 @@ export default class Auth {
     static init() {
         Auth.getFromStorage("username").then(username => {
             Auth.username = username;
-            Storage.set("user.username", username);
+            if (username) Storage.set("user.username", username);
         });
         Auth.getFromStorage("id").then(id => {
             const idNum = parseInt(id, 10);
             Auth.id = idNum;
-            Storage.set("user.id", idNum);
+            if (idNum) Storage.set("user.id", idNum);
         });
     }
 
@@ -35,7 +36,10 @@ export default class Auth {
             await this.setInStorage("email", email);
             await this.setInStorage("id", json.id.toString());
             Auth.username = json.username;
+            Storage.set("user.username", json.username);
             Auth.id = json.id;
+            Storage.set("user.id", json.id);
+            resetSocket();
         } else {
             const error = new AuthResult(false, json.msg || "");
             console.error(`Faliled :( ${error.message}`);
@@ -59,7 +63,10 @@ export default class Auth {
             await this.setInStorage("email", email);
             await this.setInStorage("id", json.id.toString());
             Auth.username = json.username;
+            Storage.set("user.username", json.username);
             Auth.id = json.id;
+            Storage.set("user.id", json.id);
+            resetSocket();
         } else {
             const error = new AuthResult(false, json.msg || "");
             console.error(`Faliled :( ${error.message}`);

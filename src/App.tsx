@@ -15,7 +15,7 @@ import {
 import { createNavigationContainerRef, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
@@ -58,10 +58,8 @@ type RootStackParamList = {
 };
 
 function App() {
-    const [currentPage, setCurrentPage] = useState<string>("none");
     const notificationRef = useRef<NotificationHandle | null>(null);
     const homePageRef = useRef<HomePageHandler | null>(null);
-    const currentPageRef = useRef<string>(currentPage);
     const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
     async function requestUserPermission(messaging: FirebaseMessagingTypes.Module) {
@@ -113,9 +111,9 @@ function App() {
                 }
             }
             if (await Auth.getFromStorage("token")) {
-                setCurrentPage("Home");
+                commandHandler({ action: "go", to: "Home" });
             } else {
-                setCurrentPage("Sign");
+                commandHandler({ action: "go", to: "Sign" });
             }
         }
 
@@ -180,17 +178,26 @@ function App() {
         };
     }, []);
 
-    useEffect(() => {
-        currentPageRef.current = currentPage;
-    }, [currentPage]);
-
     function commandHandler(command: CommandData) {
         switch (command.action) {
             case "go":
                 if (command.to === "Home" || command.to === "Sign") {
-                    navigationRef.reset({
-                        index: 0,
-                        routes: [{ name: command.to }],
+                    const to = command.to;
+                    async function waitForNavigationRef(): Promise<void> {
+                        return new Promise(resolve => {
+                            const check = setInterval(() => {
+                                if (navigationRef.isReady()) {
+                                    clearInterval(check);
+                                    resolve();
+                                }
+                            }, 10);
+                        });
+                    }
+                    waitForNavigationRef().then(() => {
+                        navigationRef.reset({
+                            index: 0,
+                            routes: [{ name: to }],
+                        });
                     });
                 } else {
                     navigationRef.navigate(command.to as any);

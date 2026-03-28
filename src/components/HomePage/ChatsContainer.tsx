@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
 });
 
 export interface ChatsContainerHandle {
+    getChats: () => ChatData[];
     setChats: (chats: ChatData[]) => void;
     show: () => void;
     showWithoutAnimation: () => void;
@@ -32,6 +33,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
     const [userId] = useStorage<number>("user.id", -1);
 
     useImperativeHandle(ref, () => ({
+        getChats: () => chatsRef.current,
         setChats: (newChats: ChatData[]) => {
             chatsRef.current = newChats;
         },

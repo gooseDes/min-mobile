@@ -149,7 +149,12 @@ function SignPage(props: PageProps) {
 
             {/* Language Change Button */}
             <Animated.View style={styles.languageButtonContainer} layout={Constants.layoutTransition}>
-                <TouchableOpacity style={styles.languageButton} onPress={changeLanguage}>
+                <TouchableOpacity
+                    style={styles.languageButton}
+                    onPress={() => {
+                        changeLanguage();
+                    }}
+                >
                     <Icon name="language" size={24} color="#fff" />
                     <Text style={Styles.primaryText}>{t.language}</Text>
                 </TouchableOpacity>

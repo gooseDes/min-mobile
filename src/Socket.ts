@@ -28,3 +28,7 @@ export async function getSocket(): Promise<Socket> {
 
     return socketPromise;
 }
+
+export async function resetSocket() {
+    socketPromise = null;
+}
