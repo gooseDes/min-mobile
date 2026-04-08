@@ -1,7 +1,8 @@
 import { Colors, Constants } from "@/Style";
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Divider from "./Divider";
 import DropdownItem from "./DropdownItem";
 
@@ -32,19 +33,27 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
     const { items } = props;
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+    const [position, setPosition] = useState<Position | null>(null);
     const [isMounted, setIsMounted] = useState<boolean>(false);
     const [localItems, setLocalItems] = useState<DropdownItemData[]>(items || []);
     const removeTimeout = useRef<number | null>(null);
+    const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
 
     useImperativeHandle(ref, () => ({
-        open: (coords: { x: number; y: number }) => {
+        open: (coords: Position) => {
             if (removeTimeout.current !== null) {
                 clearTimeout(removeTimeout.current);
                 removeTimeout.current = null;
             }
             setIsMounted(true);
-            setPosition({ x: coords.x - 100, y: coords.y });
+            setPosition(
+                makePositionSafe(
+                    { x: coords.x - styles.container.width / 2, y: coords.y },
+                    styles.container.width,
+                    50 * localItems.length,
+                ),
+            );
             setTimeout(() => setIsOpen(true));
         },
         setItems: (newItems: DropdownItemData[]) => {
@@ -72,6 +81,26 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
     useEffect(() => {
         setLocalItems(items || []);
     }, [items]);
+
+    function makePositionSafe(coords: Position, width: number, height: number): Position {
+        let safeX = coords.x;
+        let safeY = coords.y;
+        if (coords.x + width > windowWidth - insets.right) {
+            safeX = windowWidth - insets.right - width;
+        } else if (coords.x < insets.left) {
+            safeX = insets.left;
+        }
+        if (coords.y + height > windowHeight - insets.bottom) {
+            safeY = windowHeight - insets.bottom - height;
+        } else if (coords.y < insets.top) {
+            safeY = insets.top;
+        }
+
+        return {
+            x: safeX,
+            y: safeY,
+        };
+    }
 
     return (
         <>

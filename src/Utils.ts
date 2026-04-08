@@ -31,6 +31,17 @@ export function CreateChat(obj: any): ChatData {
     };
 }
 
+export function CreateRemoteMessagePayload(obj: any): RemoteMessagePayload {
+    return {
+        authorName: obj.authorName || "",
+        text: obj.text || "",
+        chatId: parseInt(obj.chatId, 10) || -1,
+        authorId: parseInt(obj.authorId, 10) || -1,
+        messageId: parseInt(obj.messageId, 10) || -1,
+        sentAt: parseInt(obj.sentAt, 10) || -1,
+    };
+}
+
 export async function CreateDatabase() {
     console.log("Creating Database");
     const migrationEntries = Object.entries(migrations.migrations || {});
@@ -98,6 +109,7 @@ export function timestampToDate(timestamp: number): Date {
     return new Date(timestamp * 1000);
 }
 
+// Sets the alpha for a given color and returns it
 export function setAlphaForColor(color: string, alpha: number): string {
     const hex = color.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);

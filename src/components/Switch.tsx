@@ -55,7 +55,7 @@ function Switch(props: SwitchProps) {
                             transition: "all 0.3s",
                             transitionTimingFunction: Constants.cubicBezier,
                             backgroundColor: isChecked ? Colors.primaryTextColor : Colors.secondaryTextColor,
-                            transform: [{ translateX: isPressing ? 0 : isChecked ? 22.5 : -22.5 }],
+                            transform: [{ translateX: isPressing ? 0 : isChecked ? 25 : -25 }],
                         },
                     ]}
                 />

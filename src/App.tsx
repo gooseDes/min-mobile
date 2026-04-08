@@ -2,7 +2,7 @@ import Dropdown from "@components/Dropdown";
 import Notification, { NotificationHandle } from "@components/Notification";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
-import notifee, { AndroidImportance, AndroidStyle } from "@notifee/react-native";
+import notifee from "@notifee/react-native";
 import SettingsPage from "@pages/SettingsPage";
 import {
     AuthorizationStatus,
@@ -11,7 +11,6 @@ import {
     getToken,
     onMessage,
     requestPermission,
-    setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
 import { createNavigationContainerRef, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
@@ -30,20 +29,9 @@ import Storage from "./Storage";
 import { Colors } from "./Style";
 import Translation from "./Translation";
 import { TranslationProvider } from "./TranslationContext";
-import { CreateDatabase } from "./Utils";
+import { CreateDatabase, CreateRemoteMessagePayload } from "./Utils";
 
 enableScreens();
-
-function CreateRemoteMessagePayload(obj: any): RemoteMessagePayload {
-    return {
-        authorName: obj.authorName || "",
-        text: obj.text || "",
-        chatId: parseInt(obj.chatId, 10) || -1,
-        authorId: parseInt(obj.authorId, 10) || -1,
-        messageId: parseInt(obj.messageId, 10) || -1,
-        sentAt: parseInt(obj.sentAt, 10) || -1,
-    };
-}
 
 const Stack = createNativeStackNavigator();
 
@@ -76,14 +64,6 @@ function App() {
 
         // Request user permission for Notifee notifications
         await notifee.requestPermission();
-
-        // Create a default channel for notifications
-        const channel = await notifee.createChannel({
-            id: "min",
-            name: "Min Channel",
-            importance: 4,
-        });
-        Storage.set("channelId", channel);
     }
 
     const sendFirebaseToken = async (messaging: FirebaseMessagingTypes.Module) => {
@@ -112,9 +92,7 @@ function App() {
                     console.warn("Standard migration failed:", e);
                 }
             }
-            if (await Auth.getFromStorage("token")) {
-                commandHandler({ action: "go", to: "Home" });
-            } else {
+            if (!(await Auth.getFromStorage("token"))) {
                 commandHandler({ action: "go", to: "Sign" });
             }
         }
@@ -136,43 +114,6 @@ function App() {
             if (homePageRef.current?.getCurrentChat().id !== data.chatId) {
                 notificationRef.current?.show();
             }
-        });
-
-        // Background Message Handler
-        setBackgroundMessageHandler(messaging, async remoteMessage => {
-            if (!remoteMessage.data) return;
-            const data = CreateRemoteMessagePayload(remoteMessage.data);
-            await notifee.displayNotification({
-                title: data.authorName,
-                body: data.text,
-                android: {
-                    smallIcon: "ic_notification",
-                    largeIcon: `${SERVER}/avatars/${data.authorId}.png`,
-                    channelId: Storage.getString("channelId") || "min",
-                    //circularLargeIcon: true,
-                    importance: AndroidImportance.HIGH,
-                    style: {
-                        type: AndroidStyle.MESSAGING,
-                        person: {
-                            name: "me",
-                        },
-                        messages: [
-                            {
-                                text: data.text,
-                                timestamp: data.sentAt,
-                                person: {
-                                    name: data.authorName,
-                                    icon: `${SERVER}/avatars/${data.authorId}.png`,
-                                },
-                            },
-                        ],
-                    },
-                    pressAction: {
-                        id: "default",
-                    },
-                    //category: AndroidCategory.MESSAGE,
-                },
-            });
         });
 
         return () => {
@@ -235,8 +176,8 @@ function App() {
                     </Stack.Navigator>
                 </NavigationContainer>
                 <Notification ref={notificationRef} title="Default Title" text="Default Text" />
+                <Dropdown ref={dropdownRef} />
             </SafeAreaProvider>
-            <Dropdown ref={dropdownRef} />
         </TranslationProvider>
     );
 }

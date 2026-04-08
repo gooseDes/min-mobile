@@ -3,9 +3,9 @@ import { Colors, Constants, Styles } from "@/Style";
 import Translation from "@/Translation";
 import { useTranslation } from "@/TranslationContext";
 import { ClearCache } from "@/Utils";
-import Dropdown, { DropdownHandler } from "@components/Dropdown";
 import Icon from "@components/Icon";
 import Switch from "@components/Switch";
+import { openDropdown } from "@services/DropdownService";
 import { JSX, useEffect, useRef, useState } from "react";
 import { BackHandler, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -82,7 +82,6 @@ function SettingsSection(props: SettingsSectionProps) {
     const { width, height } = Dimensions.get("window");
     const [expanded, setExpanded] = useState<boolean>(false);
     const expandedRef = useRef(expanded);
-    const dropdownRef = useRef<DropdownHandler>(null);
 
     const contentPosition = useSharedValue<"relative" | "absolute">("relative");
     const contentWidth = useSharedValue<number>(width - 40);
@@ -163,12 +162,22 @@ function SettingsSection(props: SettingsSectionProps) {
                                     <Text style={Styles.secondaryCenter}>{`${t.now}: ${t.language_name}`}</Text>
                                     <View style={{ height: 16 }} />
                                     <TouchableOpacity
-                                        onPress={e => {
-                                            dropdownRef.current?.open({
-                                                x: e.nativeEvent.locationX,
-                                                y: e.nativeEvent.locationY,
-                                            });
-                                        }}
+                                        onPress={e =>
+                                            openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
+                                                {
+                                                    text: Translation.en.language_name,
+                                                    onPress: () => changeLanguage("en"),
+                                                },
+                                                {
+                                                    text: Translation.ru.language_name,
+                                                    onPress: () => changeLanguage("ru"),
+                                                },
+                                                {
+                                                    text: Translation.ua.language_name,
+                                                    onPress: () => changeLanguage("ua"),
+                                                },
+                                            ])
+                                        }
                                     >
                                         <Text
                                             style={[Styles.secondaryCenter, { textDecorationLine: "underline", fontSize: 16 }]}
@@ -176,23 +185,6 @@ function SettingsSection(props: SettingsSectionProps) {
                                             {t.change_language}
                                         </Text>
                                     </TouchableOpacity>
-                                    <Dropdown
-                                        ref={dropdownRef}
-                                        items={[
-                                            {
-                                                text: Translation.en.language_name || "Unknown",
-                                                onPress: () => changeLanguage("en"),
-                                            },
-                                            {
-                                                text: Translation.ru.language_name || "Unknown",
-                                                onPress: () => changeLanguage("ru"),
-                                            },
-                                            {
-                                                text: Translation.ua.language_name || "Unknown",
-                                                onPress: () => changeLanguage("ua"),
-                                            },
-                                        ]}
-                                    />
                                 </View>
                             );
                         } else if (item.type === "cache") {
