@@ -1,5 +1,6 @@
-import { Styles } from "@/Style";
+import { Colors, Styles } from "@/Style";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Icon from "./Icon";
 
 export interface DropdownItemProps {
     text?: string;
@@ -15,17 +16,27 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
+    container: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+    },
     text: {
         fontSize: 24,
     },
 });
 
 function DropdownItem(props: DropdownItemProps) {
-    const { text } = props;
+    const { text, icon } = props;
 
     return (
         <TouchableOpacity style={styles.touchable} onPress={props.onClick}>
-            <View>{text && <Text style={[Styles.primaryText, styles.text]}>{text}</Text>}</View>
+            <View style={styles.container}>
+                {icon && <Icon color={Colors.primaryTextColor} name={icon} size={styles.text.fontSize * 0.75} />}
+                {text && <Text style={[Styles.primaryText, styles.text]}>{text}</Text>}
+            </View>
         </TouchableOpacity>
     );
 }

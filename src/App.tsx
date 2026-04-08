@@ -1,3 +1,4 @@
+import Dropdown from "@components/Dropdown";
 import Notification, { NotificationHandle } from "@components/Notification";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
@@ -14,6 +15,7 @@ import {
 } from "@react-native-firebase/messaging";
 import { createNavigationContainerRef, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import { dropdownRef } from "@services/DropdownService";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { useEffect, useRef } from "react";
 import { StatusBar } from "react-native";
@@ -234,6 +236,7 @@ function App() {
                 </NavigationContainer>
                 <Notification ref={notificationRef} title="Default Title" text="Default Text" />
             </SafeAreaProvider>
+            <Dropdown ref={dropdownRef} />
         </TranslationProvider>
     );
 }

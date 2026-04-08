@@ -5,13 +5,13 @@ import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/Utils";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
-import { CreateChat, CreateMessage } from "@/Utils";
+import { CreateChat, CreateMessage, timestampToDate } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
 import AddChatButton from "@components/HomePage/AddChatButton";
 import ChatsContainer, { ChatsContainerHandle } from "@components/HomePage/ChatsContainer";
-import MessageInput, { MessageInputHandle } from "@components/HomePage/MessageInput";
+import MessageInput from "@components/HomePage/MessageInput";
 import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
@@ -19,6 +19,7 @@ import Profile from "@components/Profile";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
+import { messageInputRef } from "@services/InputControlService";
 import { eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Alert, BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
@@ -68,7 +69,6 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [profileId, setProfileId] = useState<number>(-1);
     const lastBackButtonPress = useRef<number>(0);
-    const messageInputRef = useRef<MessageInputHandle>(null);
     const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
@@ -272,10 +272,24 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                             id: message.id,
                             text: message.text,
                             sender: { id: message.author_id, username: message.author },
-                            chatId: message.chat_id,
+                            chatId: message.chat,
+                            sentAt: timestampToDate(message.sent_at),
                         }),
                     );
+                    db.insert(messagesTable)
+                        .values({
+                            id: message.id,
+                            content: message.text,
+                            senderId: message.author_id,
+                            chatId: message.chat,
+                            sentAt: timestampToDate(message.sent_at),
+                        })
+                        .run();
                 }
+            });
+            socket.on("deleteMessage", (data: any) => {
+                messagesRef.current?.deleteMessage(data.message);
+                db.delete(messagesTable).where(eq(messagesTable.id, data.message)).run();
             });
         }
         initSocket();

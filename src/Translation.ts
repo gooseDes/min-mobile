@@ -31,6 +31,11 @@ export interface Language {
     enter_username?: string;
     username_placeholder?: string;
 
+    // Message dropdown
+    cancel?: string;
+    reply?: string;
+    delete?: string;
+
     // Settings
     settings_general?: string;
     settings_language_time?: string;
@@ -77,6 +82,11 @@ class Translation {
         enter_username: "Enter username of the person you want to chat with:",
         username_placeholder: "Username",
 
+        // Message dropdown
+        cancel: "Cancel",
+        reply: "Reply",
+        delete: "Delete",
+
         // Settings
         settings_general: "General",
         settings_language_time: "Language & Time",
@@ -120,6 +130,11 @@ class Translation {
         enter_username: "Введите имя пользователя, с которым хотите начать чат:",
         username_placeholder: "Имя пользователя",
 
+        // Message dropdown
+        cancel: "Отменить",
+        reply: "Ответить",
+        delete: "Удалить",
+
         // Settings
         settings_general: "Общие",
         settings_language_time: "Язык и время",
@@ -162,6 +177,11 @@ class Translation {
         create_chat: "Створити чат",
         enter_username: "Введіть ім'я користувача, з яким ви хочете почати чат:",
         username_placeholder: "Ім'я користувача",
+
+        // Message dropdown
+        cancel: "Відмінити",
+        reply: "Відповісти",
+        delete: "Видалити",
 
         // Settings
         settings_general: "Загальні",

@@ -6,11 +6,13 @@ import Divider from "./Divider";
 import DropdownItem from "./DropdownItem";
 
 export interface DropdownProps {
-    items: DropdownItemData[];
+    items?: DropdownItemData[];
 }
 
 export interface DropdownHandler {
     open: (coords: { x: number; y: number }) => void;
+    setItems: (items: DropdownItemData[]) => void;
+    getIsOpen: () => boolean;
 }
 
 const styles = StyleSheet.create({
@@ -32,6 +34,7 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
     const [isMounted, setIsMounted] = useState<boolean>(false);
+    const [localItems, setLocalItems] = useState<DropdownItemData[]>(items || []);
     const removeTimeout = useRef<number | null>(null);
 
     useImperativeHandle(ref, () => ({
@@ -41,9 +44,13 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
                 removeTimeout.current = null;
             }
             setIsMounted(true);
-            setPosition({ x: coords.x - 100, y: coords.y + 80 });
+            setPosition({ x: coords.x - 100, y: coords.y });
             setTimeout(() => setIsOpen(true));
         },
+        setItems: (newItems: DropdownItemData[]) => {
+            setLocalItems(newItems);
+        },
+        getIsOpen: () => isOpen,
     }));
 
     const handleItemPress = (item: DropdownItemData) => {
@@ -62,6 +69,10 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
         }
     }, [isOpen]);
 
+    useEffect(() => {
+        setLocalItems(items || []);
+    }, [items]);
+
     return (
         <>
             {isMounted && (
@@ -72,12 +83,13 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
                         {
                             pointerEvents: isOpen ? "auto" : "none",
                             transform: [{ scaleY: isOpen ? 1 : 0 }],
-                            transition: "transform 0.25s",
+                            opacity: isOpen ? 1 : 0,
+                            transition: "transform 0.25s, opacity 0.25s",
                             transitionTimingFunction: Constants.cubicBezier,
                         },
                     ]}
                 >
-                    {items.map((item, index) => (
+                    {localItems.map((item, index) => (
                         <View key={index}>
                             {index > 0 && <Divider />}
                             <DropdownItem text={item.text} icon={item.icon} onClick={() => handleItemPress(item)} />

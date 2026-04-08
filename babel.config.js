@@ -9,6 +9,7 @@ module.exports = {
                     "@components": "./src/components",
                     "@pages": "./src/pages",
                     "@types": "./src/types",
+                    "@services": "./src/services",
                     "@drizzle": "./drizzle",
                     "@": "./src",
                 },

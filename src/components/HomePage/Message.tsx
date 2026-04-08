@@ -7,9 +7,11 @@ import { useTranslation } from "@/TranslationContext";
 import { dateToString } from "@/Utils";
 import Icon from "@components/Icon";
 import { SERVER } from "@env";
+import { openDropdown } from "@services/DropdownService";
+import { setMessagePrefix } from "@services/InputControlService";
 import { eq } from "drizzle-orm";
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Markdown, { MarkedStyles } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
@@ -61,6 +63,9 @@ const styles = StyleSheet.create({
         marginBottom: 4,
         textAlign: "right",
     },
+    dropdownTrigger: {
+        flex: 1,
+    },
 });
 
 const markdownStyles: MarkedStyles = {
@@ -84,6 +89,7 @@ interface MessageProps extends React.PropsWithChildren {
     show_author?: boolean;
     shown?: boolean;
     sentAt?: Date;
+    id?: number;
 }
 
 function withoutCommand(text: string): string {
@@ -101,10 +107,10 @@ function MessageBase(props: MessageProps) {
     const showAuthor = props.show_author === undefined ? true : props.show_author;
     const shown = props.shown === undefined ? true : props.shown;
     const side = props.side || "left";
-    const sentAt = props.sentAt;
-
+    const { sentAt, id } = props;
     const text = props.children?.toString() || "";
     const is_reply = text.startsWith("/reply");
+
     const [replyText, setReplyText] = useState<string>("");
 
     const { t } = useTranslation();
@@ -150,28 +156,48 @@ function MessageBase(props: MessageProps) {
         transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }],
     }));
 
+    async function deleteMessage() {
+        const socket = await getSocket();
+        socket.emit("deleteMessage", { message: id });
+    }
+
     return (
         <Animated.View
             style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
+            layout={Constants.layoutTransition}
         >
             {showAvatar && <Image source={{ uri: `${SERVER}/avatars/${props.author_id || ""}.webp` }} style={styles.avatar} />}
-            <View style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}>
-                {props.author_name && showAuthor && (
-                    <Text style={[Styles.secondaryText, styles.authorText]}>{isCurrentUser ? t.you : props.author_name}</Text>
-                )}
-                {is_reply && replyText && (
-                    <Text numberOfLines={1} ellipsizeMode="tail" style={[Styles.secondaryText, styles.replyText]}>
-                        <Icon name="reply" size={10} /> {replyText}
-                    </Text>
-                )}
+            <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
+                <View style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}>
+                    {props.author_name && showAuthor && (
+                        <Text style={[Styles.secondaryText, styles.authorText]}>
+                            {isCurrentUser ? t.you : props.author_name}
+                        </Text>
+                    )}
+                    {is_reply && replyText && (
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={[Styles.secondaryText, styles.replyText]}>
+                            <Icon name="reply" size={10} /> {replyText}
+                        </Text>
+                    )}
 
-                <Markdown
-                    styles={markdownStyles}
-                    flatListProps={markdownFlatListProps}
-                    value={is_reply ? text.replace(/^.*\n/, "") : text}
+                    <Markdown
+                        styles={markdownStyles}
+                        flatListProps={markdownFlatListProps}
+                        value={is_reply ? text.replace(/^.*\n/, "") : text}
+                    />
+
+                    {sentAt && <Text style={[Styles.secondaryText, styles.sentAtText]}>{dateToString(sentAt)}</Text>}
+                </View>
+                <TouchableOpacity
+                    style={styles.dropdownTrigger}
+                    onPress={e => {
+                        openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
+                            { icon: "x", text: t.cancel },
+                            { icon: "reply", text: t.reply, onPress: () => setMessagePrefix(`/reply ${id}\n`) },
+                            { icon: "trash", text: t.delete, onPress: deleteMessage },
+                        ]);
+                    }}
                 />
-
-                {sentAt && <Text style={[Styles.secondaryText, styles.sentAtText]}>{dateToString(sentAt)}</Text>}
             </View>
         </Animated.View>
     );

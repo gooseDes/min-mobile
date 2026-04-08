@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
 export interface MessagesContainerHandle {
     setMessages: (newMessages: MessageData[]) => void;
     addMessage: (message: MessageData) => void;
+    deleteMessage: (messageId: number) => void;
     changeMessageNumberBy: (amount: number) => void;
     show: () => void;
     hide: () => void;
@@ -45,6 +46,10 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
         },
         addMessage: (message: MessageData) => {
             messagesRef.current.push(message);
+            setAnimProgress(messagesRef.current.length);
+        },
+        deleteMessage: (messageId: number) => {
+            messagesRef.current = messagesRef.current.filter(msg => msg.id !== messageId);
             setAnimProgress(messagesRef.current.length);
         },
         show: () => {
@@ -80,6 +85,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
                     show_author={showAvatar}
                     shown={animProgress > index || !(index <= 15) || index < newlyAddedMessages}
                     sentAt={message.sentAt}
+                    id={message.id}
                 >
                     {message.text}
                 </Message>

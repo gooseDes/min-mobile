@@ -1,5 +1,5 @@
 interface DropdownItemData {
-    text: string;
+    text?: string;
     icon?: string;
     onPress?: () => void;
 }

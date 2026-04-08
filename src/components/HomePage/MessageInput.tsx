@@ -4,7 +4,7 @@ import { setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
-import { forwardRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
@@ -51,11 +51,20 @@ export interface MessageInputProps {
     style?: StyleProp<ViewStyle>;
 }
 
-export interface MessageInputHandle {}
+export interface MessageInputHandle {
+    setMessagePrefix: (messagePrefix: string) => void;
+}
 
-const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, _ref) => {
+const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, ref) => {
     const { t } = useTranslation();
+    const [prefix, setPrefix] = useState<string>("");
     const [value, setValue] = useState<string>("");
+
+    useImperativeHandle(ref, () => ({
+        setMessagePrefix: (messagePrefix: string) => {
+            setPrefix(messagePrefix);
+        },
+    }));
 
     function onChangeText(text: string) {
         setValue(text);
@@ -63,7 +72,8 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, _
     }
 
     function onSend() {
-        props.onSend?.(value);
+        props.onSend?.(prefix + value);
+        setPrefix("");
         setValue("");
     }
 
