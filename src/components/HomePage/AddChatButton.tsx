@@ -50,7 +50,7 @@ function AddChatButton({ handler }: AddChatButtonProps) {
     }
 
     return (
-        <PopupButton right={10} bottom={60} icon="plus" iconSize={24} ref={popupRef}>
+        <PopupButton right={10} bottom={80} icon="plus" iconSize={24} ref={popupRef}>
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
                     <Icon name="plus" size={24} color={Colors.primaryTextColor} />
