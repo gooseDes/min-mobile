@@ -1,11 +1,14 @@
+import Auth from "@/Auth";
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
+import { SERVER } from "@env";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import { Alert, StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import { launchImageLibrary } from "react-native-image-picker";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
@@ -25,16 +28,16 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
         height: "100%",
-        paddingHorizontal: 16,
+        paddingHorizontal: 4,
         ...Styles.primaryText,
     },
-    sendButton: {
+    button: {
         height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         overflow: "hidden",
-        marginRight: 10,
+        margin: 10,
     },
     actualContent: {
         display: "flex",
@@ -71,10 +74,38 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
         props.onTextChanged?.(text);
     }
 
-    function onSend() {
+    function send() {
         props.onSend?.(prefix + value);
         setPrefix("");
         setValue("");
+    }
+
+    async function attach() {
+        const result = await launchImageLibrary({ mediaType: "photo", selectionLimit: 1 });
+        if (result.didCancel) return;
+        if (!result.assets) return;
+        const asset = result.assets[0];
+        if (asset.uri && asset.fileName && asset.type) {
+            const response = await fetch(`${SERVER}/attach`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${await Auth.getFromStorage("token")}`,
+                },
+                body: (() => {
+                    const formData = new FormData();
+                    formData.append("attachments", { uri: asset.uri, name: asset.fileName, type: asset.type });
+                    return formData;
+                })(),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    setValue(value + " " + data.urls.map((att: string) => `![attachment](${SERVER}${att})`).join("\n"));
+                } else {
+                    Alert.alert("Error", data.msg);
+                }
+            }
+        }
     }
 
     return (
@@ -92,6 +123,11 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                     overlayColor={setAlphaForColor(Colors.backgroundPanelColor, 0.6)}
                 >
                     <View style={[StyleSheet.absoluteFill, styles.actualContent]}>
+                        <View style={styles.button}>
+                            <TouchableOpacity onPress={attach}>
+                                <Icon name="paperclip" size={24} color={Colors.secondaryTextColor} />
+                            </TouchableOpacity>
+                        </View>
                         <TextInput
                             style={styles.input}
                             placeholder={t.your_message}
@@ -100,9 +136,9 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                             onChangeText={onChangeText}
                             value={value}
                         />
-                        <View style={styles.sendButton}>
-                            <TouchableOpacity onPress={onSend}>
-                                <Icon name="paper-plane" size={24} color={Colors.primaryTextColor} />
+                        <View style={styles.button}>
+                            <TouchableOpacity onPress={send}>
+                                <Icon name="paper-plane" size={24} color={Colors.secondaryTextColor} />
                             </TouchableOpacity>
                         </View>
                     </View>
