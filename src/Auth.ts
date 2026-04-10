@@ -59,11 +59,11 @@ export default class Auth {
         if (response.ok) {
             console.log(json);
             await this.setInStorage("token", json.token);
-            await this.setInStorage("username", json.username);
+            await this.setInStorage("username", login);
             await this.setInStorage("email", email);
             await this.setInStorage("id", json.id.toString());
-            Auth.username = json.username;
-            Storage.set("user.username", json.username);
+            Auth.username = login;
+            Storage.set("user.username", login);
             Auth.id = json.id;
             Storage.set("user.id", json.id);
             resetSocket();

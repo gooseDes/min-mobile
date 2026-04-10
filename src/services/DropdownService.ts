@@ -7,5 +7,7 @@ export function openDropdown(x: number, y: number, items: DropdownItemData[]) {
     if (dropdownRef.current?.getIsOpen()) return;
 
     dropdownRef.current?.setItems(items);
-    dropdownRef.current?.open({ x, y });
+    requestAnimationFrame(() => {
+        dropdownRef.current?.open({ x, y });
+    });
 }

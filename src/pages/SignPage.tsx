@@ -71,6 +71,7 @@ function SignPage(props: PageProps) {
             return;
         }
         const result = await Auth.register(loginValue, emailValue, passwordValue);
+        console.log(result);
         if (result.success) {
             props.handler({ action: "go", to: "Home" });
         } else {
@@ -92,8 +93,14 @@ function SignPage(props: PageProps) {
                     <Divider />
 
                     <View style={styles.signForm}>
-                        <InputField onChangeText={value => setEmailValue(value)} placeholder={t.email} key={t.email + "1"} />
                         <InputField
+                            autoCapitalize="none"
+                            onChangeText={value => setEmailValue(value)}
+                            placeholder={t.email}
+                            key={t.email + "1"}
+                        />
+                        <InputField
+                            autoCapitalize="none"
                             onChangeText={value => setPasswordValue(value)}
                             placeholder={t.password}
                             secureTextEntry={true}
@@ -122,15 +129,27 @@ function SignPage(props: PageProps) {
                     <Divider />
 
                     <View style={styles.signForm}>
-                        <InputField onChangeText={value => setLoginValue(value)} placeholder={t.login} key={t.login + "2"} />
-                        <InputField onChangeText={value => setEmailValue(value)} placeholder={t.email} key={t.email + "2"} />
                         <InputField
+                            autoCapitalize="none"
+                            onChangeText={value => setLoginValue(value)}
+                            placeholder={t.login}
+                            key={t.login + "2"}
+                        />
+                        <InputField
+                            autoCapitalize="none"
+                            onChangeText={value => setEmailValue(value)}
+                            placeholder={t.email}
+                            key={t.email + "2"}
+                        />
+                        <InputField
+                            autoCapitalize="none"
                             onChangeText={value => setPasswordValue(value)}
                             placeholder={t.password}
                             secureTextEntry={true}
                             key={t.password + "2"}
                         />
                         <InputField
+                            autoCapitalize="none"
                             onChangeText={value => setConfirmPasswordValue(value)}
                             placeholder={t.confirm_password}
                             secureTextEntry={true}

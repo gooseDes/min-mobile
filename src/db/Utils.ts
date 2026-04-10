@@ -59,7 +59,7 @@ export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
     // Saving chats to db
     promises.push(
         ...chats_payload.chats.slice().map(async (chat: any) => {
-            await db.insert(chatsTable).values({ id: chat.id, type: chatTypes.private, title: chat.name });
+            await db.insert(chatsTable).values({ id: chat.id, type: chatTypes.private, title: chat.name || "Unknown" });
             await Promise.all(
                 chat.participants.map(async (user: any) => {
                     await db
@@ -71,7 +71,7 @@ export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
             );
             return CreateChat({
                 id: chat.id,
-                title: chat.name,
+                title: chat.name || "Unknown",
                 participants: chat.participants.map((user: any) => {
                     user.username = user.name;
                     delete user.name;
