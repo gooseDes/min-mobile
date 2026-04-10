@@ -1,5 +1,5 @@
 import Dropdown from "@components/Dropdown";
-import Notification, { NotificationHandle } from "@components/Notification";
+import Notification from "@components/Notification";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
 import notifee from "@notifee/react-native";
@@ -12,9 +12,11 @@ import {
     onMessage,
     requestPermission,
 } from "@react-native-firebase/messaging";
-import { createNavigationContainerRef, NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { dropdownRef } from "@services/DropdownService";
+import { initialRouteName, navigate, navigationRef } from "@services/NavigationService";
+import { notificationRef } from "@services/NotifyService";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { useEffect, useRef } from "react";
 import { StatusBar } from "react-native";
@@ -41,16 +43,8 @@ const stackOptions: NativeStackNavigationOptions = {
     gestureEnabled: false,
 };
 
-type RootStackParamList = {
-    Home: undefined;
-    Sign: undefined;
-    Settings: undefined;
-};
-
 function App() {
-    const notificationRef = useRef<NotificationHandle | null>(null);
     const homePageRef = useRef<HomePageHandler | null>(null);
-    const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
     async function requestUserPermission(messaging: FirebaseMessagingTypes.Module) {
         // Request user permission for Firebase notifications
@@ -93,7 +87,7 @@ function App() {
                 }
             }
             if (!(await Auth.getFromStorage("token"))) {
-                commandHandler({ action: "go", to: "Sign" });
+                navigate("Sign");
             }
         }
 
@@ -121,57 +115,20 @@ function App() {
         };
     }, []);
 
-    function commandHandler(command: CommandData) {
-        switch (command.action) {
-            case "go":
-                if (command.to === "Home" || command.to === "Sign") {
-                    const to = command.to;
-                    async function waitForNavigationRef(): Promise<void> {
-                        return new Promise(resolve => {
-                            const check = setInterval(() => {
-                                if (navigationRef.isReady()) {
-                                    clearInterval(check);
-                                    resolve();
-                                }
-                            }, 10);
-                        });
-                    }
-                    waitForNavigationRef().then(() => {
-                        navigationRef.reset({
-                            index: 0,
-                            routes: [{ name: to }],
-                        });
-                    });
-                } else {
-                    navigationRef.navigate(command.to as any);
-                }
-                break;
-            case "back":
-                navigationRef.goBack();
-                break;
-            case "notify":
-                notificationRef.current?.setText(command.text ?? "");
-                notificationRef.current?.setTitle(command.title ?? "");
-                notificationRef.current?.setImage(command.image ?? null);
-                notificationRef.current?.show();
-                break;
-        }
-    }
-
     return (
         <TranslationProvider>
             <SafeAreaProvider style={{ backgroundColor: Colors.backgroundColor }}>
                 <StatusBar barStyle={"light-content"} />
-                <NavigationContainer ref={navigationRef}>
+                <NavigationContainer ref={navigationRef} onReady={() => navigate(initialRouteName)}>
                     <Stack.Navigator initialRouteName="Home">
                         <Stack.Screen name="Home" options={stackOptions}>
-                            {() => <HomePage ref={homePageRef} handler={commandHandler} />}
+                            {() => <HomePage ref={homePageRef} />}
                         </Stack.Screen>
                         <Stack.Screen name="Sign" options={stackOptions}>
-                            {() => <SignPage handler={commandHandler} />}
+                            {() => <SignPage />}
                         </Stack.Screen>
                         <Stack.Screen name="Settings" options={stackOptions}>
-                            {() => <SettingsPage handler={commandHandler} />}
+                            {() => <SettingsPage />}
                         </Stack.Screen>
                     </Stack.Navigator>
                 </NavigationContainer>

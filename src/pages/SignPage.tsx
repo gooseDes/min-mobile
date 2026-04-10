@@ -5,6 +5,8 @@ import Button from "@components/Button";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import InputField from "@components/InputField";
+import { navigate } from "@services/NavigationService";
+import { showNotification } from "@services/NotifyService";
 import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { ZoomInDown, ZoomInUp, ZoomOutDown, ZoomOutUp } from "react-native-reanimated";
@@ -48,7 +50,7 @@ const styles = StyleSheet.create({
     },
 });
 
-function SignPage(props: PageProps) {
+function SignPage() {
     const [emailValue, setEmailValue] = useState<string>("");
     const [loginValue, setLoginValue] = useState<string>("");
     const [passwordValue, setPasswordValue] = useState<string>("");
@@ -59,9 +61,9 @@ function SignPage(props: PageProps) {
     async function SignIn() {
         const result = await Auth.login(emailValue, passwordValue);
         if (result.success) {
-            props.handler({ action: "go", to: "Home" });
+            navigate("Home");
         } else {
-            props.handler({ action: "notify", title: "Failed :(", text: result.message });
+            showNotification("Failed :(", result.message);
         }
     }
 
@@ -73,9 +75,9 @@ function SignPage(props: PageProps) {
         const result = await Auth.register(loginValue, emailValue, passwordValue);
         console.log(result);
         if (result.success) {
-            props.handler({ action: "go", to: "Home" });
+            navigate("Home");
         } else {
-            props.handler({ action: "notify", title: "Failed :(", text: result.message });
+            showNotification("Failed :(", result.message);
         }
     }
 

@@ -6,6 +6,7 @@ import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import InputField from "@components/InputField";
 import PopupButton, { PopupButtonHandler } from "@components/PopupButton";
+import { showNotification } from "@services/NotifyService";
 import { useRef, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
 
@@ -25,11 +26,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export interface AddChatButtonProps {
-    handler: PageHandler;
-}
-
-function AddChatButton({ handler }: AddChatButtonProps) {
+function AddChatButton() {
     const [username, setUsername] = useState<string>("");
     const popupRef = useRef<PopupButtonHandler>(null);
 
@@ -42,7 +39,7 @@ function AddChatButton({ handler }: AddChatButtonProps) {
                 popupRef.current?.close();
                 socket.emit("getChats", {});
             } else {
-                handler({ action: "notify", title: "Failed to create chat", text: data.msg, image: null });
+                showNotification("Failed to create chat", data.msg);
             }
             socket.off("createChatResult");
         });

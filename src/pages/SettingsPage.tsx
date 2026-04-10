@@ -5,6 +5,7 @@ import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import SettingsSection from "@components/Settings/SettingsSection";
+import { goBack } from "@services/NavigationService";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     },
 });
 
-function SettingsPage(props: PageProps) {
+function SettingsPage() {
     const { t } = useTranslation();
 
     return (
@@ -64,7 +65,7 @@ function SettingsPage(props: PageProps) {
                 {/* Header */}
                 <View style={styles.header}>
                     {/* Back Button */}
-                    <IconButton icon="list-ul" style={styles.backButton} onPress={() => props.handler({ action: "back" })} />
+                    <IconButton icon="list-ul" style={styles.backButton} onPress={() => goBack()} />
 
                     {/* Title */}
                     <View style={styles.title}>
@@ -82,7 +83,7 @@ function SettingsPage(props: PageProps) {
                 <View style={styles.content}>
                     {/* Settings Content */}
                     {settings.sections.map((section, index) => (
-                        <SettingsSection key={index} section={section} handler={props.handler} />
+                        <SettingsSection key={index} section={section} />
                     ))}
                 </View>
             </View>

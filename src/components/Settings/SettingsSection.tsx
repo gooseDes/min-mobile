@@ -6,6 +6,7 @@ import { ClearCache } from "@/Utils";
 import Icon from "@components/Icon";
 import Switch from "@components/Switch";
 import { openDropdown } from "@services/DropdownService";
+import { goBack } from "@services/NavigationService";
 import { JSX, useEffect, useRef, useState } from "react";
 import { BackHandler, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -75,7 +76,6 @@ const styles = StyleSheet.create({
 interface SettingsSectionProps {
     onExpand?: () => void;
     section: SettingsSection;
-    handler: PageHandler;
 }
 
 function SettingsSection(props: SettingsSectionProps) {
@@ -118,7 +118,7 @@ function SettingsSection(props: SettingsSectionProps) {
             if (expandedRef.current) {
                 setExpanded(false);
             } else {
-                props.handler({ action: "back" });
+                goBack();
             }
             return true;
         });

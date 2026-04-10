@@ -20,6 +20,7 @@ import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
 import { messageInputRef } from "@services/InputControlService";
+import { navigate } from "@services/NavigationService";
 import { eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Alert, BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
@@ -59,7 +60,7 @@ type TabStyles = {
     [K in keyof ViewStyle]?: Record<Tabs, ViewStyle[K]>;
 };
 
-const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
+const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const messagesRef = useRef<MessagesContainerHandle>(null);
     const chatsRef = useRef<ChatsContainerHandle>(null);
     const [currentTab, setCurrentTab] = useState<Tabs>("chats");
@@ -140,7 +141,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
 
     async function SignOut() {
         await Auth.clearStorage();
-        props.handler({ action: "go", to: "Sign" });
+        navigate("Sign");
     }
 
     async function requestHistory() {
@@ -254,9 +255,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
             });
             socket.on("connect_error", err => {
                 if (err.message.includes("Invalid token")) {
-                    Alert.alert(t.relogin || "", t.relogin_msg, [
-                        { text: t.ok, onPress: () => props.handler({ action: "go", to: "Sign" }) },
-                    ]);
+                    Alert.alert(t.relogin || "", t.relogin_msg, [{ text: t.ok, onPress: () => navigate("Sign") }]);
                 } else {
                     console.log("Connection Error:", err);
                 }
@@ -388,12 +387,9 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
 
                 {/* Chats Tab */}
                 {currentTab === "chats" && (
-                    <FloatIslandButton
-                        icon="gear"
-                        text={t.settings}
-                        onPress={() => props.handler({ action: "go", to: "Settings" })}
-                    />
+                    <FloatIslandButton icon="gear" text={t.settings} onPress={() => navigate("Settings", "push")} />
                 )}
+                {/*currentTab === "chats" && <FloatIslandButton icon="user-circle" text="Profile" onPress={() => {}} />*/}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
 
                 {/* Profile Tab */}
@@ -426,7 +422,7 @@ const HomePage = forwardRef<HomePageHandler, PageProps>((props, ref) => {
                 )}
                 {currentTab === "chats" && <Divider />}
                 {currentTab === "chats" && <ChatsContainer bottomGap={70} handler={handleChat} ref={chatsRef} />}
-                {currentTab === "chats" && <AddChatButton handler={props.handler} />}
+                {currentTab === "chats" && <AddChatButton />}
             </Animated.View>
         </SafeAreaView>
     );
