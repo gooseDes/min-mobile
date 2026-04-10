@@ -100,7 +100,9 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
-                    setValue(value + " " + data.urls.map((att: string) => `![attachment](${SERVER}${att})`).join("\n"));
+                    setValue(
+                        value + value ? " " : "" + data.urls.map((att: string) => `![attachment](${SERVER}${att})`).join("\n"),
+                    );
                 } else {
                     Alert.alert("Error", data.msg);
                 }

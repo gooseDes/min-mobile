@@ -117,3 +117,7 @@ export function setAlphaForColor(color: string, alpha: number): string {
     const b = parseInt(hex.substring(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+export function countChars(str: string, char: string): number {
+    return str.split(char).length - 1;
+}

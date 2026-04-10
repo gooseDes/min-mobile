@@ -4,7 +4,7 @@ import { messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Colors, Constants, Styles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
-import { dateToString } from "@/Utils";
+import { countChars, dateToString } from "@/Utils";
 import Icon from "@components/Icon";
 import { SERVER } from "@env";
 import { openDropdown } from "@services/DropdownService";
@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
     },
     sentAtText: {
         fontSize: 11,
-        marginTop: -8,
         marginBottom: 4,
         textAlign: "right",
     },
@@ -70,8 +69,19 @@ const styles = StyleSheet.create({
 
 const markdownStyles: MarkedStyles = {
     table: { borderWidth: Constants.borderWidth, borderColor: Colors.borderColor },
-    blockquote: { marginVertical: 8 },
+    blockquote: { marginTop: 8, ...Styles.primaryText },
     text: { ...Styles.primaryText },
+    strong: { ...Styles.primaryBoldText },
+    strikethrough: { ...Styles.primaryText },
+    em: { ...Styles.primaryText },
+    image: { borderRadius: Constants.rounding - styles.messageContent.paddingHorizontal },
+    li: { ...Styles.primaryText },
+    h1: { ...Styles.primaryBoldText },
+    h2: { ...Styles.primaryText },
+    h3: { ...Styles.primaryText },
+    h4: { ...Styles.primaryText },
+    h5: { ...Styles.primaryText },
+    h6: { ...Styles.primaryText },
 };
 
 const markdownFlatListProps: any = {
@@ -109,6 +119,7 @@ function MessageBase(props: MessageProps) {
     const side = props.side || "left";
     const { sentAt, id } = props;
     const text = props.children?.toString() || "";
+    const textWithoutCommand = withoutCommand(text);
     const is_reply = text.startsWith("/reply");
 
     const [replyText, setReplyText] = useState<string>("");
@@ -161,6 +172,34 @@ function MessageBase(props: MessageProps) {
         socket.emit("deleteMessage", { message: id });
     }
 
+    function calculateMargin(md: string) {
+        let margin = -8;
+        function changeMargin(newMargin: number) {
+            if (newMargin > margin) {
+                margin = newMargin;
+            }
+        }
+
+        md = md.trim();
+
+        if (md.includes(">") && !md.includes("\\>")) {
+            changeMargin(0);
+        }
+
+        const lastLine = md.split("\n").at(-1) || "";
+        if (lastLine.includes("# ") && !lastLine.includes("\\# ")) {
+            changeMargin(0);
+        } else if (lastLine.startsWith("- ") || lastLine.startsWith("* ") || lastLine.startsWith("+ ")) {
+            changeMargin(0);
+        } else if (lastLine.startsWith("![") && !lastLine.includes("\\![")) {
+            changeMargin(0);
+        }
+        if (countChars(lastLine, "`") >= 2) {
+            changeMargin(-4);
+        }
+        return margin;
+    }
+
     return (
         <Animated.View
             style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
@@ -180,13 +219,19 @@ function MessageBase(props: MessageProps) {
                         </Text>
                     )}
 
-                    <Markdown
-                        styles={markdownStyles}
-                        flatListProps={markdownFlatListProps}
-                        value={is_reply ? text.replace(/^.*\n/, "") : text}
-                    />
+                    <Markdown styles={markdownStyles} flatListProps={markdownFlatListProps} value={textWithoutCommand} />
 
-                    {sentAt && <Text style={[Styles.secondaryText, styles.sentAtText]}>{dateToString(sentAt)}</Text>}
+                    {sentAt && (
+                        <Text
+                            style={[
+                                Styles.secondaryText,
+                                styles.sentAtText,
+                                { marginTop: calculateMargin(textWithoutCommand) },
+                            ]}
+                        >
+                            {dateToString(sentAt)}
+                        </Text>
+                    )}
                 </View>
                 <TouchableOpacity
                     style={styles.dropdownTrigger}

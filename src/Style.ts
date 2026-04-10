@@ -31,30 +31,36 @@ export const Styles = StyleSheet.create({
     primaryText: {
         color: Colors.primaryTextColor,
         fontFamily: "Rubik",
+        fontWeight: "normal",
     },
     primaryBoldText: {
         color: Colors.primaryTextColor,
         fontFamily: "Rubik-Medium",
+        fontWeight: "normal",
     },
     primaryCenter: {
         color: Colors.primaryTextColor,
         fontFamily: "Rubik",
         textAlign: "center",
+        fontWeight: "normal",
     },
     secondaryText: {
         color: Colors.secondaryTextColor,
         fontFamily: "Rubik",
+        fontWeight: "normal",
     },
     secondaryCenter: {
         color: Colors.secondaryTextColor,
         fontFamily: "Rubik",
         textAlign: "center",
+        fontWeight: "normal",
     },
     titleText: {
         color: Colors.primaryTextColor,
         fontSize: 26,
         fontFamily: "Rubik-Medium",
         textAlign: "center",
+        fontWeight: "normal",
     },
     textInput: {
         color: Colors.primaryTextColor,
