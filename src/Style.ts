@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { PressableAndroidRippleConfig, StyleSheet } from "react-native";
 import { cubicBezier, LinearTransition } from "react-native-reanimated";
 
 export class Colors {
@@ -9,6 +9,7 @@ export class Colors {
     static messageBackgroundColor = "#1f1f23c2";
     static primaryTextColor = "#ffffff";
     static secondaryTextColor = "#aaaaaa";
+    static rippleColor = "#ffffffaa";
 }
 
 export class Constants {
@@ -17,6 +18,7 @@ export class Constants {
     static fontFamily = "Rubik";
     static layoutTransition = LinearTransition.springify(500);
     static cubicBezier = cubicBezier(0.4, 0, 0.2, 1);
+    static rippleConfig: PressableAndroidRippleConfig = { color: Colors.rippleColor, foreground: true };
 }
 
 export const Styles = StyleSheet.create({
@@ -55,13 +57,6 @@ export const Styles = StyleSheet.create({
         textAlign: "center",
         fontWeight: "normal",
     },
-    titleText: {
-        color: Colors.primaryTextColor,
-        fontSize: 26,
-        fontFamily: "Rubik-Medium",
-        textAlign: "center",
-        fontWeight: "normal",
-    },
     textInput: {
         color: Colors.primaryTextColor,
         fontFamily: "Rubik",
@@ -71,17 +66,47 @@ export const Styles = StyleSheet.create({
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
     },
-    header: {
-        color: Colors.primaryTextColor,
-        fontSize: 24,
-        fontFamily: "Rubik",
-        textAlign: "center",
-    },
     bgAndBorder: {
         backgroundColor: Colors.backgroundPanelColor,
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
         padding: 8,
+    },
+    header: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        height: 50,
+        marginBottom: 5,
+    },
+    title: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        flex: 1,
+        gap: 10,
+    },
+    titleText: {
+        color: Colors.primaryTextColor,
+        fontSize: 26,
+        fontFamily: "Rubik-Medium",
+        textAlign: "center",
+        fontWeight: "normal",
+    },
+    backButton: {
+        aspectRatio: 1,
+        height: "100%",
+    },
+    content: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        flex: 1,
     },
 });

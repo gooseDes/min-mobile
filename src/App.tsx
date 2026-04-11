@@ -3,6 +3,7 @@ import Notification from "@components/Notification";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
 import notifee from "@notifee/react-native";
+import ProfilePage from "@pages/ProfilePage";
 import SettingsPage from "@pages/SettingsPage";
 import {
     AuthorizationStatus,
@@ -129,6 +130,9 @@ function App() {
                         </Stack.Screen>
                         <Stack.Screen name="Settings" options={stackOptions}>
                             {() => <SettingsPage />}
+                        </Stack.Screen>
+                        <Stack.Screen name="Profile" options={stackOptions}>
+                            {() => <ProfilePage />}
                         </Stack.Screen>
                     </Stack.Navigator>
                 </NavigationContainer>

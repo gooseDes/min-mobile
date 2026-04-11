@@ -23,37 +23,6 @@ const styles = StyleSheet.create({
         width: "100%",
         flex: 1,
     },
-    header: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        height: 50,
-    },
-    backButton: {
-        aspectRatio: 1,
-        height: "100%",
-    },
-    title: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        flex: 1,
-    },
-    titleText: {
-        fontSize: 24,
-        marginLeft: 10,
-    },
-    content: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        flex: 1,
-    },
 });
 
 function SettingsPage() {
@@ -63,25 +32,25 @@ function SettingsPage() {
         <SafeAreaView style={Styles.container}>
             <View style={styles.panel}>
                 {/* Header */}
-                <View style={styles.header}>
+                <View style={Styles.header}>
                     {/* Back Button */}
-                    <IconButton icon="list-ul" style={styles.backButton} onPress={() => goBack()} />
+                    <IconButton icon="list-ul" style={Styles.backButton} onPress={() => goBack()} />
 
                     {/* Title */}
-                    <View style={styles.title}>
+                    <View style={Styles.title}>
                         <Icon name="gear" size={24} color={Colors.primaryTextColor} />
-                        <Text style={[Styles.primaryBoldText, styles.titleText]}>{t.settings}</Text>
+                        <Text style={[Styles.primaryBoldText, Styles.titleText]}>{t.settings}</Text>
                     </View>
 
                     {/* Spacer */}
-                    <View style={styles.backButton} />
+                    <View style={Styles.backButton} />
                 </View>
 
                 <Divider />
 
                 {/* Content */}
-                <View style={styles.content}>
-                    {/* Settings Content */}
+                <View style={Styles.content}>
+                    {/* Sections */}
                     {settings.sections.map((section, index) => (
                         <SettingsSection key={index} section={section} />
                     ))}
