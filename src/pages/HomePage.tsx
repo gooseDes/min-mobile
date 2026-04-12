@@ -270,7 +270,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                         CreateMessage({
                             id: message.id,
                             text: message.text,
-                            sender: { id: message.author_id, username: message.author },
+                            sender: { id: message.author_id, username: message.author, avatar: message.author_avatar },
                             chatId: message.chat,
                             sentAt: timestampToDate(message.sent_at),
                         }),
