@@ -46,6 +46,11 @@ export interface Language {
     // Time
     code?: string;
     yesterday?: string;
+
+    // Profile
+    profile?: string;
+    edit?: string;
+    apply?: string;
 }
 
 class Translation {
@@ -97,6 +102,11 @@ class Translation {
         // Time
         code: "en",
         yesterday: "Yesterday",
+
+        // Profile
+        profile: "Profile",
+        edit: "Edit",
+        apply: "Apply",
     };
 
     static ru: Language = {
@@ -145,6 +155,11 @@ class Translation {
         // Time
         code: "ru",
         yesterday: "Вчера",
+
+        // Profile
+        profile: "Профиль",
+        edit: "Изменить",
+        apply: "Сохранить",
     };
 
     static ua: Language = {
@@ -193,6 +208,11 @@ class Translation {
         // Time
         code: "uk",
         yesterday: "Вчора",
+
+        // Profile
+        profile: "Профіль",
+        edit: "Змінити",
+        apply: "Зберегти",
     };
 
     static getCurrentTranslation(): Language {

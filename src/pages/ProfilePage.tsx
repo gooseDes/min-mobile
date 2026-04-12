@@ -168,7 +168,7 @@ function ProfilePage() {
                     {/* Title */}
                     <View style={Styles.title}>
                         <Icon name="user-circle" size={24} color={Colors.primaryTextColor} />
-                        <Text style={Styles.titleText}>{t.settings}</Text>
+                        <Text style={Styles.titleText}>{t.profile}</Text>
                     </View>
 
                     {/* Spacer */}
@@ -219,7 +219,7 @@ function ProfilePage() {
 
                     {/* Actions */}
                     <ActionButton
-                        text={isEditMode ? "Apply" : "Edit"}
+                        text={isEditMode ? t.apply : t.edit}
                         icon={isEditMode ? "check" : "pencil"}
                         onPress={() => setIsEditMode(!isEditMode)}
                     />

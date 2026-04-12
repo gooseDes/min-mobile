@@ -390,7 +390,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     <FloatIslandButton icon="gear" text={t.settings} onPress={() => navigate("Settings", "push")} />
                 )}
                 {currentTab === "chats" && (
-                    <FloatIslandButton icon="user-circle" text="Profile" onPress={() => navigate("Profile", "push")} />
+                    <FloatIslandButton icon="user-circle" text={t.profile} onPress={() => navigate("Profile", "push")} />
                 )}
                 {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
 
