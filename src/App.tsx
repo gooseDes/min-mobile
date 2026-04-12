@@ -105,7 +105,7 @@ function App() {
             const data = CreateRemoteMessagePayload(remoteMessage.data);
             notificationRef.current?.setTitle(data.authorName);
             notificationRef.current?.setText(data.text);
-            notificationRef.current?.setImage(`${SERVER}/avatars/${data.authorId}.webp` || null);
+            notificationRef.current?.setImage(`${SERVER}/avatars/${data.authorAvatar}.webp` || null);
             if (homePageRef.current?.getCurrentChat().id !== data.chatId) {
                 notificationRef.current?.show();
             }

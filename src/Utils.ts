@@ -38,6 +38,7 @@ export function CreateRemoteMessagePayload(obj: any): RemoteMessagePayload {
         text: obj.text || "",
         chatId: parseInt(obj.chatId, 10) || -1,
         authorId: parseInt(obj.authorId, 10) || -1,
+        authorAvatar: obj.authorAvatar || "",
         messageId: parseInt(obj.messageId, 10) || -1,
         sentAt: parseInt(obj.sentAt, 10) || -1,
     };

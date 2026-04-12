@@ -3,11 +3,21 @@
  */
 
 import { SERVER } from "@env";
-import notifee, { AndroidImportance, AndroidStyle } from "@notifee/react-native";
+import notifee, { AndroidCategory, AndroidImportance, AndroidStyle } from "@notifee/react-native";
 import { getMessaging, setBackgroundMessageHandler } from "@react-native-firebase/messaging";
 import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
 import App from "./src/App";
+
+async function createChannel() {
+    await notifee.createChannel({
+        id: "min",
+        name: "Min Messages",
+        importance: AndroidImportance.HIGH,
+    });
+}
+
+createChannel();
 
 const messaging = getMessaging();
 
@@ -15,15 +25,16 @@ const messaging = getMessaging();
 setBackgroundMessageHandler(messaging, async remoteMessage => {
     if (!remoteMessage.data) return;
     const data = remoteMessage.data;
+
     await notifee.displayNotification({
-        title: data.authorName,
-        body: data.text,
         android: {
             smallIcon: "ic_notification",
-            largeIcon: `${SERVER}/avatars/${data.authorId}.png`,
             channelId: "min",
-            //circularLargeIcon: true,
+            largeIcon: `${SERVER}/avatars/${data.authorAvatar}.webp`,
             importance: AndroidImportance.HIGH,
+            category: AndroidCategory.MESSAGE,
+            showTimestamp: true,
+
             style: {
                 type: AndroidStyle.MESSAGING,
                 person: {
@@ -32,10 +43,10 @@ setBackgroundMessageHandler(messaging, async remoteMessage => {
                 messages: [
                     {
                         text: data.text,
-                        timestamp: parseInt(data.sentAt, 10),
+                        timestamp: parseInt(data.sentAt, 10) * 1000,
                         person: {
                             name: data.authorName,
-                            icon: `${SERVER}/avatars/${data.authorId}.png`,
+                            icon: `${SERVER}/avatars/${data.authorAvatar}.webp`,
                         },
                     },
                 ],
@@ -43,7 +54,6 @@ setBackgroundMessageHandler(messaging, async remoteMessage => {
             pressAction: {
                 id: "default",
             },
-            //category: AndroidCategory.MESSAGE,
         },
     });
 });
