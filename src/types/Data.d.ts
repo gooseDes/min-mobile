@@ -15,4 +15,5 @@ interface ChatData {
 interface UserData {
     id: number;
     username: string;
+    avatar?: string;
 }

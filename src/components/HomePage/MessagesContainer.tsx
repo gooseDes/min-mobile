@@ -80,6 +80,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
                 <Message
                     author_name={message.sender.username}
                     author_id={message.sender.id}
+                    author_avatar={message.sender.avatar}
                     side={userId === message.sender.id ? "right" : "left"}
                     show_avatar={showAvatar}
                     show_author={showAvatar}

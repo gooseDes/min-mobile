@@ -18,6 +18,7 @@ export const chatsTable = sqliteTable("chats", {
 export const usersTable = sqliteTable("users", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     username: text("username").notNull().default(""),
+    avatar: text("avatar").default(""),
 });
 
 export const messagesTable = sqliteTable("messages", {

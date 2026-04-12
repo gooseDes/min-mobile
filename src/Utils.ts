@@ -10,6 +10,7 @@ export function CreateUserData(obj: any = {}): UserData {
     return {
         id: o.id || -1,
         username: o.username || "Unknown",
+        avatar: o.avatar || undefined,
     };
 }
 

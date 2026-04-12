@@ -15,6 +15,13 @@
       "when": 1774212078051,
       "tag": "0001_sent_at",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1775998469299,
+      "tag": "0002_avatar",
+      "breakpoints": true
     }
   ]
 }

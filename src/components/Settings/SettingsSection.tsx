@@ -71,6 +71,10 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         aspectRatio: 1,
     },
+    titleText: {
+        ...Styles.primaryCenter,
+        fontSize: 24,
+    },
 });
 
 interface SettingsSectionProps {
@@ -158,7 +162,7 @@ function SettingsSection(props: SettingsSectionProps) {
                         if (item.type === "language") {
                             component = (
                                 <View>
-                                    <Text style={Styles.header}>{itemTitle(item.title)}</Text>
+                                    <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
                                     <Text style={Styles.secondaryCenter}>{`${t.now}: ${t.language_name}`}</Text>
                                     <View style={{ height: 16 }} />
                                     <TouchableOpacity
@@ -190,7 +194,7 @@ function SettingsSection(props: SettingsSectionProps) {
                         } else if (item.type === "cache") {
                             component = (
                                 <View>
-                                    <Text style={Styles.header}>{itemTitle(item.title)}</Text>
+                                    <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
                                     <View style={{ height: 16 }} />
                                     <TouchableOpacity onPress={ClearCache}>
                                         <Text
@@ -205,7 +209,7 @@ function SettingsSection(props: SettingsSectionProps) {
                             component = (
                                 <View>
                                     <View style={{ flexDirection: "column", alignItems: "center", gap: 8 }}>
-                                        <Text style={Styles.header}>{itemTitle(item.title)}</Text>
+                                        <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
                                         <Switch
                                             checked={Storage.getBoolean(item.storageKey ?? "") ?? false}
                                             onChange={value => Storage.set(item.storageKey ?? "", value)}

@@ -1,4 +1,4 @@
-import { CreateChat, CreateMessage, timestampToDate } from "@/Utils";
+import { CreateChat, CreateMessage, CreateUserData, timestampToDate } from "@/Utils";
 import db from "./Client";
 import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./Schema";
 
@@ -10,11 +10,13 @@ export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageDa
                 .values({
                     id: msg.author_id,
                     username: msg.author,
+                    avatar: msg.author_avatar,
                 })
                 .onConflictDoUpdate({
                     target: [usersTable.id],
                     set: {
                         username: msg.author,
+                        avatar: msg.author_avatar,
                     },
                 });
             await db
@@ -38,7 +40,7 @@ export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageDa
             return CreateMessage({
                 id: msg.id,
                 text: msg.text,
-                sender: { id: msg.author_id, username: msg.author },
+                sender: CreateUserData({ id: msg.author_id, username: msg.author, avatar: msg.author_avatar }),
                 chatId: msg.chat_id,
                 sentAt: timestampToDate(msg.sent_at),
             });
@@ -64,8 +66,8 @@ export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
                 chat.participants.map(async (user: any) => {
                     await db
                         .insert(usersTable)
-                        .values({ id: user.id, username: user.name })
-                        .onConflictDoUpdate({ target: usersTable.id, set: { username: user.name } });
+                        .values({ id: user.id, username: user.name, avatar: user.avatar })
+                        .onConflictDoUpdate({ target: usersTable.id, set: { username: user.name, avatar: user.avatar } });
                     await db.insert(chatUsersTable).values({ chatId: chat.id, userId: user.id }).onConflictDoNothing();
                 }),
             );

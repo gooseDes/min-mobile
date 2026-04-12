@@ -56,7 +56,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
         <ClickableProfile
             text={chat.title}
             image={`${SERVER}/avatars/${
-                chat.participants?.find(participant => (participant?.id || -1) !== userId)?.id || "default"
+                chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
             }.webp`}
             anim={index % 2 === 0 ? "left" : "right"}
             shown={animProgress >= index}

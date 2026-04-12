@@ -111,6 +111,16 @@ function App() {
             }
         });
 
+        getSocket().then(socket => {
+            socket.on("userInfo", data => {
+                if (data.user.id === Auth.id) {
+                    Storage.set("avatar", data.user.avatar);
+                }
+                socket.off("userInfo");
+            });
+            socket.emit("getUserInfo", { id: Auth.id });
+        });
+
         return () => {
             ForegroundMessageHandlerUnsubscribe();
         };

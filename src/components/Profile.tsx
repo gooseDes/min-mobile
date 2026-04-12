@@ -46,7 +46,7 @@ function Profile(props: ProfileProps) {
             // Get user info from socket
             const socket = await getSocket();
             socket.on("userInfo", data => {
-                setUser(CreateUserData({ id: data.user?.id, username: data.user?.name }));
+                setUser(CreateUserData({ id: data.user?.id, username: data.user?.name, avatar: data.user?.avatar }));
                 socket.off("userInfo");
             });
             socket.emit("getUserInfo", { id: props.id });
@@ -58,7 +58,7 @@ function Profile(props: ProfileProps) {
         <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
             {user && (
                 <View>
-                    <Image source={{ uri: `${SERVER}/avatars/${user.id}.webp` }} style={styles.avatar} />
+                    <Image source={{ uri: `${SERVER}/avatars/${user.avatar}.webp` }} style={styles.avatar} />
                     <Text style={[Styles.primaryText, styles.name]} selectable={true}>
                         {user.username}
                     </Text>

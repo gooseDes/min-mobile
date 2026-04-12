@@ -376,7 +376,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
                         return (
                             <ClickableProfile
-                                image={`${SERVER}/avatars/${otherParticipant.id}.webp`}
+                                image={`${SERVER}/avatars/${otherParticipant.avatar}.webp`}
                                 text={currentChat?.title}
                                 bottomText={isPrivate ? t.private_chat : t.group_chat}
                                 onPress={isPrivate ? () => openProfile(otherParticipant.id) : () => {}}

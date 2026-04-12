@@ -94,6 +94,7 @@ const markdownFlatListProps: any = {
 interface MessageProps extends React.PropsWithChildren {
     author_name?: string;
     author_id?: number;
+    author_avatar?: string;
     side?: "left" | "right";
     show_avatar?: boolean;
     show_author?: boolean;
@@ -205,7 +206,9 @@ function MessageBase(props: MessageProps) {
             style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
             layout={Constants.layoutTransition}
         >
-            {showAvatar && <Image source={{ uri: `${SERVER}/avatars/${props.author_id || ""}.webp` }} style={styles.avatar} />}
+            {showAvatar && (
+                <Image source={{ uri: `${SERVER}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
+            )}
             <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
                 <View style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}>
                     {props.author_name && showAuthor && (

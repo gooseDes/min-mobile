@@ -1,4 +1,5 @@
 import Auth from "@/Auth";
+import Storage from "@/Storage";
 import { Colors, Constants, Styles } from "@/Style";
 import { t } from "@/Translation";
 import Divider from "@components/Divider";
@@ -108,7 +109,7 @@ function ActionButton(props: ActionButtonProps) {
 function ProfilePage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [avatarPreview, setAvatarPreview] = useState<Asset | undefined>(undefined);
-    const [avatar, setAvatar] = useState<string>(`${SERVER}/avatars/${Auth.id}.webp`);
+    const [avatar, setAvatar] = useState<string>(`${SERVER}/avatars/${Storage.getString("avatar")}.webp`);
 
     useEffect(() => {
         const listener = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -145,11 +146,13 @@ function ProfilePage() {
                         });
                         return formData;
                     })(),
-                }).then(_res => {
-                    console.log(_res);
-                    setAvatarPreview(undefined);
-                    setAvatar(`${SERVER}/avatars/${Auth.id}.webp?t=${new Date().getTime()}`);
-                });
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        Storage.set("avatar", data.avatar);
+                        setAvatarPreview(undefined);
+                        setAvatar(`${SERVER}${data.url}`);
+                    });
             }
         })();
     }, [isEditMode]);
