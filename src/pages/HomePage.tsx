@@ -159,7 +159,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     return CreateMessage({
                         id: message.id,
                         text: message.content,
-                        sender: { id: message.sender?.id, username: message.sender?.username },
+                        sender: { id: message.sender?.id, username: message.sender?.username, avatar: message.sender?.avatar },
                         chatId: message.chatId,
                         sentAt: message.sentAt,
                     });
@@ -171,7 +171,6 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         // Initialize messages from socket
         const socket = await getSocket();
         socket.on("history", async data => {
-            //console.log(data);
             if (data.messages.length > 0) {
                 const lastMessage = await db.query.messagesTable.findFirst({
                     where: eq(messagesTable.chatId, currentChat?.id || 0),
