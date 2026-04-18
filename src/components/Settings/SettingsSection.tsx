@@ -8,7 +8,7 @@ import Switch from "@components/Switch";
 import { openDropdown } from "@services/DropdownService";
 import { goBack } from "@services/NavigationService";
 import { JSX, useEffect, useRef, useState } from "react";
-import { BackHandler, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BackHandler, Dimensions, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
     Easing,
     FadeIn,
@@ -74,6 +74,43 @@ const styles = StyleSheet.create({
     titleText: {
         ...Styles.primaryCenter,
         fontSize: 24,
+    },
+    languageSelectorContainer: {
+        backgroundColor: Colors.backgroundColor,
+        padding: 16,
+        borderRadius: Constants.rounding,
+        borderColor: Colors.borderColor,
+        borderWidth: Constants.borderWidth,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        height: 70,
+    },
+    languageSelectorPressable: {
+        height: "100%",
+        aspectRatio: 1,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: Constants.rounding,
+        overflow: "hidden",
+    },
+    switchContainer: {
+        backgroundColor: Colors.backgroundColor,
+        padding: 16,
+        borderRadius: Constants.rounding,
+        borderColor: Colors.borderColor,
+        borderWidth: Constants.borderWidth,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 8,
+        height: 70,
+    },
+    switchOffOnText: {
+        ...Styles.secondaryCenter,
+        fontSize: 18,
+        flex: 1,
     },
 });
 
@@ -162,33 +199,37 @@ function SettingsSection(props: SettingsSectionProps) {
                         if (item.type === "language") {
                             component = (
                                 <View>
+                                    {/* Title */}
                                     <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
-                                    <Text style={Styles.secondaryCenter}>{`${t.now}: ${t.language_name}`}</Text>
-                                    <View style={{ height: 16 }} />
-                                    <TouchableOpacity
-                                        onPress={e =>
-                                            openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
-                                                {
-                                                    text: Translation.en.language_name,
-                                                    onPress: () => changeLanguage("en"),
-                                                },
-                                                {
-                                                    text: Translation.ru.language_name,
-                                                    onPress: () => changeLanguage("ru"),
-                                                },
-                                                {
-                                                    text: Translation.ua.language_name,
-                                                    onPress: () => changeLanguage("ua"),
-                                                },
-                                            ])
-                                        }
-                                    >
-                                        <Text
-                                            style={[Styles.secondaryCenter, { textDecorationLine: "underline", fontSize: 16 }]}
+
+                                    {/* Box */}
+                                    <View style={styles.languageSelectorContainer}>
+                                        <Icon name="earth-americas" size={24} color={Colors.secondaryTextColor} />
+                                        <Text style={[Styles.secondaryCenter, { fontSize: 18 }]}>{t.language_name}</Text>
+                                        <View style={{ flex: 1 }} />
+                                        <Pressable
+                                            style={styles.languageSelectorPressable}
+                                            android_ripple={Constants.rippleConfig}
+                                            onPress={e =>
+                                                openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
+                                                    {
+                                                        text: Translation.en.language_name,
+                                                        onPress: () => changeLanguage("en"),
+                                                    },
+                                                    {
+                                                        text: Translation.ru.language_name,
+                                                        onPress: () => changeLanguage("ru"),
+                                                    },
+                                                    {
+                                                        text: Translation.ua.language_name,
+                                                        onPress: () => changeLanguage("ua"),
+                                                    },
+                                                ])
+                                            }
                                         >
-                                            {t.change_language}
-                                        </Text>
-                                    </TouchableOpacity>
+                                            <Icon name="chevron-right" size={24} color={Colors.secondaryTextColor} />
+                                        </Pressable>
+                                    </View>
                                 </View>
                             );
                         } else if (item.type === "cache") {
@@ -208,12 +249,14 @@ function SettingsSection(props: SettingsSectionProps) {
                         } else if (item.type === "switch") {
                             component = (
                                 <View>
-                                    <View style={{ flexDirection: "column", alignItems: "center", gap: 8 }}>
-                                        <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
+                                    <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
+                                    <View style={styles.switchContainer}>
+                                        <Text style={styles.switchOffOnText}>Off</Text>
                                         <Switch
                                             checked={Storage.getBoolean(item.storageKey ?? "") ?? false}
                                             onChange={value => Storage.set(item.storageKey ?? "", value)}
                                         />
+                                        <Text style={styles.switchOffOnText}>On</Text>
                                     </View>
                                 </View>
                             );

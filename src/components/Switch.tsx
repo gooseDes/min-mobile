@@ -10,8 +10,8 @@ export interface SwitchProps {
 
 const styles = StyleSheet.create({
     touchable: {
-        width: 100,
-        height: 50,
+        width: 80,
+        height: 40,
     },
     switchBg: {
         flex: 1,
@@ -24,9 +24,9 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     switchThumb: {
-        width: 35,
-        height: 35,
-        borderRadius: 17.5,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
     },
 });
 
@@ -55,7 +55,7 @@ function Switch(props: SwitchProps) {
                             transition: "all 0.3s",
                             transitionTimingFunction: Constants.cubicBezier,
                             backgroundColor: isChecked ? Colors.primaryTextColor : Colors.secondaryTextColor,
-                            transform: [{ translateX: isPressing ? 0 : isChecked ? 25 : -25 }],
+                            transform: [{ translateX: isPressing ? 0 : isChecked ? 19 : -19 }],
                         },
                     ]}
                 />
