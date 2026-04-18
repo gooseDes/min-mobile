@@ -12,6 +12,7 @@ export interface DropdownProps {
 
 export interface DropdownHandler {
     open: (coords: { x: number; y: number }) => void;
+    close: () => void;
     setItems: (items: DropdownItemData[]) => void;
     getIsOpen: () => boolean;
 }
@@ -55,6 +56,9 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
                 ),
             );
             setTimeout(() => setIsOpen(true));
+        },
+        close: () => {
+            setIsOpen(false);
         },
         setItems: (newItems: DropdownItemData[]) => {
             setLocalItems(newItems);

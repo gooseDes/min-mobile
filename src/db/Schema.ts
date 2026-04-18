@@ -8,7 +8,6 @@ export const chatTypes = {
 };
 
 // DB structure
-
 export const chatsTable = sqliteTable("chats", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     type: text("type").notNull().default(chatTypes.group),

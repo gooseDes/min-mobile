@@ -6,7 +6,7 @@ import Divider from "@components/Divider";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import IconButton from "@components/IconButton";
 import { SERVER } from "@env";
-import { goBack } from "@services/NavigationService";
+import { goBack, navigate } from "@services/NavigationService";
 import { useEffect, useState } from "react";
 import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
 import { Asset, launchImageLibrary } from "react-native-image-picker";
@@ -48,15 +48,19 @@ const styles = StyleSheet.create({
         fontSize: 24,
         textAlign: "center",
     },
+    actionButtonContainer: {
+        position: "absolute",
+        right: 0,
+        bottom: 0,
+        gap: 8,
+    },
     actionButton: {
         backgroundColor: Colors.backgroundColor,
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         borderRadius: 25,
+        width: "auto",
         overflow: "hidden",
-        position: "absolute",
-        right: 8,
-        bottom: 8,
     },
     actionButtonPressable: {
         display: "flex",
@@ -157,6 +161,11 @@ function ProfilePage() {
         })();
     }, [isEditMode]);
 
+    async function logOut() {
+        await Auth.clearStorage();
+        navigate("Sign");
+    }
+
     return (
         <SafeAreaView style={Styles.container}>
             <View style={styles.panel}>
@@ -218,11 +227,14 @@ function ProfilePage() {
                     <Text style={[Styles.primaryBoldText, styles.username]}>{Auth.username}</Text>
 
                     {/* Actions */}
-                    <ActionButton
-                        text={isEditMode ? t.apply : t.edit}
-                        icon={isEditMode ? "check" : "pencil"}
-                        onPress={() => setIsEditMode(!isEditMode)}
-                    />
+                    <View style={styles.actionButtonContainer}>
+                        <ActionButton
+                            text={isEditMode ? t.apply : t.edit}
+                            icon={isEditMode ? "check" : "pencil"}
+                            onPress={() => setIsEditMode(!isEditMode)}
+                        />
+                        <ActionButton text={t.log_out} icon="right-from-bracket" onPress={logOut} />
+                    </View>
                 </View>
             </View>
         </SafeAreaView>

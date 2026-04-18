@@ -127,7 +127,7 @@ function SettingsSection(props: SettingsSectionProps) {
             return true;
         });
         return () => listener.remove();
-    }, []);
+    }, [expanded]);
 
     useEffect(() => {
         expandedRef.current = expanded;

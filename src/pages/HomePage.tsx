@@ -139,11 +139,6 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         };
     }, [keyboardHeight, contentPanelScale]);
 
-    async function SignOut() {
-        await Auth.clearStorage();
-        navigate("Sign");
-    }
-
     async function requestHistory() {
         // Initialize messages from database
         db.query.messagesTable
@@ -391,7 +386,6 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                 {currentTab === "chats" && (
                     <FloatIslandButton icon="user-circle" text={t.profile} onPress={() => navigate("Profile", "push")} />
                 )}
-                {currentTab === "chats" && <FloatIslandButton icon="right-from-bracket" text={t.log_out} onPress={SignOut} />}
 
                 {/* Profile Tab */}
                 {currentTab === "profile" && <Profile id={profileId} />}
