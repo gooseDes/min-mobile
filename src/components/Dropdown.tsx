@@ -15,6 +15,7 @@ export interface DropdownHandler {
     close: () => void;
     setItems: (items: DropdownItemData[]) => void;
     getIsOpen: () => boolean;
+    bindSelection: (newOnSelect: (item: DropdownItemData) => void) => void;
 }
 
 const styles = StyleSheet.create({
@@ -37,6 +38,7 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
     const [position, setPosition] = useState<Position | null>(null);
     const [isMounted, setIsMounted] = useState<boolean>(false);
     const [localItems, setLocalItems] = useState<DropdownItemData[]>(items || []);
+    const [onSelect, setOnSelect] = useState<((item: DropdownItemData) => void) | null>(null);
     const removeTimeout = useRef<number | null>(null);
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const insets = useSafeAreaInsets();
@@ -64,11 +66,18 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
             setLocalItems(newItems);
         },
         getIsOpen: () => isOpen,
+        bindSelection: (newOnSelect: (item: DropdownItemData) => void) => {
+            setOnSelect(() => newOnSelect);
+        },
     }));
 
     const handleItemPress = (item: DropdownItemData) => {
         if (item.onPress) {
             item.onPress();
+        }
+        if (onSelect) {
+            onSelect(item);
+            setOnSelect(null);
         }
         setIsOpen(false);
     };

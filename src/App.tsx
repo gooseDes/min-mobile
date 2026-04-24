@@ -1,5 +1,6 @@
 import Dropdown from "@components/Dropdown";
 import Notification from "@components/Notification";
+import PressableOverlay from "@components/PressableOverlay";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
 import notifee from "@notifee/react-native";
@@ -16,6 +17,7 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { dropdownRef } from "@services/DropdownService";
+import { PressableOverlayRef } from "@services/InterceptClickService";
 import { initialRouteName, navigate, navigationRef } from "@services/NavigationService";
 import { notificationRef } from "@services/NotifyService";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
@@ -146,6 +148,10 @@ function App() {
                         </Stack.Screen>
                     </Stack.Navigator>
                 </NavigationContainer>
+
+                {/* This thing can intercept any clicks */}
+                <PressableOverlay ref={PressableOverlayRef} />
+
                 <Notification ref={notificationRef} title="Default Title" text="Default Text" />
                 <Dropdown ref={dropdownRef} />
             </SafeAreaProvider>

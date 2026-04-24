@@ -240,7 +240,6 @@ function MessageBase(props: MessageProps) {
                     style={styles.dropdownTrigger}
                     onPress={e => {
                         openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
-                            { icon: "x", text: t.cancel },
                             { icon: "reply", text: t.reply, onPress: () => setMessagePrefix(`/reply ${id}\n`) },
                             { icon: "trash", text: t.delete, onPress: deleteMessage },
                         ]);
