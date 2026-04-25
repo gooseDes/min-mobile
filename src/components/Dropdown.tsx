@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
         borderRadius: Constants.rounding,
         borderWidth: Constants.borderWidth,
         borderColor: Colors.borderColor,
+        padding: 8,
         width: 200,
         height: "auto",
         zIndex: 2,
