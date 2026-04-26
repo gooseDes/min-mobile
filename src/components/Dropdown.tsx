@@ -1,7 +1,7 @@
 import { Colors, Constants } from "@/Style";
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Divider from "./Divider";
 import DropdownItem from "./DropdownItem";
@@ -85,10 +85,13 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
 
     useEffect(() => {
         if (!isOpen) {
+            scaleY.value = withSpring(0);
             removeTimeout.current = setTimeout(() => {
                 removeTimeout.current = null;
                 setIsMounted(false);
             }, 300);
+        } else {
+            scaleY.value = withSpring(1, { velocity: 3, damping: 60 });
         }
     }, [isOpen]);
 
@@ -116,6 +119,12 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
         };
     }
 
+    const scaleY = useSharedValue(0);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scaleY: scaleY.value }],
+    }));
+
     return (
         <>
             {isMounted && (
@@ -125,11 +134,12 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
                         position && { top: position.y, left: position.x },
                         {
                             pointerEvents: isOpen ? "auto" : "none",
-                            transform: [{ scaleY: isOpen ? 1 : 0 }],
+                            transformOrigin: "top center",
                             opacity: isOpen ? 1 : 0,
-                            transition: "transform 0.25s, opacity 0.25s",
+                            transition: "opacity 0.25s",
                             transitionTimingFunction: Constants.cubicBezier,
                         },
+                        animatedStyle,
                     ]}
                 >
                     {localItems.map((item, index) => (
