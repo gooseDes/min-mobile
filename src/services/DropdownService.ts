@@ -5,7 +5,7 @@ import { cancelClickInterception, interceptNextClick } from "./InterceptClickSer
 
 export const dropdownRef = React.createRef<DropdownHandler>();
 
-export function openDropdown(x: number, y: number, items: DropdownItemData[]) {
+export function openDropdown(x: number, y: number, items: DropdownItemData[], onClose?: () => void) {
     if (dropdownRef.current?.getIsOpen()) return;
 
     dropdownRef.current?.setItems(items);
@@ -15,6 +15,7 @@ export function openDropdown(x: number, y: number, items: DropdownItemData[]) {
             dropdownRef.current?.close();
             listener.remove();
             cancelClickInterception();
+            if (onClose) onClose();
         };
         const listener = BackHandler.addEventListener("hardwareBackPress", () => {
             close();

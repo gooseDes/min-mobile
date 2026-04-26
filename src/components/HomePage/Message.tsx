@@ -124,6 +124,7 @@ function MessageBase(props: MessageProps) {
     const is_reply = text.startsWith("/reply");
 
     const [replyText, setReplyText] = useState<string>("");
+    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
     const { t } = useTranslation();
 
@@ -210,7 +211,18 @@ function MessageBase(props: MessageProps) {
                 <Image source={{ uri: `${SERVER}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
             )}
             <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
-                <View style={[styles.messageContent, props.side === "left" ? styles.leftSideContent : styles.rightSideContent]}>
+                <Animated.View
+                    style={[
+                        styles.messageContent,
+                        props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
+                        {
+                            transition: "all 0.3s ease",
+                            boxShadow: dropdownOpen
+                                ? `${side === "left" ? 4 : -4}px 2px 4px rgba(50, 50, 50, 1)`
+                                : "0px 4px 0px rgba(0, 0, 0, 0.1)",
+                        },
+                    ]}
+                >
                     {props.author_name && showAuthor && (
                         <Text style={[Styles.secondaryText, styles.authorText]}>
                             {isCurrentUser ? t.you : props.author_name}
@@ -235,14 +247,20 @@ function MessageBase(props: MessageProps) {
                             {dateToString(sentAt)}
                         </Text>
                     )}
-                </View>
+                </Animated.View>
                 <TouchableOpacity
                     style={styles.dropdownTrigger}
                     onPress={e => {
-                        openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
-                            { icon: "reply", text: t.reply, onPress: () => setMessagePrefix(`/reply ${id}\n`) },
-                            { icon: "trash", text: t.delete, onPress: deleteMessage },
-                        ]);
+                        setDropdownOpen(true);
+                        openDropdown(
+                            e.nativeEvent.pageX,
+                            e.nativeEvent.pageY,
+                            [
+                                { icon: "reply", text: t.reply, onPress: () => setMessagePrefix(`/reply ${id}\n`) },
+                                { icon: "trash", text: t.delete, onPress: deleteMessage },
+                            ],
+                            () => setDropdownOpen(false),
+                        );
                     }}
                 />
             </View>
