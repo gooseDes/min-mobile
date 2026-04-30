@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
         transformOrigin: "center",
         padding: 8,
         gap: 16,
+        boxShadow: Constants.shadow,
     },
     title: {
         fontSize: 16,

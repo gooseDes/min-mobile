@@ -66,6 +66,7 @@ export const Styles = StyleSheet.create({
         borderColor: Colors.borderColor,
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
+        boxShadow: Constants.shadow,
     },
     bgAndBorder: {
         backgroundColor: Colors.backgroundPanelColor,
@@ -73,6 +74,7 @@ export const Styles = StyleSheet.create({
         borderWidth: Constants.borderWidth,
         borderRadius: Constants.rounding,
         padding: 8,
+        boxShadow: Constants.shadow,
     },
     header: {
         display: "flex",

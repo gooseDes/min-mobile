@@ -1,5 +1,5 @@
 import { Colors, Constants, Styles } from "@/Style";
-import { StyleSheet, Text, TouchableOpacity, ViewProps } from "react-native";
+import { Pressable, StyleSheet, Text, ViewProps } from "react-native";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
@@ -13,6 +13,8 @@ const styles = StyleSheet.create({
         borderWidth: Constants.borderWidth,
         borderColor: Colors.borderColor,
         paddingHorizontal: 10,
+        boxShadow: Constants.shadow,
+        overflow: "hidden",
     },
     text: {
         textAlign: "center",
@@ -30,9 +32,9 @@ function Button(props: ButtonProps) {
 
     return (
         <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} {...rest}>
-            <TouchableOpacity style={styles.button} onPress={onPress}>
+            <Pressable style={styles.button} onPress={onPress} android_ripple={Constants.rippleConfig}>
                 <Text style={[Styles.primaryText, styles.text]}>{text || "Button"}</Text>
-            </TouchableOpacity>
+            </Pressable>
         </Animated.View>
     );
 }

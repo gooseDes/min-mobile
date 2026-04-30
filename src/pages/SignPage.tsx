@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
         borderRadius: Constants.rounding,
         gap: 10,
         padding: 10,
+        boxShadow: Constants.shadow,
     },
     signForm: {
         gap: 10,
