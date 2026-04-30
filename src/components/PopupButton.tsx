@@ -66,11 +66,13 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
     const width = useSharedValue(100);
     const height = useSharedValue(100);
     const borderRadius = useSharedValue(50);
+    const boxShadow = useSharedValue(Constants.shadow);
     const backgroundColor = useSharedValue(Colors.backgroundPanelColor);
     const animatedContentStyle = useAnimatedStyle(() => ({
         width: withSpring(width.value),
         height: withSpring(height.value),
         borderRadius: withSpring(borderRadius.value),
+        boxShadow: withSpring(boxShadow.value),
         backgroundColor: withSpring(backgroundColor.value),
     }));
 

@@ -212,14 +212,17 @@ function MessageBase(props: MessageProps) {
             )}
             <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
                 <Animated.View
+                    layout={Constants.layoutTransition}
                     style={[
                         styles.messageContent,
                         props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
                         {
-                            transition: "all 0.3s ease",
-                            boxShadow: dropdownOpen
-                                ? `${side === "left" ? 4 : -4}px 2px 4px rgba(50, 50, 50, 1)`
-                                : "0px 4px 0px rgba(0, 0, 0, 0.1)",
+                            transition: "boxShadow 0.3s ease-in-out, transform 0.3s ease-in-out",
+                            boxShadow: dropdownOpen ? `0px 0px 16px ${Colors.borderColor}` : Constants.shadow,
+                            transform: [
+                                { scale: dropdownOpen ? 1.1 : 1 },
+                                { translateX: dropdownOpen ? (side === "left" ? 8 : -8) : 0 },
+                            ],
                         },
                     ]}
                 >

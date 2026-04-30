@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 8,
         height: 70,
+        boxShadow: Constants.shadow,
     },
     languageSelectorPressable: {
         height: "100%",
@@ -106,6 +107,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 8,
         height: 70,
+        boxShadow: Constants.shadow,
     },
     switchOffOnText: {
         ...Styles.secondaryCenter,

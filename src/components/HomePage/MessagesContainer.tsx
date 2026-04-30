@@ -16,6 +16,9 @@ const styles = StyleSheet.create({
         width: "100%",
         display: "flex",
     },
+    contentContainerStyle: {
+        padding: 4,
+    },
 });
 
 export interface MessagesContainerHandle {
@@ -103,7 +106,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
             <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
                 <Animated.FlatList
                     style={styles.messagesContainer}
-                    contentContainerStyle={{ paddingTop: bottomGap }}
+                    contentContainerStyle={[styles.contentContainerStyle, { paddingTop: bottomGap }]}
                     data={reversedMessages}
                     renderItem={renderMessage}
                     keyExtractor={msg => msg.id.toString()}

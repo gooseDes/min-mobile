@@ -19,6 +19,7 @@ export class Constants {
     static layoutTransition = LinearTransition.springify(500);
     static cubicBezier = cubicBezier(0.4, 0, 0.2, 1);
     static rippleConfig: PressableAndroidRippleConfig = { color: Colors.rippleColor, foreground: true };
+    static shadow = "0px 4px 4px rgba(0, 0, 0, 0.5)";
 }
 
 export const Styles = StyleSheet.create({

@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
         borderRadius: Constants.rounding,
         backgroundColor: Colors.backgroundPanelColor,
         overflow: "hidden",
+        boxShadow: Constants.shadow,
     },
     input: {
         flex: 1,

@@ -39,11 +39,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
+        boxShadow: Constants.shadow,
     },
     topPanel: {
         gap: 20,
         flexDirection: "row",
         zIndex: 1,
+        boxShadow: Constants.shadow,
     },
     contentPanel: {
         flex: 1,

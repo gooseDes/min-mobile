@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
         width: 200,
         height: "auto",
         zIndex: 2,
+        boxShadow: Constants.shadow,
     },
 });
 

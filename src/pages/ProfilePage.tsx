@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         borderRadius: 100,
+        boxShadow: Constants.shadow,
     },
     username: {
         fontSize: 24,
@@ -61,6 +62,7 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         width: "auto",
         overflow: "hidden",
+        boxShadow: Constants.shadow,
     },
     actionButtonPressable: {
         display: "flex",
