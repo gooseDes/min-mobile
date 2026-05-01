@@ -89,10 +89,9 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
                     show_author={showAvatar}
                     shown={animProgress > index || !(index <= 15) || index < newlyAddedMessages}
                     sentAt={message.sentAt}
-                    id={message.id}
-                >
-                    {message.text}
-                </Message>
+                    msg_id={message.id}
+                    text={message.text}
+                />
             </Animated.View>
         );
     };

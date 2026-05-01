@@ -11,7 +11,7 @@ import { openDropdown } from "@services/DropdownService";
 import { setMessagePrefix } from "@services/InputControlService";
 import { eq } from "drizzle-orm";
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View, ViewProps } from "react-native";
 import Markdown, { MarkedStyles } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
@@ -91,7 +91,7 @@ const markdownFlatListProps: any = {
     },
 };
 
-interface MessageProps extends React.PropsWithChildren {
+interface MessageProps extends ViewProps {
     author_name?: string;
     author_id?: number;
     author_avatar?: string;
@@ -100,7 +100,8 @@ interface MessageProps extends React.PropsWithChildren {
     show_author?: boolean;
     shown?: boolean;
     sentAt?: Date;
-    id?: number;
+    msg_id?: number;
+    text?: string;
 }
 
 function withoutCommand(text: string): string {
@@ -118,9 +119,10 @@ function MessageBase(props: MessageProps) {
     const showAuthor = props.show_author === undefined ? true : props.show_author;
     const shown = props.shown === undefined ? true : props.shown;
     const side = props.side || "left";
-    const { sentAt, id } = props;
-    const text = props.children?.toString() || "";
-    const textWithoutCommand = withoutCommand(text);
+    const { sentAt, msg_id } = props;
+    const [text, setText] = useState<string>(props.text?.toString() || "");
+    const [textWithoutCommand, setTextWithoutCommand] = useState<string>(withoutCommand(text));
+    const [marginTop, setMarginTop] = useState<number>(0);
     const is_reply = text.startsWith("/reply");
 
     const [replyText, setReplyText] = useState<string>("");
@@ -136,7 +138,7 @@ function MessageBase(props: MessageProps) {
                 setReplyText(`${userData.user.name}: ${msgData.message.content}`);
                 socket.off("userInfo");
             });
-            socket.emit("getUserInfo", { id: msgData.message.sender_id });
+            socket.emit("getUserInfo", { msg_id: msgData.message.sender_id });
             socket.off("requestedMessage");
         });
         const replyMessage = await db.query.messagesTable.findFirst({ where: eq(messagesTable.id, replyId) });
@@ -151,6 +153,12 @@ function MessageBase(props: MessageProps) {
     useEffect(() => {
         if (is_reply) getReplyText();
     }, [is_reply]);
+
+    useEffect(() => {
+        setText(props.text?.toString() || "");
+        setTextWithoutCommand(withoutCommand(text));
+        setMarginTop(calculateMargin(textWithoutCommand));
+    }, [props.text]);
 
     const opacity = useSharedValue(shown ? 1 : 0);
     const translateX = useSharedValue(shown ? 0 : side === "left" ? -100 : 100);
@@ -171,7 +179,7 @@ function MessageBase(props: MessageProps) {
 
     async function deleteMessage() {
         const socket = await getSocket();
-        socket.emit("deleteMessage", { message: id });
+        socket.emit("deleteMessage", { message: msg_id });
     }
 
     function calculateMargin(md: string) {
@@ -240,13 +248,7 @@ function MessageBase(props: MessageProps) {
                     <Markdown styles={markdownStyles} flatListProps={markdownFlatListProps} value={textWithoutCommand} />
 
                     {sentAt && (
-                        <Text
-                            style={[
-                                Styles.secondaryText,
-                                styles.sentAtText,
-                                { marginTop: calculateMargin(textWithoutCommand) },
-                            ]}
-                        >
+                        <Text style={[Styles.secondaryText, styles.sentAtText, { marginTop: marginTop }]}>
                             {dateToString(sentAt)}
                         </Text>
                     )}
@@ -259,7 +261,7 @@ function MessageBase(props: MessageProps) {
                             e.nativeEvent.pageX,
                             e.nativeEvent.pageY,
                             [
-                                { icon: "reply", text: t.reply, onPress: () => setMessagePrefix(`/reply ${id}\n`) },
+                                { icon: "reply", text: t.reply, onPress: () => setMessagePrefix(`/reply ${msg_id}\n`) },
                                 { icon: "trash", text: t.delete, onPress: deleteMessage },
                             ],
                             () => setDropdownOpen(false),
