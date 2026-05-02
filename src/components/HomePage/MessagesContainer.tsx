@@ -32,10 +32,11 @@ export interface MessagesContainerHandle {
 
 export interface MessagesContainerProps {
     bottomGap: number;
+    disabled?: boolean;
 }
 
 const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerProps>((props, ref) => {
-    const { bottomGap } = props;
+    const { bottomGap, disabled } = props;
     const messagesRef = useRef<MessageData[]>([]);
     const [animProgress, setAnimProgress] = useState<number>(0);
     const [newlyAddedMessages, setNewlyAddedMessages] = useState<number>(0);
@@ -105,7 +106,10 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
             <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
                 <Animated.FlatList
                     style={styles.messagesContainer}
-                    contentContainerStyle={[styles.contentContainerStyle, { paddingTop: bottomGap }]}
+                    contentContainerStyle={[
+                        styles.contentContainerStyle,
+                        { paddingTop: bottomGap, pointerEvents: disabled === true ? "none" : "auto" },
+                    ]}
                     data={reversedMessages}
                     renderItem={renderMessage}
                     keyExtractor={msg => msg.id.toString()}

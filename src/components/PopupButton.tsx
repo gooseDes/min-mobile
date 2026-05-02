@@ -1,36 +1,37 @@
-import { Colors, Constants } from "@/Style";
+import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Keyboard, StyleSheet, TouchableOpacity, TouchableOpacityProps, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "./Icon";
 
-const styles = StyleSheet.create({
-    container: {
-        width: "auto",
-        height: "auto",
-        position: "absolute",
-        zIndex: 2,
-    },
-    view: {
-        backgroundColor: Colors.backgroundPanelColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    content: {
-        position: "absolute",
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 8,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        container: {
+            width: "auto",
+            height: "auto",
+            position: "absolute",
+            zIndex: 2,
+        },
+        view: {
+            backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        content: {
+            position: "absolute",
+            flex: 1,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 8,
+        },
+    });
 
 export interface PopupButtonProps extends TouchableOpacityProps {
     right?: number;
@@ -51,6 +52,8 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
     const insets = useSafeAreaInsets();
     const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
     const { right: rightProp, bottom: bottomProp, children, icon, iconSize, style, ...rest } = props;
+    const theme = useThemeStore(s => s.theme);
+    const styles = useAppStyles(createStyles);
 
     useImperativeHandle(
         ref,
@@ -67,7 +70,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
     const height = useSharedValue(100);
     const borderRadius = useSharedValue(50);
     const boxShadow = useSharedValue(Constants.shadow);
-    const backgroundColor = useSharedValue(Colors.backgroundPanelColor);
+    const backgroundColor = useSharedValue(theme.backgroundPanelColor);
     const animatedContentStyle = useAnimatedStyle(() => ({
         width: withSpring(width.value),
         height: withSpring(height.value),
@@ -103,7 +106,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
             width.value = screenWidth - 20;
             height.value = screenHeight - 20;
             borderRadius.value = Constants.rounding;
-            backgroundColor.value = Colors.backgroundPanelColorOpaque;
+            backgroundColor.value = theme.backgroundPanelColorOpaque;
             right.value = -2;
             bottom.value = -2;
             buttonStateOpacity.value = 0;
@@ -112,13 +115,13 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
             width.value = 60;
             height.value = 60;
             borderRadius.value = 30;
-            backgroundColor.value = Colors.backgroundPanelColor;
+            backgroundColor.value = theme.backgroundPanelColor;
             right.value = rightProp || 0;
             bottom.value = bottomProp || 0;
             buttonStateOpacity.value = 1;
             popupStateOpacity.value = 0;
         }
-    }, [isOpened, entireScreenWidth, entireScreenHeight, insets, keyboardHeight]);
+    }, [isOpened, entireScreenWidth, entireScreenHeight, insets, keyboardHeight, theme]);
 
     // Listen for keyboard changes
     useEffect(() => {
@@ -136,7 +139,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
                 <Animated.View style={[styles.view, animatedContentStyle]}>
                     {/* Button state */}
                     <Animated.View style={[styles.content, animatedButtonStateStyle, { pointerEvents: "none" }]}>
-                        <Icon name={icon || "plus"} color={Colors.primaryTextColor} size={iconSize || 24} />
+                        <Icon name={icon || "plus"} color={theme.primaryTextColor} size={iconSize || 24} />
                     </Animated.View>
 
                     {/* Popup state */}

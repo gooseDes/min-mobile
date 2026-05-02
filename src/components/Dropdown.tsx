@@ -1,4 +1,4 @@
-import { Colors, Constants } from "@/Style";
+import { Constants, ThemeData, useAppStyles } from "@/Style";
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -18,20 +18,21 @@ export interface DropdownHandler {
     bindSelection: (newOnSelect: (item: DropdownItemData) => void) => void;
 }
 
-const styles = StyleSheet.create({
-    container: {
-        position: "absolute",
-        backgroundColor: Colors.backgroundColor,
-        borderRadius: Constants.rounding,
-        borderWidth: Constants.borderWidth,
-        borderColor: Colors.borderColor,
-        padding: 8,
-        width: 200,
-        height: "auto",
-        zIndex: 2,
-        boxShadow: Constants.shadow,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        container: {
+            position: "absolute",
+            backgroundColor: theme.backgroundColor,
+            borderRadius: Constants.rounding,
+            borderWidth: Constants.borderWidth,
+            borderColor: theme.borderColor,
+            padding: 8,
+            width: 200,
+            height: "auto",
+            zIndex: 2,
+            boxShadow: Constants.shadow,
+        },
+    });
 
 const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
     const { items } = props;
@@ -44,6 +45,7 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
     const removeTimeout = useRef<number | null>(null);
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const insets = useSafeAreaInsets();
+    const styles = useAppStyles(createStyles);
 
     useImperativeHandle(ref, () => ({
         open: (coords: Position) => {

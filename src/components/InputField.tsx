@@ -1,13 +1,15 @@
-import { Colors, Styles } from "@/Style";
+import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
 import { TextInput, TextInputProps } from "react-native";
 
 function InputField(props: TextInputProps) {
     const { style, children, ...rest } = props;
+    const theme = useThemeStore(s => s.theme);
+    const Styles = useAppStyles(createGlobalStyles);
 
     return (
         <TextInput
-            placeholderTextColor={Colors.secondaryTextColor}
-            cursorColor={Colors.primaryTextColor}
+            placeholderTextColor={theme.secondaryTextColor}
+            cursorColor={theme.primaryTextColor}
             style={[Styles.textInput, style]}
             {...rest}
         >

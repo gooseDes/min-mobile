@@ -1,4 +1,4 @@
-import { Colors, Constants } from "@/Style";
+import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -8,33 +8,36 @@ export interface SwitchProps {
     onChange?: (checked: boolean) => void;
 }
 
-const styles = StyleSheet.create({
-    touchable: {
-        width: 80,
-        height: 40,
-    },
-    switchBg: {
-        flex: 1,
-        backgroundColor: Colors.backgroundPanelColor,
-        borderRadius: 25,
-        borderWidth: Constants.borderWidth,
-        borderColor: Colors.borderColor,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    switchThumb: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        touchable: {
+            width: 80,
+            height: 40,
+        },
+        switchBg: {
+            flex: 1,
+            backgroundColor: theme.backgroundPanelColor,
+            borderRadius: 25,
+            borderWidth: Constants.borderWidth,
+            borderColor: theme.borderColor,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        switchThumb: {
+            width: 30,
+            height: 30,
+            borderRadius: 15,
+        },
+    });
 
 function Switch(props: SwitchProps) {
     const { checked = false, onChange } = props;
 
     const [isChecked, setIsChecked] = useState<boolean>(checked);
     const [isPressing, setIsPressing] = useState<boolean>(false);
+    const theme = useThemeStore(s => s.theme);
+    const styles = useAppStyles(createStyles);
 
     return (
         <TouchableOpacity
@@ -54,7 +57,7 @@ function Switch(props: SwitchProps) {
                         {
                             transition: "all 0.3s",
                             transitionTimingFunction: Constants.cubicBezier,
-                            backgroundColor: isChecked ? Colors.primaryTextColor : Colors.secondaryTextColor,
+                            backgroundColor: isChecked ? theme.primaryTextColor : theme.secondaryTextColor,
                             transform: [{ translateX: isPressing ? 0 : isChecked ? 19 : -19 }],
                         },
                     ]}

@@ -1,5 +1,5 @@
 import { getSocket } from "@/Socket";
-import { Colors, Styles } from "@/Style";
+import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
 import { t } from "@/Translation";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
@@ -29,6 +29,8 @@ const styles = StyleSheet.create({
 function AddChatButton() {
     const [username, setUsername] = useState<string>("");
     const popupRef = useRef<PopupButtonHandler>(null);
+    const theme = useThemeStore(s => s.theme);
+    const Styles = useAppStyles(createGlobalStyles);
 
     async function createChat() {
         Keyboard.dismiss();
@@ -50,7 +52,7 @@ function AddChatButton() {
         <PopupButton right={10} bottom={80} icon="plus" iconSize={24} ref={popupRef}>
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
-                    <Icon name="plus" size={24} color={Colors.primaryTextColor} />
+                    <Icon name="plus" size={24} color={theme.primaryTextColor} />
                     <Text style={Styles.titleText}>{t.create_chat}</Text>
                 </View>
                 <Divider />

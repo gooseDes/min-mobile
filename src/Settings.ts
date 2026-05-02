@@ -1,3 +1,5 @@
+import ThemeSettings from "@components/Settings/ThemeSettings";
+
 export const settings: Settings = {
     sections: [
         {
@@ -22,6 +24,16 @@ export const settings: Settings = {
                     title: "24_hour_time",
                     type: "switch",
                     storageKey: "use24HourTime",
+                },
+            ],
+        },
+        {
+            title: "appearance",
+            icon: "paintbrush",
+            items: [
+                {
+                    type: "custom",
+                    component: ThemeSettings,
                 },
             ],
         },

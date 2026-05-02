@@ -1,5 +1,5 @@
 import settings from "@/Settings";
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
@@ -9,24 +9,29 @@ import { goBack } from "@services/NavigationService";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const styles = StyleSheet.create({
-    panel: {
-        backgroundColor: Colors.backgroundPanelColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        borderRadius: Constants.rounding,
-        padding: 10,
-        margin: 10,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        flex: 1,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        panel: {
+            backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            borderRadius: Constants.rounding,
+            padding: 10,
+            margin: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            flex: 1,
+            boxShadow: Constants.shadow,
+        },
+    });
 
 function SettingsPage() {
     const { t } = useTranslation();
+    const theme = useThemeStore(s => s.theme);
+    const styles = createStyles(theme);
+    const Styles = useAppStyles(createGlobalStyles);
 
     return (
         <SafeAreaView style={Styles.container}>
@@ -38,7 +43,7 @@ function SettingsPage() {
 
                     {/* Title */}
                     <View style={Styles.title}>
-                        <Icon name="gear" size={24} color={Colors.primaryTextColor} />
+                        <Icon name="gear" size={24} color={theme.primaryTextColor} />
                         <Text style={[Styles.primaryBoldText, Styles.titleText]}>{t.settings}</Text>
                     </View>
 

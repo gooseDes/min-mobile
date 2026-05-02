@@ -39,9 +39,13 @@ export interface Language {
     // Settings
     settings_general?: string;
     settings_language_time?: string;
+    settings_appearance?: string;
     settings_cache?: string;
     settings_language?: string;
     settings_24_hour_time?: string;
+    settings_preview?: string;
+    settings_change_theme?: string;
+    settings_reset_theme?: string;
 
     // Time
     code?: string;
@@ -95,9 +99,13 @@ class Translation {
         // Settings
         settings_general: "General",
         settings_language_time: "Language & Time",
+        settings_appearance: "Appearance",
         settings_cache: "Cache",
         settings_language: "Language",
         settings_24_hour_time: "Force 24-hour time",
+        settings_preview: "Preview",
+        settings_change_theme: "Change Theme",
+        settings_reset_theme: "Reset Theme",
 
         // Time
         code: "en",
@@ -148,9 +156,13 @@ class Translation {
         // Settings
         settings_general: "Общие",
         settings_language_time: "Язык и время",
+        settings_appearance: "Внешний вид",
         settings_cache: "Кэш",
         settings_language: "Язык",
         settings_24_hour_time: "Принудительный 24-часовой формат",
+        settings_preview: "Предпросмотр",
+        settings_change_theme: "Сменить тему",
+        settings_reset_theme: "Сбросить тему",
 
         // Time
         code: "ru",
@@ -201,9 +213,13 @@ class Translation {
         // Settings
         settings_general: "Загальні",
         settings_language_time: "Мова та час",
+        settings_appearance: "Зовнішній вигляд",
         settings_cache: "Кеш",
         settings_language: "Мова",
         settings_24_hour_time: "Примусовий 24-годинний формат",
+        settings_preview: "Попередній перегляд",
+        settings_change_theme: "Змінити тему",
+        settings_reset_theme: "Скинути тему",
 
         // Time
         code: "uk",

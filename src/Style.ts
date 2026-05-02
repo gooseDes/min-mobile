@@ -1,14 +1,70 @@
+import { useMemo } from "react";
 import { PressableAndroidRippleConfig, StyleSheet } from "react-native";
 import { cubicBezier, LinearTransition } from "react-native-reanimated";
+import { create } from "zustand";
+import { createJSONStorage, persist, StateStorage } from "zustand/middleware";
+import Storage from "./Storage";
+import { midnightTheme } from "./Themes";
 
-export class Colors {
-    static backgroundColor = "#131317";
-    static backgroundPanelColor = "#1f1f23dd";
-    static backgroundPanelColorOpaque = "#1e1e20";
-    static borderColor = "#2d2d32dd";
-    static messageBackgroundColor = "#1f1f23c2";
-    static primaryTextColor = "#ffffff";
-    static secondaryTextColor = "#aaaaaa";
+export interface ThemeData {
+    isDark: boolean;
+    backgroundColor: string;
+    backgroundPanelColor: string;
+    backgroundPanelColorOpaque: string;
+    borderColor: string;
+    dividerColor: string;
+    messageBackgroundColor: string;
+    primaryTextColor: string;
+    secondaryTextColor: string;
+    rippleColor: string;
+}
+
+const initialState = midnightTheme;
+
+interface ThemeState {
+    theme: ThemeData;
+    setTheme: (key: keyof ThemeData, value: any) => void;
+    resetTheme: () => void;
+}
+
+const mmkvWrapper: StateStorage<ThemeState | unknown> = {
+    getItem: async name => {
+        return Storage.getString(name) || null;
+    },
+    setItem: async (name, value) => {
+        return Storage.set(name, value);
+    },
+    removeItem: async name => {
+        return Storage.remove(name);
+    },
+};
+
+export const useThemeStore = create<ThemeState>()(
+    persist(
+        set => ({
+            theme: initialState,
+
+            setTheme: (key, value) =>
+                set(state => ({
+                    theme: { ...state.theme, [key]: value },
+                })),
+
+            resetTheme: () => set({ theme: initialState }),
+        }),
+        {
+            name: "theme-storage",
+            storage: createJSONStorage(() => mmkvWrapper),
+        },
+    ),
+);
+type StyleFactory<T> = (colors: ThemeData) => T;
+
+export function useAppStyles<T>(factory: StyleFactory<T>): T {
+    const theme = useThemeStore(s => s.theme);
+    return useMemo(() => factory(theme), [theme]);
+}
+
+class Colors {
     static rippleColor = "#ffffffaa";
 }
 
@@ -22,94 +78,95 @@ export class Constants {
     static shadow = "0px 4px 4px rgba(0, 0, 0, 0.5)";
 }
 
-export const Styles = StyleSheet.create({
-    container: {
-        backgroundColor: Colors.backgroundColor,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flex: 1,
-        padding: 10,
-    },
-    primaryText: {
-        color: Colors.primaryTextColor,
-        fontFamily: "Rubik",
-        fontWeight: "normal",
-    },
-    primaryBoldText: {
-        color: Colors.primaryTextColor,
-        fontFamily: "Rubik-Medium",
-        fontWeight: "normal",
-    },
-    primaryCenter: {
-        color: Colors.primaryTextColor,
-        fontFamily: "Rubik",
-        textAlign: "center",
-        fontWeight: "normal",
-    },
-    secondaryText: {
-        color: Colors.secondaryTextColor,
-        fontFamily: "Rubik",
-        fontWeight: "normal",
-    },
-    secondaryCenter: {
-        color: Colors.secondaryTextColor,
-        fontFamily: "Rubik",
-        textAlign: "center",
-        fontWeight: "normal",
-    },
-    textInput: {
-        color: Colors.primaryTextColor,
-        fontFamily: "Rubik",
-        textAlign: "center",
-        backgroundColor: Colors.backgroundPanelColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        borderRadius: Constants.rounding,
-        boxShadow: Constants.shadow,
-    },
-    bgAndBorder: {
-        backgroundColor: Colors.backgroundPanelColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        borderRadius: Constants.rounding,
-        padding: 8,
-        boxShadow: Constants.shadow,
-    },
-    header: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        height: 50,
-        marginBottom: 5,
-    },
-    title: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        flex: 1,
-        gap: 10,
-    },
-    titleText: {
-        color: Colors.primaryTextColor,
-        fontSize: 26,
-        fontFamily: "Rubik-Medium",
-        textAlign: "center",
-        fontWeight: "normal",
-    },
-    backButton: {
-        aspectRatio: 1,
-        height: "100%",
-    },
-    content: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        flex: 1,
-    },
-});
+export const createGlobalStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        container: {
+            backgroundColor: theme.backgroundColor,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flex: 1,
+            padding: 10,
+        },
+        primaryText: {
+            color: theme.primaryTextColor,
+            fontFamily: "Rubik",
+            fontWeight: "normal",
+        },
+        primaryBoldText: {
+            color: theme.primaryTextColor,
+            fontFamily: "Rubik-Medium",
+            fontWeight: "normal",
+        },
+        primaryCenter: {
+            color: theme.primaryTextColor,
+            fontFamily: "Rubik",
+            textAlign: "center",
+            fontWeight: "normal",
+        },
+        secondaryText: {
+            color: theme.secondaryTextColor,
+            fontFamily: "Rubik",
+            fontWeight: "normal",
+        },
+        secondaryCenter: {
+            color: theme.secondaryTextColor,
+            fontFamily: "Rubik",
+            textAlign: "center",
+            fontWeight: "normal",
+        },
+        textInput: {
+            color: theme.primaryTextColor,
+            fontFamily: "Rubik",
+            textAlign: "center",
+            backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            borderRadius: Constants.rounding,
+            boxShadow: Constants.shadow,
+        },
+        bgAndBorder: {
+            backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            borderRadius: Constants.rounding,
+            padding: 8,
+            boxShadow: Constants.shadow,
+        },
+        header: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: 50,
+            marginBottom: 5,
+        },
+        title: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
+            gap: 10,
+        },
+        titleText: {
+            color: theme.primaryTextColor,
+            fontSize: 26,
+            fontFamily: "Rubik-Medium",
+            textAlign: "center",
+            fontWeight: "normal",
+        },
+        backButton: {
+            aspectRatio: 1,
+            height: "100%",
+        },
+        content: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            flex: 1,
+        },
+    });

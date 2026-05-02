@@ -1,5 +1,5 @@
 import Auth from "@/Auth";
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
@@ -11,43 +11,43 @@ import { Alert, StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewSt
 import { launchImageLibrary } from "react-native-image-picker";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-const styles = StyleSheet.create({
-    container: {
-        width: "100%",
-        height: 50,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: Constants.borderWidth,
-        borderColor: Colors.borderColor,
-        borderRadius: Constants.rounding,
-        backgroundColor: Colors.backgroundPanelColor,
-        overflow: "hidden",
-        boxShadow: Constants.shadow,
-    },
-    input: {
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        paddingHorizontal: 4,
-        ...Styles.primaryText,
-    },
-    button: {
-        height: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "hidden",
-        margin: 10,
-    },
-    actualContent: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
-        flex: 1,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        container: {
+            width: "100%",
+            height: 50,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            borderWidth: Constants.borderWidth,
+            borderColor: theme.borderColor,
+            borderRadius: Constants.rounding,
+            backgroundColor: theme.backgroundPanelColor,
+            overflow: "hidden",
+            boxShadow: Constants.shadow,
+        },
+        input: {
+            flex: 1,
+            width: "100%",
+            height: "100%",
+            paddingHorizontal: 4,
+        },
+        button: {
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            overflow: "hidden",
+            margin: 10,
+        },
+        actualContent: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "row",
+            flex: 1,
+        },
+    });
 
 export interface MessageInputProps {
     onTextChanged?: (text: string) => void;
@@ -63,6 +63,9 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
     const { t } = useTranslation();
     const [prefix, setPrefix] = useState<string>("");
     const [value, setValue] = useState<string>("");
+    const theme = useThemeStore(s => s.theme);
+    const styles = createStyles(theme);
+    const Styles = useAppStyles(createGlobalStyles);
 
     useImperativeHandle(ref, () => ({
         setMessagePrefix: (messagePrefix: string) => {
@@ -122,26 +125,26 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                 <BlurView
                     style={StyleSheet.absoluteFill}
                     targetId="chat-blur-target"
-                    type="dark"
-                    overlayColor={setAlphaForColor(Colors.backgroundPanelColor, 0.6)}
+                    type={theme.isDark ? "dark" : "light"}
+                    overlayColor={setAlphaForColor(theme.backgroundPanelColor, 0.6)}
                 >
                     <View style={[StyleSheet.absoluteFill, styles.actualContent]}>
                         <View style={styles.button}>
                             <TouchableOpacity onPress={attach}>
-                                <Icon name="paperclip" size={24} color={Colors.secondaryTextColor} />
+                                <Icon name="paperclip" size={24} color={theme.secondaryTextColor} />
                             </TouchableOpacity>
                         </View>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, Styles.primaryText]}
                             placeholder={t.your_message}
-                            placeholderTextColor={Colors.secondaryTextColor}
+                            placeholderTextColor={theme.secondaryTextColor}
                             multiline={true}
                             onChangeText={onChangeText}
                             value={value}
                         />
                         <View style={styles.button}>
                             <TouchableOpacity onPress={send}>
-                                <Icon name="paper-plane" size={24} color={Colors.secondaryTextColor} />
+                                <Icon name="paper-plane" size={24} color={theme.secondaryTextColor} />
                             </TouchableOpacity>
                         </View>
                     </View>

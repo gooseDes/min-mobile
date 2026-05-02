@@ -1,6 +1,6 @@
 import Auth from "@/Auth";
 import Storage from "@/Storage";
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { t } from "@/Translation";
 import Divider from "@components/Divider";
 import Icon, { AnimatedIcon } from "@components/Icon";
@@ -13,68 +13,69 @@ import { Asset, launchImageLibrary } from "react-native-image-picker";
 import Animated, { ZoomInEasyDown, ZoomInEasyUp, ZoomOutEasyDown, ZoomOutEasyUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const styles = StyleSheet.create({
-    panel: {
-        backgroundColor: Colors.backgroundPanelColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        borderRadius: Constants.rounding,
-        padding: 10,
-        margin: 10,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        flex: 1,
-    },
-    avatarContainerContainer: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    avatarContainer: {
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 8,
-        borderRadius: 999,
-        overflow: "hidden",
-    },
-    avatar: {
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        boxShadow: Constants.shadow,
-    },
-    username: {
-        fontSize: 24,
-        textAlign: "center",
-    },
-    actionButtonContainer: {
-        position: "absolute",
-        right: 0,
-        bottom: 0,
-        gap: 8,
-    },
-    actionButton: {
-        backgroundColor: Colors.backgroundColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        borderRadius: 25,
-        width: "auto",
-        overflow: "hidden",
-        boxShadow: Constants.shadow,
-    },
-    actionButtonPressable: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
-        paddingHorizontal: 16,
-        width: "auto",
-        height: 50,
-        gap: 8,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        panel: {
+            backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            borderRadius: Constants.rounding,
+            padding: 10,
+            margin: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            flex: 1,
+        },
+        avatarContainerContainer: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        avatarContainer: {
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 8,
+            borderRadius: 999,
+            overflow: "hidden",
+        },
+        avatar: {
+            width: 200,
+            height: 200,
+            borderRadius: 100,
+            boxShadow: Constants.shadow,
+        },
+        username: {
+            fontSize: 24,
+            textAlign: "center",
+        },
+        actionButtonContainer: {
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            gap: 8,
+        },
+        actionButton: {
+            backgroundColor: theme.backgroundColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            borderRadius: 25,
+            width: "auto",
+            overflow: "hidden",
+            boxShadow: Constants.shadow,
+        },
+        actionButtonPressable: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "row",
+            paddingHorizontal: 16,
+            width: "auto",
+            height: 50,
+            gap: 8,
+        },
+    });
 
 interface ActionButtonProps {
     text?: string;
@@ -84,6 +85,9 @@ interface ActionButtonProps {
 
 function ActionButton(props: ActionButtonProps) {
     const { text, icon, onPress } = props;
+    const theme = useThemeStore(s => s.theme);
+    const styles = useAppStyles(createStyles);
+    const Styles = useAppStyles(createGlobalStyles);
 
     return (
         <Animated.View style={styles.actionButton} layout={Constants.layoutTransition}>
@@ -102,7 +106,7 @@ function ActionButton(props: ActionButtonProps) {
                 </Animated.Text>
                 <AnimatedIcon
                     name={icon || "x"}
-                    color={Colors.primaryTextColor}
+                    color={theme.primaryTextColor}
                     size={24}
                     entering={ZoomInEasyUp}
                     exiting={ZoomOutEasyDown}
@@ -116,6 +120,9 @@ function ProfilePage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [avatarPreview, setAvatarPreview] = useState<Asset | undefined>(undefined);
     const [avatar, setAvatar] = useState<string>(`${SERVER}/avatars/${Storage.getString("avatar")}.webp`);
+    const theme = useThemeStore(s => s.theme);
+    const styles = useAppStyles(createStyles);
+    const Styles = useAppStyles(createGlobalStyles);
 
     useEffect(() => {
         const listener = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -178,7 +185,7 @@ function ProfilePage() {
 
                     {/* Title */}
                     <View style={Styles.title}>
-                        <Icon name="user-circle" size={24} color={Colors.primaryTextColor} />
+                        <Icon name="user-circle" size={24} color={theme.primaryTextColor} />
                         <Text style={Styles.titleText}>{t.profile}</Text>
                     </View>
 
@@ -201,11 +208,10 @@ function ProfilePage() {
                                 src={avatarPreview ? avatarPreview.uri : avatar}
                                 style={[
                                     styles.avatar,
-                                    /* @ts-ignore */
                                     {
                                         filter: `blur(${isEditMode && !avatarPreview ? 5 : 0})`,
                                         transition: "filter 0.25s ease",
-                                    },
+                                    } as any,
                                 ]}
                             />
                         </Pressable>

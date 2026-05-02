@@ -1,5 +1,5 @@
 import Storage from "@/Storage";
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import Translation from "@/Translation";
 import { useTranslation } from "@/TranslationContext";
 import { ClearCache } from "@/Utils";
@@ -31,90 +31,89 @@ const CustomZoomIn = new Keyframe({
     },
 }).duration(800);
 
-const styles = StyleSheet.create({
-    content: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderColor: Colors.borderColor,
-        borderRadius: Constants.rounding,
-    },
-    button: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
-        gap: 8,
-    },
-    buttonText: {
-        fontSize: 24,
-    },
-    popupContent: {
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        padding: 16,
-        paddingTop: 64,
-    },
-    okButton: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
-        position: "absolute",
-        top: 10,
-        left: 10,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        aspectRatio: 1,
-    },
-    titleText: {
-        ...Styles.primaryCenter,
-        fontSize: 24,
-    },
-    languageSelectorContainer: {
-        backgroundColor: Colors.backgroundColor,
-        padding: 16,
-        borderRadius: Constants.rounding,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        height: 70,
-        boxShadow: Constants.shadow,
-    },
-    languageSelectorPressable: {
-        height: "100%",
-        aspectRatio: 1,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: Constants.rounding,
-        overflow: "hidden",
-    },
-    switchContainer: {
-        backgroundColor: Colors.backgroundColor,
-        padding: 16,
-        borderRadius: Constants.rounding,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 8,
-        height: 70,
-        boxShadow: Constants.shadow,
-    },
-    switchOffOnText: {
-        ...Styles.secondaryCenter,
-        fontSize: 18,
-        flex: 1,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        content: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            borderColor: theme.borderColor,
+            borderRadius: Constants.rounding,
+        },
+        button: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "row",
+            gap: 8,
+        },
+        buttonText: {
+            fontSize: 24,
+        },
+        popupContent: {
+            flex: 1,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            padding: 16,
+            paddingTop: 64,
+        },
+        okButton: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "row",
+            position: "absolute",
+            top: 10,
+            left: 10,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            aspectRatio: 1,
+        },
+        titleText: {
+            fontSize: 24,
+        },
+        languageSelectorContainer: {
+            backgroundColor: theme.backgroundColor,
+            padding: 16,
+            borderRadius: Constants.rounding,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            height: 70,
+            boxShadow: Constants.shadow,
+        },
+        languageSelectorPressable: {
+            height: "100%",
+            aspectRatio: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: Constants.rounding,
+            overflow: "hidden",
+        },
+        switchContainer: {
+            backgroundColor: theme.backgroundColor,
+            padding: 16,
+            borderRadius: Constants.rounding,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 8,
+            height: 70,
+            boxShadow: Constants.shadow,
+        },
+        switchOffOnText: {
+            fontSize: 18,
+            flex: 1,
+        },
+    });
 
 interface SettingsSectionProps {
     onExpand?: () => void;
@@ -135,16 +134,20 @@ function SettingsSection(props: SettingsSectionProps) {
     const contentZIndex = useSharedValue<number>(0);
 
     const { t, changeLanguage } = useTranslation();
+    const styles = useAppStyles(createStyles);
+    const theme = useThemeStore(s => s.theme);
+    const Styles = useAppStyles(createGlobalStyles);
 
+    // Update styles
     useEffect(() => {
         contentPosition.value = expanded ? "absolute" : "relative";
         contentWidth.value = withSpring(expanded ? width - 20 : width - 40);
         contentHeight.value = withSpring(expanded ? height - 60 : 50);
         contentBottom.value = withSpring(expanded ? -20 : 0);
-        contentBgColor.value = withSpring(expanded ? Colors.backgroundPanelColorOpaque : "#ffffff00");
+        contentBgColor.value = withSpring(expanded ? theme.backgroundPanelColorOpaque : "#ffffff00");
         contentBorderWidth.value = withSpring(expanded ? Constants.borderWidth : 0);
         contentZIndex.value = expanded ? 1 : 0;
-    }, [expanded, width, height]);
+    }, [expanded, width, height, theme]);
 
     const contentStyle = useAnimatedStyle(() => ({
         position: contentPosition.value,
@@ -177,8 +180,9 @@ function SettingsSection(props: SettingsSectionProps) {
         if (props.onExpand) props.onExpand();
     }
 
-    function itemTitle(title: string): string {
-        return (t as any)["settings_" + title] || title;
+    function itemTitle(title?: string): string {
+        const ti = title || "Title";
+        return (t as any)["settings_" + ti] || ti;
     }
 
     return (
@@ -187,7 +191,7 @@ function SettingsSection(props: SettingsSectionProps) {
             {!expanded && (
                 <Animated.View entering={CustomZoomIn} exiting={FadeOut}>
                     <TouchableOpacity style={styles.button} onPress={expand}>
-                        {props.section.icon && <Icon name={props.section.icon} size={24} color="#fff" />}
+                        {props.section.icon && <Icon name={props.section.icon} size={24} color={theme.primaryTextColor} />}
                         <Text style={[Styles.primaryText, styles.buttonText]}>{itemTitle(props.section.title)}</Text>
                     </TouchableOpacity>
                 </Animated.View>
@@ -202,11 +206,11 @@ function SettingsSection(props: SettingsSectionProps) {
                             component = (
                                 <View>
                                     {/* Title */}
-                                    <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
+                                    <Text style={[styles.titleText, Styles.primaryCenter]}>{itemTitle(item.title)}</Text>
 
                                     {/* Box */}
                                     <View style={styles.languageSelectorContainer}>
-                                        <Icon name="earth-americas" size={24} color={Colors.secondaryTextColor} />
+                                        <Icon name="earth-americas" size={24} color={theme.secondaryTextColor} />
                                         <Text style={[Styles.secondaryCenter, { fontSize: 18 }]}>{t.language_name}</Text>
                                         <View style={{ flex: 1 }} />
                                         <Pressable
@@ -229,7 +233,7 @@ function SettingsSection(props: SettingsSectionProps) {
                                                 ])
                                             }
                                         >
-                                            <Icon name="chevron-right" size={24} color={Colors.secondaryTextColor} />
+                                            <Icon name="chevron-right" size={24} color={theme.secondaryTextColor} />
                                         </Pressable>
                                     </View>
                                 </View>
@@ -237,7 +241,7 @@ function SettingsSection(props: SettingsSectionProps) {
                         } else if (item.type === "cache") {
                             component = (
                                 <View>
-                                    <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
+                                    <Text style={[styles.titleText, Styles.primaryCenter]}>{itemTitle(item.title)}</Text>
                                     <View style={{ height: 16 }} />
                                     <TouchableOpacity onPress={ClearCache}>
                                         <Text
@@ -251,17 +255,19 @@ function SettingsSection(props: SettingsSectionProps) {
                         } else if (item.type === "switch") {
                             component = (
                                 <View>
-                                    <Text style={styles.titleText}>{itemTitle(item.title)}</Text>
+                                    <Text style={[styles.titleText, Styles.primaryCenter]}>{itemTitle(item.title)}</Text>
                                     <View style={styles.switchContainer}>
-                                        <Text style={styles.switchOffOnText}>Off</Text>
+                                        <Text style={[styles.switchOffOnText, Styles.secondaryCenter]}>Off</Text>
                                         <Switch
                                             checked={Storage.getBoolean(item.storageKey ?? "") ?? false}
                                             onChange={value => Storage.set(item.storageKey ?? "", value)}
                                         />
-                                        <Text style={styles.switchOffOnText}>On</Text>
+                                        <Text style={[styles.switchOffOnText, Styles.secondaryCenter]}>On</Text>
                                     </View>
                                 </View>
                             );
+                        } else if (item.component) {
+                            component = <item.component />;
                         }
                         return (
                             <View key={index} style={{ width: "100%" }}>
@@ -273,7 +279,7 @@ function SettingsSection(props: SettingsSectionProps) {
 
                     {/* Ok Button */}
                     <TouchableOpacity style={styles.okButton} onPress={() => setExpanded(false)}>
-                        <Icon name="arrow-left" size={24} color="#fff" />
+                        <Icon name="arrow-left" size={24} color={theme.primaryTextColor} />
                     </TouchableOpacity>
                 </Animated.View>
             )}

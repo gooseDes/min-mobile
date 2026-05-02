@@ -2,7 +2,7 @@ import Auth from "@/Auth";
 import db from "@/db/Client";
 import { messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { countChars, dateToString } from "@/Utils";
 import Icon from "@components/Icon";
@@ -15,74 +15,58 @@ import { Image, StyleSheet, Text, TouchableOpacity, View, ViewProps } from "reac
 import Markdown, { MarkedStyles } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
-const styles = StyleSheet.create({
-    messageContainer: {
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
-        flexDirection: "column",
-    },
-    messageContent: {
-        backgroundColor: Colors.messageBackgroundColor,
-        paddingHorizontal: 10,
-        paddingTop: 4,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        borderRadius: Constants.rounding,
-        maxWidth: "80%",
-    },
-    authorText: {
-        fontSize: 13,
-        marginBottom: -6,
-    },
-    replyText: {
-        fontSize: 11,
-        marginBottom: -4,
-    },
-    leftSide: {
-        alignItems: "flex-start",
-    },
-    rightSide: {
-        alignItems: "flex-end",
-    },
-    leftSideContent: {
-        borderTopLeftRadius: 0,
-    },
-    rightSideContent: {
-        borderTopRightRadius: 0,
-    },
-    avatar: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        marginBottom: 5,
-    },
-    sentAtText: {
-        fontSize: 11,
-        marginBottom: 4,
-        textAlign: "right",
-    },
-    dropdownTrigger: {
-        flex: 1,
-    },
-});
-
-const markdownStyles: MarkedStyles = {
-    table: { borderWidth: Constants.borderWidth, borderColor: Colors.borderColor },
-    blockquote: { marginTop: 8, ...Styles.primaryText },
-    text: { ...Styles.primaryText },
-    strong: { ...Styles.primaryBoldText },
-    strikethrough: { ...Styles.primaryText },
-    em: { ...Styles.primaryText },
-    image: { borderRadius: Constants.rounding - styles.messageContent.paddingHorizontal },
-    li: { ...Styles.primaryText },
-    h1: { ...Styles.primaryBoldText },
-    h2: { ...Styles.primaryText },
-    h3: { ...Styles.primaryText },
-    h4: { ...Styles.primaryText },
-    h5: { ...Styles.primaryText },
-    h6: { ...Styles.primaryText },
-};
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        messageContainer: {
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+        },
+        messageContent: {
+            backgroundColor: theme.messageBackgroundColor,
+            paddingHorizontal: 10,
+            paddingTop: 4,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            borderRadius: Constants.rounding,
+            maxWidth: "80%",
+        },
+        authorText: {
+            fontSize: 13,
+            marginBottom: -6,
+        },
+        replyText: {
+            fontSize: 11,
+            marginBottom: -4,
+        },
+        leftSide: {
+            alignItems: "flex-start",
+        },
+        rightSide: {
+            alignItems: "flex-end",
+        },
+        leftSideContent: {
+            borderTopLeftRadius: 0,
+        },
+        rightSideContent: {
+            borderTopRightRadius: 0,
+        },
+        avatar: {
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            marginBottom: 5,
+        },
+        sentAtText: {
+            fontSize: 11,
+            marginBottom: 4,
+            textAlign: "right",
+        },
+        dropdownTrigger: {
+            flex: 1,
+        },
+    });
 
 const markdownFlatListProps: any = {
     style: {
@@ -129,6 +113,26 @@ function MessageBase(props: MessageProps) {
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
     const { t } = useTranslation();
+    const theme = useThemeStore(s => s.theme);
+    const styles = useAppStyles(createStyles);
+    const Styles = useAppStyles(createGlobalStyles);
+
+    const markdownStyles: MarkedStyles = {
+        table: { borderWidth: Constants.borderWidth, borderColor: theme.borderColor },
+        blockquote: { marginTop: 8, ...Styles.primaryText },
+        text: { ...Styles.primaryText },
+        strong: { ...Styles.primaryBoldText },
+        strikethrough: { ...Styles.primaryText },
+        em: { ...Styles.primaryText },
+        image: { borderRadius: Constants.rounding - styles.messageContent.paddingHorizontal },
+        li: { ...Styles.primaryText },
+        h1: { ...Styles.primaryBoldText },
+        h2: { ...Styles.primaryText },
+        h3: { ...Styles.primaryText },
+        h4: { ...Styles.primaryText },
+        h5: { ...Styles.primaryText },
+        h6: { ...Styles.primaryText },
+    };
 
     async function getReplyText() {
         const replyId = parseInt(text.split("\n")[0].split(" ")[1], 10);
@@ -226,7 +230,7 @@ function MessageBase(props: MessageProps) {
                         props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
                         {
                             transition: "boxShadow 0.3s ease-in-out, transform 0.3s ease-in-out",
-                            boxShadow: dropdownOpen ? `0px 0px 16px ${Colors.borderColor}` : Constants.shadow,
+                            boxShadow: dropdownOpen ? `0px 0px 16px ${theme.borderColor}` : Constants.shadow,
                             transform: [
                                 { scale: dropdownOpen ? 1.1 : 1 },
                                 { translateX: dropdownOpen ? (side === "left" ? 8 : -8) : 0 },

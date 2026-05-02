@@ -1,7 +1,7 @@
 import db from "@/db/Client";
 import { usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
-import { Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, useAppStyles } from "@/Style";
 import { CreateUserData } from "@/Utils";
 import { SERVER } from "@env";
 import { eq } from "drizzle-orm";
@@ -36,6 +36,7 @@ export interface ProfileProps {
 
 function Profile(props: ProfileProps) {
     const [user, setUser] = useState<UserData>(CreateUserData({ id: props.id }));
+    const Styles = useAppStyles(createGlobalStyles);
 
     useEffect(() => {
         async function fetchUser() {
@@ -57,7 +58,7 @@ function Profile(props: ProfileProps) {
     return (
         <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
             {user && (
-                <View>
+                <View style={{ alignItems: "center", justifyContent: "center" }}>
                     <Image source={{ uri: `${SERVER}/avatars/${user.avatar}.webp` }} style={styles.avatar} />
                     <Text style={[Styles.primaryText, styles.name]} selectable={true}>
                         {user.username}

@@ -1,4 +1,4 @@
-import { Styles } from "@/Style";
+import { createGlobalStyles, useAppStyles } from "@/Style";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { useAnimatedStyle, withSpring, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
 
@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
 
 function ClickableProfile(props: ClickableProfileProps) {
     const { text, bottomText, image, onPress, anim = "none", shown = true } = props;
+    const Styles = useAppStyles(createGlobalStyles);
 
     const animatedStyle = useAnimatedStyle(() => {
         if (anim === "none") return {};

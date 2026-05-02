@@ -1,21 +1,24 @@
-import { Colors, Constants } from "@/Style";
+import { Constants, ThemeData, useAppStyles } from "@/Style";
 import { StyleSheet, View } from "react-native";
 
-const styles = StyleSheet.create({
-    divider: {
-        backgroundColor: Colors.borderColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth / 2,
-        borderRadius: 999,
-        width: "100%",
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        divider: {
+            backgroundColor: theme.dividerColor,
+            borderColor: theme.dividerColor,
+            borderWidth: Constants.borderWidth / 2,
+            borderRadius: 999,
+            width: "100%",
+        },
+    });
 
 interface DividerProps {
     style?: any;
 }
 
 function Divider(props: DividerProps) {
+    const styles = useAppStyles(createStyles);
+
     return <View style={[styles.divider, props.style]} />;
 }
 

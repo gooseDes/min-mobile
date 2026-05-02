@@ -31,7 +31,7 @@ import HomePage, { HomePageHandler } from "./pages/HomePage";
 import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
 import Storage from "./Storage";
-import { Colors } from "./Style";
+import { useThemeStore } from "./Style";
 import Translation from "./Translation";
 import { TranslationProvider } from "./TranslationContext";
 import { CreateDatabase, CreateRemoteMessagePayload } from "./Utils";
@@ -48,6 +48,7 @@ const stackOptions: NativeStackNavigationOptions = {
 
 function App() {
     const homePageRef = useRef<HomePageHandler | null>(null);
+    const theme = useThemeStore(s => s.theme);
 
     async function requestUserPermission(messaging: FirebaseMessagingTypes.Module) {
         // Request user permission for Firebase notifications
@@ -130,8 +131,8 @@ function App() {
 
     return (
         <TranslationProvider>
-            <SafeAreaProvider style={{ backgroundColor: Colors.backgroundColor }}>
-                <StatusBar barStyle={"light-content"} />
+            <SafeAreaProvider style={{ backgroundColor: theme.backgroundColor }}>
+                <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
                 <NavigationContainer ref={navigationRef} onReady={() => navigate(initialRouteName)}>
                     <Stack.Navigator initialRouteName="Home">
                         <Stack.Screen name="Home" options={stackOptions}>

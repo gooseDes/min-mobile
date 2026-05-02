@@ -1,42 +1,43 @@
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Image, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: Colors.backgroundPanelColor,
-        width: "80%",
-        maxWidth: 600,
-        height: 64,
-        borderRadius: 999,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        position: "absolute",
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        zIndex: 9999,
-        transformOrigin: "center",
-        padding: 8,
-        gap: 16,
-        boxShadow: Constants.shadow,
-    },
-    title: {
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    text: {
-        fontSize: 14,
-    },
-    image: {
-        aspectRatio: 1,
-        height: "100%",
-        borderRadius: 999,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        container: {
+            backgroundColor: theme.backgroundPanelColor,
+            width: "80%",
+            maxWidth: 600,
+            height: 64,
+            borderRadius: 999,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            position: "absolute",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            zIndex: 9999,
+            transformOrigin: "center",
+            padding: 8,
+            gap: 16,
+            boxShadow: Constants.shadow,
+        },
+        title: {
+            fontSize: 16,
+            fontWeight: "bold",
+        },
+        text: {
+            fontSize: 14,
+        },
+        image: {
+            aspectRatio: 1,
+            height: "100%",
+            borderRadius: 999,
+        },
+    });
 
 export interface NotificationHandle {
     setText: (newText: string) => void;
@@ -58,6 +59,8 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
     const [image, setImage] = useState<string | null>(null);
     const closeTimeout = useRef<number | null>(null);
     const { width } = useWindowDimensions();
+    const styles = useAppStyles(createStyles);
+    const Styles = useAppStyles(createGlobalStyles);
 
     useImperativeHandle(ref, () => ({
         setTitle: (newTitle: string) => {
@@ -104,7 +107,7 @@ const Notification = forwardRef<NotificationHandle, NotificationProps>((props, r
 
     return (
         <Animated.View style={[styles.container, animatedStyle]}>
-            {image && <Image source={{ uri: image }} style={styles.image} />}
+            {image && <Image source={{ uri: image }} style={styles.image as any} />}
             <View style={{ marginLeft: image ? 0 : 16 }}>
                 <Text style={[styles.title, Styles.primaryText]}>{title}</Text>
                 <Text

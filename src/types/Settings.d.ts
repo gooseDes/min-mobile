@@ -1,7 +1,8 @@
 interface SettingsItem {
-    title: string;
-    type: "language" | "cache" | "switch";
+    title?: string;
+    type: "language" | "cache" | "switch" | "custom";
     storageKey?: string;
+    component?: React.ComponentType<any>;
 }
 
 interface SettingsSection {

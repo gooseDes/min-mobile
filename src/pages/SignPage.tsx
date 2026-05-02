@@ -1,5 +1,5 @@
 import Auth from "@/Auth";
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import Button from "@components/Button";
 import Divider from "@components/Divider";
@@ -12,44 +12,45 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { ZoomInDown, ZoomInUp, ZoomOutDown, ZoomOutUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const styles = StyleSheet.create({
-    signContainer: {
-        backgroundColor: Colors.backgroundPanelColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        maxHeight: "90%",
-        maxWidth: "100%",
-        aspectRatio: 0.75,
-        display: "flex",
-        borderRadius: Constants.rounding,
-        gap: 10,
-        padding: 10,
-        boxShadow: Constants.shadow,
-    },
-    signForm: {
-        gap: 10,
-        flex: 1,
-    },
-    buttonsContainer: {
-        height: 100,
-        gap: 10,
-    },
-    languageButtonContainer: {
-        position: "absolute",
-        bottom: 10,
-        right: 10,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-    },
-    languageButton: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        signContainer: {
+            backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            maxHeight: "90%",
+            maxWidth: "100%",
+            aspectRatio: 0.75,
+            display: "flex",
+            borderRadius: Constants.rounding,
+            gap: 10,
+            padding: 10,
+            boxShadow: Constants.shadow,
+        },
+        signForm: {
+            gap: 10,
+            flex: 1,
+        },
+        buttonsContainer: {
+            height: 100,
+            gap: 10,
+        },
+        languageButtonContainer: {
+            position: "absolute",
+            bottom: 10,
+            right: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+        },
+        languageButton: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+        },
+    });
 
 function SignPage() {
     const [emailValue, setEmailValue] = useState<string>("");
@@ -58,6 +59,8 @@ function SignPage() {
     const [confirmPasswordValue, setConfirmPasswordValue] = useState<string>("");
     const [state, setState] = useState<"sign_in" | "sign_up">("sign_in");
     const { t, changeLanguage } = useTranslation();
+    const styles = useAppStyles(createStyles);
+    const Styles = useAppStyles(createGlobalStyles);
 
     async function SignIn() {
         const result = await Auth.login(emailValue, passwordValue);

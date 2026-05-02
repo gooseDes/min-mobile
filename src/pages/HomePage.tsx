@@ -3,7 +3,7 @@ import db from "@/db/Client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Schema";
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/Utils";
 import { getSocket } from "@/Socket";
-import { Colors, Constants, Styles } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { CreateChat, CreateMessage, timestampToDate } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
@@ -27,31 +27,32 @@ import { Alert, BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, Vie
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const styles = StyleSheet.create({
-    panel: {
-        backgroundColor: Colors.backgroundPanelColor,
-        borderColor: Colors.borderColor,
-        borderWidth: Constants.borderWidth,
-        borderRadius: Constants.rounding,
-        padding: 10,
-        margin: 10,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        boxShadow: Constants.shadow,
-    },
-    topPanel: {
-        gap: 20,
-        flexDirection: "row",
-        zIndex: 1,
-        boxShadow: Constants.shadow,
-    },
-    contentPanel: {
-        flex: 1,
-        overflow: "visible",
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        panel: {
+            backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: Constants.borderWidth,
+            borderRadius: Constants.rounding,
+            padding: 10,
+            margin: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            boxShadow: Constants.shadow,
+        },
+        topPanel: {
+            gap: 20,
+            flexDirection: "row",
+            zIndex: 1,
+            boxShadow: Constants.shadow,
+        },
+        contentPanel: {
+            flex: 1,
+            overflow: "visible",
+        },
+    });
 
 export interface HomePageHandler {
     getCurrentChat: () => ChatData;
@@ -73,6 +74,9 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const [profileId, setProfileId] = useState<number>(-1);
     const lastBackButtonPress = useRef<number>(0);
     const { t } = useTranslation();
+    const styles = useAppStyles(createStyles);
+    const theme = useThemeStore(s => s.theme);
+    const Styles = useAppStyles(createGlobalStyles);
 
     useImperativeHandle(ref, () => ({
         getCurrentChat: () => currentChatRef.current || CreateChat({}),
@@ -413,7 +417,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                         entering={ZoomIn}
                         exiting={ZoomOut}
                     >
-                        <Icon name="comments" size={24} color={Colors.primaryTextColor} />
+                        <Icon name="comments" size={24} color={theme.primaryTextColor} />
                         <Text style={[Styles.titleText, { marginLeft: 10 }]}>{t.chats}</Text>
                     </SurelyAnimatedView>
                 )}
