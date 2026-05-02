@@ -30,6 +30,10 @@ jobs:
               env:
                   GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
+            - name: Create Keystore
+              run: |
+                  echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
+
             - name: Setup Java
               uses: actions/setup-java@v4
               with:
