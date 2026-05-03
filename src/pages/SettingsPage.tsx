@@ -1,6 +1,7 @@
 import settings from "@/Settings";
-import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
+import { getShadow } from "@/Utils";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
@@ -14,8 +15,8 @@ const createStyles = (theme: ThemeData) =>
         panel: {
             backgroundColor: theme.backgroundPanelColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
-            borderRadius: Constants.rounding,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
             padding: 10,
             margin: 10,
             display: "flex",
@@ -23,7 +24,7 @@ const createStyles = (theme: ThemeData) =>
             alignItems: "center",
             width: "100%",
             flex: 1,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
     });
 

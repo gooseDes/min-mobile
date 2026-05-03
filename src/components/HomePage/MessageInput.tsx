@@ -1,7 +1,7 @@
 import Auth from "@/Auth";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
-import { setAlphaForColor } from "@/Utils";
+import { getShadow, setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
@@ -19,12 +19,12 @@ const createStyles = (theme: ThemeData) =>
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             borderColor: theme.borderColor,
-            borderRadius: Constants.rounding,
+            borderRadius: theme.rounding,
             backgroundColor: theme.backgroundPanelColor,
             overflow: "hidden",
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         input: {
             flex: 1,

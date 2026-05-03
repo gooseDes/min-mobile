@@ -1,4 +1,4 @@
-import { Constants, ThemeData, useAppStyles } from "@/Style";
+import { ThemeData, useAppStyles } from "@/Style";
 import { StyleSheet, View } from "react-native";
 
 const createStyles = (theme: ThemeData) =>
@@ -6,7 +6,7 @@ const createStyles = (theme: ThemeData) =>
         divider: {
             backgroundColor: theme.dividerColor,
             borderColor: theme.dividerColor,
-            borderWidth: Constants.borderWidth / 2,
+            borderWidth: theme.borderWidth / 2,
             borderRadius: 999,
             width: "100%",
         },

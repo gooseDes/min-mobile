@@ -2,6 +2,7 @@ import Auth from "@/Auth";
 import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { t } from "@/Translation";
+import { getShadow } from "@/Utils";
 import Divider from "@components/Divider";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import IconButton from "@components/IconButton";
@@ -18,8 +19,8 @@ const createStyles = (theme: ThemeData) =>
         panel: {
             backgroundColor: theme.backgroundPanelColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
-            borderRadius: Constants.rounding,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
             padding: 10,
             margin: 10,
             display: "flex",
@@ -44,7 +45,7 @@ const createStyles = (theme: ThemeData) =>
             width: 200,
             height: 200,
             borderRadius: 100,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         username: {
             fontSize: 24,
@@ -59,11 +60,11 @@ const createStyles = (theme: ThemeData) =>
         actionButton: {
             backgroundColor: theme.backgroundColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             borderRadius: 25,
             width: "auto",
             overflow: "hidden",
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         actionButtonPressable: {
             display: "flex",
@@ -92,7 +93,7 @@ function ActionButton(props: ActionButtonProps) {
     return (
         <Animated.View style={styles.actionButton} layout={Constants.layoutTransition}>
             <Pressable
-                android_ripple={{ ...Constants.rippleConfig, borderless: true }}
+                android_ripple={{ color: theme.rippleColor, foreground: true, borderless: true }}
                 style={styles.actionButtonPressable}
                 onPress={onPress}
             >
@@ -200,7 +201,7 @@ function ProfilePage() {
                     {/* Profile */}
                     <View style={styles.avatarContainerContainer}>
                         <Pressable
-                            android_ripple={{ ...Constants.rippleConfig, borderless: true }}
+                            android_ripple={{ color: theme.rippleColor, foreground: true, borderless: true }}
                             style={styles.avatarContainer}
                             onPress={() => uploadAvatar()}
                         >

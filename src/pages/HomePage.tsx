@@ -5,7 +5,7 @@ import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/Utils";
 import { getSocket } from "@/Socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
-import { CreateChat, CreateMessage, timestampToDate } from "@/Utils";
+import { CreateChat, CreateMessage, getShadow, timestampToDate } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
@@ -32,21 +32,21 @@ const createStyles = (theme: ThemeData) =>
         panel: {
             backgroundColor: theme.backgroundPanelColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
-            borderRadius: Constants.rounding,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
             padding: 10,
             margin: 10,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             width: "100%",
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         topPanel: {
             gap: 20,
             flexDirection: "row",
             zIndex: 1,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         contentPanel: {
             flex: 1,

@@ -1,4 +1,5 @@
-import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { getShadow } from "@/Utils";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Keyboard, StyleSheet, TouchableOpacity, TouchableOpacityProps, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
@@ -16,7 +17,7 @@ const createStyles = (theme: ThemeData) =>
         view: {
             backgroundColor: theme.backgroundPanelColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -69,7 +70,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
     const width = useSharedValue(100);
     const height = useSharedValue(100);
     const borderRadius = useSharedValue(50);
-    const boxShadow = useSharedValue(Constants.shadow);
+    const boxShadow = useSharedValue(getShadow(theme));
     const backgroundColor = useSharedValue(theme.backgroundPanelColor);
     const animatedContentStyle = useAnimatedStyle(() => ({
         width: withSpring(width.value),
@@ -105,7 +106,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
         if (isOpened) {
             width.value = screenWidth - 20;
             height.value = screenHeight - 20;
-            borderRadius.value = Constants.rounding;
+            borderRadius.value = theme.rounding;
             backgroundColor.value = theme.backgroundPanelColorOpaque;
             right.value = -2;
             bottom.value = -2;

@@ -1,4 +1,4 @@
-import { Constants, createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { setAlphaForColor } from "@/Utils";
 import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -10,33 +10,34 @@ export interface DropdownItemProps {
     onClick?: () => void;
 }
 
-const styles = StyleSheet.create({
-    touchable: {
-        width: "100%",
-        height: 50,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    labelContainer: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-    },
-    container: {
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: Constants.rounding - 8,
-    },
-    text: {
-        fontSize: 24,
-    },
-});
+const createStyles = (theme: ThemeData) =>
+    StyleSheet.create({
+        touchable: {
+            width: "100%",
+            height: 50,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        labelContainer: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+        },
+        container: {
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: theme.rounding - 8,
+        },
+        text: {
+            fontSize: 24,
+        },
+    });
 
 function DropdownItem(props: DropdownItemProps) {
     const { text, icon } = props;
@@ -45,6 +46,7 @@ function DropdownItem(props: DropdownItemProps) {
     const backgroundColor = useSharedValue("#ffffff00");
 
     const theme = useThemeStore(s => s.theme);
+    const styles = useAppStyles(createStyles);
     const Styles = useAppStyles(createGlobalStyles);
 
     const containerAnimatedStyle = useAnimatedStyle(() => {

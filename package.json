@@ -10,6 +10,7 @@
         "test": "jest",
         "generate_sql": "drizzle-kit generate",
         "assets": "npx react-native-asset",
+        "release": "git push origin main:release -f",
         "apk": "export $(grep -v '^#' .env | xargs -d '\n') && cd android && ./gradlew assembleRelease && adb install ./app/build/outputs/apk/release/app-release.apk && cd .."
     },
     "dependencies": {

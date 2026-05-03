@@ -1,12 +1,14 @@
 import { useMemo } from "react";
-import { PressableAndroidRippleConfig, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { cubicBezier, LinearTransition } from "react-native-reanimated";
 import { create } from "zustand";
 import { createJSONStorage, persist, StateStorage } from "zustand/middleware";
 import Storage from "./Storage";
-import { midnightTheme } from "./Themes";
+import { midnightTheme, themes } from "./Themes";
+import { getShadow } from "./Utils";
 
 export interface ThemeData {
+    name: string;
     isDark: boolean;
     backgroundColor: string;
     backgroundPanelColor: string;
@@ -17,6 +19,15 @@ export interface ThemeData {
     primaryTextColor: string;
     secondaryTextColor: string;
     rippleColor: string;
+    rounding: number;
+    borderWidth: number;
+    fontFamily: string;
+    shadowOffsetX: number;
+    shadowOffsetY: number;
+    shadowBlur: number;
+    shadowSpread: number;
+    shadowColor: string;
+    shadowInset: boolean;
 }
 
 const initialState = midnightTheme;
@@ -54,6 +65,35 @@ export const useThemeStore = create<ThemeState>()(
         {
             name: "theme-storage",
             storage: createJSONStorage(() => mmkvWrapper),
+            merge: (persistedState, currentState) => {
+                function mergeTheme(persistedTheme: ThemeData): ThemeData {
+                    // Saved theme merged with defaults
+                    const withDefaults = { ...initialState, ...persistedTheme };
+
+                    // If saved theme has a name
+                    if (persistedTheme.name) {
+                        // Try to find the theme by name
+                        try {
+                            // If found, return merged with saved theme
+                            const theme = themes[persistedTheme.name];
+                            if (theme) {
+                                return { ...theme, ...persistedTheme };
+                            }
+                        } catch {
+                            // If not found, return merged with defaults
+                            return withDefaults;
+                        }
+                    }
+
+                    return withDefaults;
+                }
+
+                return {
+                    ...currentState,
+                    ...(persistedState as ThemeState),
+                    theme: mergeTheme((persistedState as ThemeState)?.theme),
+                };
+            },
         },
     ),
 );
@@ -64,18 +104,9 @@ export function useAppStyles<T>(factory: StyleFactory<T>): T {
     return useMemo(() => factory(theme), [theme]);
 }
 
-class Colors {
-    static rippleColor = "#ffffffaa";
-}
-
 export class Constants {
-    static rounding = 16;
-    static borderWidth = 2;
-    static fontFamily = "Rubik";
     static layoutTransition = LinearTransition.springify(500);
     static cubicBezier = cubicBezier(0.4, 0, 0.2, 1);
-    static rippleConfig: PressableAndroidRippleConfig = { color: Colors.rippleColor, foreground: true };
-    static shadow = "0px 4px 4px rgba(0, 0, 0, 0.5)";
 }
 
 export const createGlobalStyles = (theme: ThemeData) =>
@@ -121,17 +152,17 @@ export const createGlobalStyles = (theme: ThemeData) =>
             textAlign: "center",
             backgroundColor: theme.backgroundPanelColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
-            borderRadius: Constants.rounding,
-            boxShadow: Constants.shadow,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
+            boxShadow: getShadow(theme),
         },
         bgAndBorder: {
             backgroundColor: theme.backgroundPanelColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
-            borderRadius: Constants.rounding,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
             padding: 8,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         header: {
             display: "flex",

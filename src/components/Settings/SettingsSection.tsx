@@ -2,7 +2,7 @@ import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import Translation from "@/Translation";
 import { useTranslation } from "@/TranslationContext";
-import { ClearCache } from "@/Utils";
+import { ClearCache, getShadow } from "@/Utils";
 import Icon from "@components/Icon";
 import Switch from "@components/Switch";
 import { openDropdown } from "@services/DropdownService";
@@ -38,7 +38,7 @@ const createStyles = (theme: ThemeData) =>
             justifyContent: "center",
             alignItems: "center",
             borderColor: theme.borderColor,
-            borderRadius: Constants.rounding,
+            borderRadius: theme.rounding,
         },
         button: {
             display: "flex",
@@ -78,14 +78,14 @@ const createStyles = (theme: ThemeData) =>
         languageSelectorContainer: {
             backgroundColor: theme.backgroundColor,
             padding: 16,
-            borderRadius: Constants.rounding,
+            borderRadius: theme.rounding,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
             height: 70,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         languageSelectorPressable: {
             height: "100%",
@@ -93,21 +93,21 @@ const createStyles = (theme: ThemeData) =>
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            borderRadius: Constants.rounding,
+            borderRadius: theme.rounding,
             overflow: "hidden",
         },
         switchContainer: {
             backgroundColor: theme.backgroundColor,
             padding: 16,
-            borderRadius: Constants.rounding,
+            borderRadius: theme.rounding,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
             gap: 8,
             height: 70,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         switchOffOnText: {
             fontSize: 18,
@@ -145,7 +145,7 @@ function SettingsSection(props: SettingsSectionProps) {
         contentHeight.value = withSpring(expanded ? height - 60 : 50);
         contentBottom.value = withSpring(expanded ? -20 : 0);
         contentBgColor.value = withSpring(expanded ? theme.backgroundPanelColorOpaque : "#ffffff00");
-        contentBorderWidth.value = withSpring(expanded ? Constants.borderWidth : 0);
+        contentBorderWidth.value = withSpring(expanded ? theme.borderWidth : 0);
         contentZIndex.value = expanded ? 1 : 0;
     }, [expanded, width, height, theme]);
 
@@ -215,7 +215,7 @@ function SettingsSection(props: SettingsSectionProps) {
                                         <View style={{ flex: 1 }} />
                                         <Pressable
                                             style={styles.languageSelectorPressable}
-                                            android_ripple={Constants.rippleConfig}
+                                            android_ripple={{ color: theme.rippleColor, foreground: true }}
                                             onPress={e =>
                                                 openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
                                                     {

@@ -18,7 +18,7 @@ const createStyles = (theme: ThemeData) =>
             flex: 1,
             backgroundColor: theme.backgroundPanelColor,
             borderRadius: 25,
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             borderColor: theme.borderColor,
             display: "flex",
             alignItems: "center",

@@ -1,6 +1,7 @@
 import Auth from "@/Auth";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
+import { getShadow } from "@/Utils";
 import Button from "@components/Button";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
@@ -17,15 +18,15 @@ const createStyles = (theme: ThemeData) =>
         signContainer: {
             backgroundColor: theme.backgroundPanelColor,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             maxHeight: "90%",
             maxWidth: "100%",
             aspectRatio: 0.75,
             display: "flex",
-            borderRadius: Constants.rounding,
+            borderRadius: theme.rounding,
             gap: 10,
             padding: 10,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         signForm: {
             gap: 10,

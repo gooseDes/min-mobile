@@ -24,7 +24,12 @@ function IconButton(props: IconButtonProps) {
 
     return (
         <Animated.View layout={layoutTransition ? Constants.layoutTransition : undefined} entering={ZoomIn} exiting={ZoomOut}>
-            <Pressable onPress={onPress} style={[styles.iconButton, style]} android_ripple={Constants.rippleConfig} {...rest}>
+            <Pressable
+                onPress={onPress}
+                style={[styles.iconButton, style]}
+                android_ripple={{ color: theme.rippleColor, foreground: true }}
+                {...rest}
+            >
                 <Icon name={icon} size={24} color={theme.primaryTextColor} />
             </Pressable>
         </Animated.View>

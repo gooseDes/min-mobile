@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { Alert } from "react-native";
 import db, { sqliteClient } from "./db/Client";
 import Storage from "./Storage";
+import { ThemeData } from "./Style";
 import { t } from "./Translation";
 
 export function CreateUserData(obj: any = {}): UserData {
@@ -122,4 +123,11 @@ export function setAlphaForColor(color: string, alpha: number): string {
 
 export function countChars(str: string, char: string): number {
     return str.split(char).length - 1;
+}
+
+// Generate boxShadow style prop from theme data
+export function getShadow(theme: ThemeData): string {
+    return `${theme.shadowInset ? "inset " : ""}${theme.shadowOffsetX}px ${theme.shadowOffsetY}px ${theme.shadowBlur}px ${
+        theme.shadowSpread
+    }px ${theme.shadowColor}`;
 }

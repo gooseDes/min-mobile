@@ -1,4 +1,5 @@
 import { Constants, ThemeData, useAppStyles } from "@/Style";
+import { getShadow } from "@/Utils";
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -23,14 +24,14 @@ const createStyles = (theme: ThemeData) =>
         container: {
             position: "absolute",
             backgroundColor: theme.backgroundColor,
-            borderRadius: Constants.rounding,
-            borderWidth: Constants.borderWidth,
+            borderRadius: theme.rounding,
+            borderWidth: theme.borderWidth,
             borderColor: theme.borderColor,
             padding: 8,
             width: 200,
             height: "auto",
             zIndex: 2,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
     });
 

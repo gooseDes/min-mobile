@@ -4,7 +4,7 @@ import { messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
-import { countChars, dateToString } from "@/Utils";
+import { countChars, dateToString, getShadow } from "@/Utils";
 import Icon from "@components/Icon";
 import { SERVER } from "@env";
 import { openDropdown } from "@services/DropdownService";
@@ -28,8 +28,8 @@ const createStyles = (theme: ThemeData) =>
             paddingHorizontal: 10,
             paddingTop: 4,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
-            borderRadius: Constants.rounding,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
             maxWidth: "80%",
         },
         authorText: {
@@ -118,13 +118,13 @@ function MessageBase(props: MessageProps) {
     const Styles = useAppStyles(createGlobalStyles);
 
     const markdownStyles: MarkedStyles = {
-        table: { borderWidth: Constants.borderWidth, borderColor: theme.borderColor },
+        table: { borderWidth: theme.borderWidth, borderColor: theme.borderColor },
         blockquote: { marginTop: 8, ...Styles.primaryText },
         text: { ...Styles.primaryText },
         strong: { ...Styles.primaryBoldText },
         strikethrough: { ...Styles.primaryText },
         em: { ...Styles.primaryText },
-        image: { borderRadius: Constants.rounding - styles.messageContent.paddingHorizontal },
+        image: { borderRadius: theme.rounding - styles.messageContent.paddingHorizontal },
         li: { ...Styles.primaryText },
         h1: { ...Styles.primaryBoldText },
         h2: { ...Styles.primaryText },
@@ -230,7 +230,7 @@ function MessageBase(props: MessageProps) {
                         props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
                         {
                             transition: "boxShadow 0.3s ease-in-out, transform 0.3s ease-in-out",
-                            boxShadow: dropdownOpen ? `0px 0px 16px ${theme.borderColor}` : Constants.shadow,
+                            boxShadow: dropdownOpen ? `0px 0px 16px ${theme.borderColor}` : getShadow(theme),
                             transform: [
                                 { scale: dropdownOpen ? 1.1 : 1 },
                                 { translateX: dropdownOpen ? (side === "left" ? 8 : -8) : 0 },

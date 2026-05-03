@@ -1,4 +1,5 @@
-import { Constants, createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
+import { getShadow } from "@/Utils";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Image, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -13,7 +14,7 @@ const createStyles = (theme: ThemeData) =>
             height: 64,
             borderRadius: 999,
             borderColor: theme.borderColor,
-            borderWidth: Constants.borderWidth,
+            borderWidth: theme.borderWidth,
             position: "absolute",
             display: "flex",
             flexDirection: "row",
@@ -23,7 +24,7 @@ const createStyles = (theme: ThemeData) =>
             transformOrigin: "center",
             padding: 8,
             gap: 16,
-            boxShadow: Constants.shadow,
+            boxShadow: getShadow(theme),
         },
         title: {
             fontSize: 16,
