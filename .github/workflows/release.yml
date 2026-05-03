@@ -41,7 +41,7 @@ jobs:
 
             - name: Sync Assets
               run: |
-                  yes | npm run assets
+                  npm run assets
 
             - name: Setup Java
               uses: actions/setup-java@v4
