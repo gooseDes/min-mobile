@@ -39,10 +39,6 @@ jobs:
               run: |
                   echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
-            - name: Sync Assets
-              run: |
-                  npm run assets
-
             - name: Setup Java
               uses: actions/setup-java@v4
               with:
@@ -51,6 +47,10 @@ jobs:
 
             - name: Setup Gradle
               uses: gradle/actions/setup-gradle@v3
+
+            - name: Sync Assets
+              run: |
+                  npm run assets
 
             - name: Build Release APK
               run: |
