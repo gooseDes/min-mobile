@@ -154,3 +154,4 @@ gradle/wrapper/gradle-wrapper.jar
 *.keystore
 
 android/app/google-services.json
+android/link-assets-manifest.json
