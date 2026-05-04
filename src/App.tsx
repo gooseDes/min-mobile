@@ -2,7 +2,7 @@ import Dropdown from "@components/Dropdown";
 import Notification from "@components/Notification";
 import PressableOverlay from "@components/PressableOverlay";
 import migrations from "@drizzle/migrations";
-import { SERVER } from "@env";
+import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, SERVER, VERSION } from "@env";
 import notifee from "@notifee/react-native";
 import ProfilePage from "@pages/ProfilePage";
 import SettingsPage from "@pages/SettingsPage";
@@ -22,7 +22,7 @@ import { initialRouteName, navigate, navigationRef } from "@services/NavigationS
 import { notificationRef } from "@services/NotifyService";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { useEffect, useRef } from "react";
-import { StatusBar } from "react-native";
+import { Alert, StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
 import Auth from "./Auth";
@@ -34,7 +34,7 @@ import Storage from "./Storage";
 import { useThemeStore } from "./Style";
 import Translation from "./Translation";
 import { TranslationProvider } from "./TranslationContext";
-import { CreateDatabase, CreateRemoteMessagePayload } from "./Utils";
+import { CreateDatabase, CreateRemoteMessagePayload, installUpdate } from "./Utils";
 
 enableScreens();
 
@@ -74,6 +74,40 @@ function App() {
     };
 
     useEffect(() => {
+        async function checkVersion() {
+            if (VERSION) {
+                if (AUTO_UPDATE) {
+                    const result = await fetch(`https://api.github.com/repos/${REPO_AUTHOR}/${REPO_NAME}/releases/latest`);
+                    const data = await result.json();
+                    const latestVersion = data.tag_name?.slice(1);
+                    if (latestVersion && latestVersion !== VERSION) {
+                        const confirmUpdate = () => {
+                            const downloadUrl = data?.assets?.[0]?.browser_download_url;
+                            console.log("Downloading", downloadUrl);
+                            if (downloadUrl) {
+                                installUpdate(downloadUrl);
+                            }
+                        };
+                        Alert.alert(
+                            "Update Available",
+                            `Version ${latestVersion} is available. Updating is highly recommended.`,
+                            [
+                                {
+                                    text: "Update",
+                                    onPress: () => {
+                                        confirmUpdate();
+                                    },
+                                },
+                                { text: "Cancel" },
+                            ],
+                        );
+                    }
+                }
+            }
+        }
+
+        checkVersion();
+
         async function migrateDatabaseAndLoadDefaultPage() {
             if (Storage.getBoolean("createNewDB")) {
                 try {

@@ -26,9 +26,12 @@ jobs:
               run: npm install
 
             - name: Create .env file
-              run: printf '%s' "$ENV_FILE" > .env
+              run: |
+                  printf '%s' "$ENV_FILE" > .env
+                  printf '%s' "VERSION=1.0.$BUILD_NUMBER" >> .env
               env:
                   ENV_FILE: ${{ secrets.ENV_FILE }}
+                  BUILD_NUMBER: ${{ github.run_number }}
 
             - name: Create google-services.json
               run: printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
