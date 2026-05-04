@@ -76,7 +76,7 @@ function App() {
     useEffect(() => {
         async function checkVersion() {
             if (VERSION) {
-                if (AUTO_UPDATE) {
+                if (AUTO_UPDATE === "true") {
                     const result = await fetch(`https://api.github.com/repos/${REPO_AUTHOR}/${REPO_NAME}/releases/latest`);
                     const data = await result.json();
                     const latestVersion = data.tag_name?.slice(1);
