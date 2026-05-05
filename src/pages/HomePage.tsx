@@ -4,6 +4,7 @@ import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Sche
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/Utils";
 import { getSocket } from "@/Socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import Translation from "@/Translation";
 import { useTranslation } from "@/TranslationContext";
 import { CreateChat, CreateMessage, getShadow, timestampToDate } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
@@ -73,7 +74,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [profileId, setProfileId] = useState<number>(-1);
     const lastBackButtonPress = useRef<number>(0);
-    const { t } = useTranslation();
+    const { t, changeLanguage } = useTranslation();
     const styles = useAppStyles(createStyles);
     const theme = useThemeStore(s => s.theme);
     const Styles = useAppStyles(createGlobalStyles);
@@ -248,6 +249,8 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     }
 
     useEffect(() => {
+        changeLanguage(Translation.getCurrentLanguage());
+
         async function initSocket() {
             const socket = await getSocket();
             socket.on("connect", () => {

@@ -32,7 +32,7 @@ import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
 import Storage from "./Storage";
 import { useThemeStore } from "./Style";
-import Translation from "./Translation";
+import Translation, { t } from "./Translation";
 import { TranslationProvider } from "./TranslationContext";
 import { CreateDatabase, CreateRemoteMessagePayload, installUpdate } from "./Utils";
 
@@ -89,16 +89,16 @@ function App() {
                             }
                         };
                         Alert.alert(
-                            "Update Available",
-                            `Version ${latestVersion} is available. Updating is highly recommended.`,
+                            t.update_available || "",
+                            (t.update_popup_content || "").replace("[version]", latestVersion),
                             [
                                 {
-                                    text: "Update",
+                                    text: t.update,
                                     onPress: () => {
                                         confirmUpdate();
                                     },
                                 },
-                                { text: "Cancel" },
+                                { text: t.later },
                             ],
                         );
                     }

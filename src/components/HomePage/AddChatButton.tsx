@@ -1,6 +1,6 @@
 import { getSocket } from "@/Socket";
 import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
-import { t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
@@ -31,6 +31,7 @@ function AddChatButton() {
     const popupRef = useRef<PopupButtonHandler>(null);
     const theme = useThemeStore(s => s.theme);
     const Styles = useAppStyles(createGlobalStyles);
+    const { t } = useTranslation();
 
     async function createChat() {
         Keyboard.dismiss();

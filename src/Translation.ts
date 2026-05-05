@@ -55,6 +55,13 @@ export interface Language {
     profile?: string;
     edit?: string;
     apply?: string;
+
+    // Auto Update
+    update_available?: string;
+    update?: string;
+    later?: string;
+    update_popup_content?: string;
+    downloading_started?: string;
 }
 
 class Translation {
@@ -115,6 +122,13 @@ class Translation {
         profile: "Profile",
         edit: "Edit",
         apply: "Apply",
+
+        // Auto Update
+        update_available: "Update Available",
+        update: "Update",
+        later: "Later",
+        update_popup_content: "Version [version] is available. Updating is highly recommended.",
+        downloading_started: "Downloading started. Dont't leave the app.",
     };
 
     static ru: Language = {
@@ -172,6 +186,13 @@ class Translation {
         profile: "Профиль",
         edit: "Изменить",
         apply: "Сохранить",
+
+        // Auto Update
+        update_available: "Доступно обновление",
+        update: "Обновить",
+        later: "Позже",
+        update_popup_content: "Версия [version] готова к загрузке. Обновите, как только будет возможность.",
+        downloading_started: "Загрузка началась. Не выходите из приложения.",
     };
 
     static ua: Language = {
@@ -229,6 +250,13 @@ class Translation {
         profile: "Профіль",
         edit: "Змінити",
         apply: "Зберегти",
+
+        // Auto Update
+        update_available: "Доступне оновлення",
+        update: "Оновити",
+        later: "Пізніше",
+        update_popup_content: "Версія [version] готова до завантаження. Оновіть, як тільки буде можливість.",
+        downloading_started: "Завантаження розпочато. Не виходьте з додатку.",
     };
 
     static getCurrentTranslation(): Language {

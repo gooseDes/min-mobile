@@ -136,5 +136,5 @@ export function getShadow(theme: ThemeData): string {
 // Install update by the link
 export function installUpdate(link: string): void {
     NativeUpdateModule?.downloadAndInstall(link);
-    ToastAndroid.showWithGravity("Downloading started. Dont't leave the app.", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+    ToastAndroid.showWithGravity(t.downloading_started || "", ToastAndroid.LONG, ToastAndroid.BOTTOM);
 }

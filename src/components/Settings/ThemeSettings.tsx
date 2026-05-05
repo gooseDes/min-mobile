@@ -1,7 +1,7 @@
 import Auth from "@/Auth";
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { midnightTheme, OneishDarkTheme, OneishLightTheme } from "@/Themes";
-import { t } from "@/Translation";
+import { useTranslation } from "@/TranslationContext";
 import Button from "@components/Button";
 import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
 import { openDropdown } from "@services/DropdownService";
@@ -31,6 +31,7 @@ function ThemeSettings() {
     const setTheme = useThemeStore(s => s.setTheme);
     const resetTheme = useThemeStore(s => s.resetTheme);
     const Styles = useAppStyles(createGlobalStyles);
+    const { t } = useTranslation();
 
     const messagesRef = useRef<MessagesContainerHandle>(null);
 
