@@ -3,16 +3,28 @@ package com.minmobile
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import android.app.DownloadManager
 import android.content.*
+import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
-import androidx.core.content.FileProvider
 import java.io.File
 
 class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
     override fun getName(): String = "UpdateModule"
+
+    private fun sendEvent(eventName: String, progress: Int, status: String) {
+        val params = Arguments.createMap().apply {
+            putInt("progress", progress)
+            putString("status", status)
+        }
+        reactApplicationContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit(eventName, params)
+    }
 
     @ReactMethod
     fun downloadAndInstall(url: String) {
@@ -20,10 +32,7 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         val uri = Uri.parse(url)
 
         val destinationFile = File(reactApplicationContext.externalCacheDir, "update.apk")
-
-        if (destinationFile.exists()) {
-            destinationFile.delete()
-        }
+        if (destinationFile.exists()) destinationFile.delete()
 
         val request = DownloadManager.Request(uri).apply {
             setDestinationUri(Uri.fromFile(destinationFile))
@@ -32,6 +41,50 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
 
         val downloadId = manager.enqueue(request)
+        sendEvent("onDownloadProgress", 0, "started")
+
+        Thread {
+            var isDownloading = true
+
+            while (isDownloading) {
+                val query = DownloadManager.Query().setFilterById(downloadId)
+                val cursor: Cursor = manager.query(query)
+
+                if (cursor.moveToFirst()) {
+                    val bytesDownloaded = cursor.getLong(
+                        cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+                    )
+                    val bytesTotal = cursor.getLong(
+                        cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+                    )
+                    val downloadStatus = cursor.getInt(
+                        cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)
+                    )
+
+                    when (downloadStatus) {
+                        DownloadManager.STATUS_RUNNING -> {
+                            val progress = if (bytesTotal > 0)
+                                (bytesDownloaded * 100 / bytesTotal).toInt()
+                            else 0
+                            sendEvent("onDownloadProgress", progress, "downloading")
+                        }
+
+                        DownloadManager.STATUS_SUCCESSFUL -> {
+                            sendEvent("onDownloadProgress", 100, "installing")
+                            isDownloading = false
+                        }
+
+                        DownloadManager.STATUS_FAILED -> {
+                            sendEvent("onDownloadProgress", 0, "error")
+                            isDownloading = false
+                        }
+                    }
+                }
+
+                cursor.close()
+                if (isDownloading) Thread.sleep(300)
+            }
+        }.start()
 
         val onComplete = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -54,4 +107,10 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
             Context.RECEIVER_EXPORTED
         )
     }
+
+    @ReactMethod
+    fun addListener(eventName: String) {}
+
+    @ReactMethod
+    fun removeListeners(count: Double) {}
 }

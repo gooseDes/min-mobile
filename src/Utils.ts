@@ -1,8 +1,7 @@
 import migrations from "@drizzle/migrations";
 import { sql } from "drizzle-orm";
-import { Alert, ToastAndroid } from "react-native";
+import { Alert } from "react-native";
 import db, { sqliteClient } from "./db/Client";
-import NativeUpdateModule from "./specs/NativeUpdateModule";
 import Storage from "./Storage";
 import { ThemeData } from "./Style";
 import { t } from "./Translation";
@@ -131,10 +130,4 @@ export function getShadow(theme: ThemeData): string {
     return `${theme.shadowInset ? "inset " : ""}${theme.shadowOffsetX}px ${theme.shadowOffsetY}px ${theme.shadowBlur}px ${
         theme.shadowSpread
     }px ${theme.shadowColor}`;
-}
-
-// Install update by the link
-export function installUpdate(link: string): void {
-    NativeUpdateModule?.downloadAndInstall(link);
-    ToastAndroid.showWithGravity(t.downloading_started || "", ToastAndroid.LONG, ToastAndroid.BOTTOM);
 }

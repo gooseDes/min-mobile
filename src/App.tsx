@@ -1,5 +1,6 @@
 import Dropdown from "@components/Dropdown";
 import Notification from "@components/Notification";
+import Overlay from "@components/Overlay";
 import PressableOverlay from "@components/PressableOverlay";
 import migrations from "@drizzle/migrations";
 import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, SERVER, VERSION } from "@env";
@@ -17,12 +18,15 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { dropdownRef } from "@services/DropdownService";
-import { PressableOverlayRef } from "@services/InterceptClickService";
+import { pressableOverlayRef } from "@services/InterceptClickService";
 import { initialRouteName, navigate, navigationRef } from "@services/NavigationService";
-import { notificationRef } from "@services/NotifyService";
+import { notificationRef, showNotification } from "@services/NotifyService";
+import { overlayRef, setOverlay, setProgress } from "@services/OverlayService";
+import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, StatusBar } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
 import Auth from "./Auth";
@@ -34,7 +38,7 @@ import Storage from "./Storage";
 import { useThemeStore } from "./Style";
 import Translation, { t } from "./Translation";
 import { TranslationProvider } from "./TranslationContext";
-import { CreateDatabase, CreateRemoteMessagePayload, installUpdate } from "./Utils";
+import { CreateDatabase, CreateRemoteMessagePayload } from "./Utils";
 
 enableScreens();
 
@@ -48,6 +52,7 @@ const stackOptions: NativeStackNavigationOptions = {
 
 function App() {
     const homePageRef = useRef<HomePageHandler | null>(null);
+    const [isContentBlurred, setIsContentBlurred] = useState<boolean>(false);
     const theme = useThemeStore(s => s.theme);
 
     async function requestUserPermission(messaging: FirebaseMessagingTypes.Module) {
@@ -85,7 +90,7 @@ function App() {
                             const downloadUrl = data?.assets?.[0]?.browser_download_url;
                             console.log("Downloading", downloadUrl);
                             if (downloadUrl) {
-                                installUpdate(downloadUrl);
+                                UpdateModule?.downloadAndInstall(downloadUrl);
                             }
                         };
                         Alert.alert(
@@ -158,8 +163,28 @@ function App() {
             socket.emit("getUserInfo", { id: Auth.id });
         });
 
+        const updateListener = UpdateModule.addListener("onDownloadProgress", data => {
+            if (data.status === "started") {
+                setIsContentBlurred(true);
+                setOverlay("downloading");
+                setProgress(0);
+            } else if (data.status === "downloading") {
+                setProgress(data.progress / 100);
+            } else if (data.status === "installing") {
+                setOverlay("none");
+                setProgress(1);
+                setIsContentBlurred(false);
+            } else if (data.status === "error") {
+                setOverlay("none");
+                setProgress(0);
+                setIsContentBlurred(false);
+                showNotification("Error", "Failed to download update");
+            }
+        });
+
         return () => {
             ForegroundMessageHandlerUnsubscribe();
+            updateListener.remove();
         };
     }, []);
 
@@ -167,25 +192,36 @@ function App() {
         <TranslationProvider>
             <SafeAreaProvider style={{ backgroundColor: theme.backgroundColor }}>
                 <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
-                <NavigationContainer ref={navigationRef} onReady={() => navigate(initialRouteName)}>
-                    <Stack.Navigator initialRouteName="Home">
-                        <Stack.Screen name="Home" options={stackOptions}>
-                            {() => <HomePage ref={homePageRef} />}
-                        </Stack.Screen>
-                        <Stack.Screen name="Sign" options={stackOptions}>
-                            {() => <SignPage />}
-                        </Stack.Screen>
-                        <Stack.Screen name="Settings" options={stackOptions}>
-                            {() => <SettingsPage />}
-                        </Stack.Screen>
-                        <Stack.Screen name="Profile" options={stackOptions}>
-                            {() => <ProfilePage />}
-                        </Stack.Screen>
-                    </Stack.Navigator>
-                </NavigationContainer>
+                <Animated.View
+                    style={{
+                        flex: 1,
+                        filter: isContentBlurred ? "blur(8px)" : "blur(0px)",
+                        transition: "filter 0.3s ease-in-out",
+                    }}
+                >
+                    <NavigationContainer ref={navigationRef} onReady={() => navigate(initialRouteName)}>
+                        <Stack.Navigator initialRouteName="Home">
+                            <Stack.Screen name="Home" options={stackOptions}>
+                                {() => <HomePage ref={homePageRef} />}
+                            </Stack.Screen>
+                            <Stack.Screen name="Sign" options={stackOptions}>
+                                {() => <SignPage />}
+                            </Stack.Screen>
+                            <Stack.Screen name="Settings" options={stackOptions}>
+                                {() => <SettingsPage />}
+                            </Stack.Screen>
+                            <Stack.Screen name="Profile" options={stackOptions}>
+                                {() => <ProfilePage />}
+                            </Stack.Screen>
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                </Animated.View>
 
                 {/* This thing can intercept any clicks */}
-                <PressableOverlay ref={PressableOverlayRef} />
+                <PressableOverlay ref={pressableOverlayRef} />
+
+                {/* This one is for displaying some processes (e.g. loading) */}
+                <Overlay ref={overlayRef} />
 
                 <Notification ref={notificationRef} title="Default Title" text="Default Text" />
                 <Dropdown ref={dropdownRef} />

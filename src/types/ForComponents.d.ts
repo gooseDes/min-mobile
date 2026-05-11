@@ -3,3 +3,5 @@ interface DropdownItemData {
     icon?: string;
     onPress?: () => void;
 }
+
+type OverlayState = "none" | "downloading" | "loading";
