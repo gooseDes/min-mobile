@@ -1,9 +1,18 @@
 import { createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { setAlphaForColor } from "@/Utils";
-import { forwardRef, useImperativeHandle, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { StyleSheet, Text } from "react-native";
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming,
+    ZoomIn,
+    ZoomOut,
+} from "react-native-reanimated";
+import Icon from "./Icon";
 import ProgressBar from "./ProgressBar";
 
 const createStyles = (theme: ThemeData) =>
@@ -37,6 +46,19 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
     const Styles = useAppStyles(createGlobalStyles);
     const { t } = useTranslation();
 
+    const spinnerRotation = useSharedValue("0deg");
+    const spinnerAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: spinnerRotation.value }],
+    }));
+
+    useEffect(() => {
+        spinnerRotation.value = withRepeat(
+            withTiming(`${360}deg`, { duration: 1000, easing: Easing.inOut(Easing.cubic) }),
+            -1,
+            false,
+        );
+    }, []);
+
     useImperativeHandle(ref, () => ({
         setOverlay: (overlay: OverlayState) => setOverlayState(overlay),
         setProgress: (newProgress: number) => setProgress(newProgress),
@@ -53,12 +75,20 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
                 },
             ]}
         >
-            {overlayState === "loading" && <Text style={[Styles.primaryBoldText, { textAlign: "center" }]}>Loading...</Text>}
+            {overlayState === "loading" && (
+                <Animated.View style={spinnerAnimatedStyle} entering={ZoomIn} exiting={ZoomOut}>
+                    <Icon name="arrows-rotate" size={48} color="white" />
+                </Animated.View>
+            )}
             {overlayState === "downloading" && (
-                <View style={{ justifyContent: "center", alignItems: "center", width: 200 }}>
+                <Animated.View
+                    style={{ justifyContent: "center", alignItems: "center", width: 200 }}
+                    entering={ZoomIn}
+                    exiting={ZoomOut}
+                >
                     <Text style={[Styles.primaryCenter, { fontSize: 16 }]}>{t.downloading_started}</Text>
                     <ProgressBar progress={progress} />
-                </View>
+                </Animated.View>
             )}
         </Animated.View>
     );

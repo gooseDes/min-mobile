@@ -24,7 +24,7 @@ import { notificationRef, showNotification } from "@services/NotifyService";
 import { overlayRef, setOverlay, setProgress } from "@services/OverlayService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Alert, StatusBar } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -50,10 +50,22 @@ const stackOptions: NativeStackNavigationOptions = {
     gestureEnabled: false,
 };
 
-function App() {
+export interface AppHandler {
+    setBlurEnabled: (enabled: boolean) => void;
+}
+
+export interface AppProps {}
+
+const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
     const homePageRef = useRef<HomePageHandler | null>(null);
     const [isContentBlurred, setIsContentBlurred] = useState<boolean>(false);
     const theme = useThemeStore(s => s.theme);
+
+    useImperativeHandle(ref, () => ({
+        setBlurEnabled: (enabled: boolean) => {
+            setIsContentBlurred(enabled);
+        },
+    }));
 
     async function requestUserPermission(messaging: FirebaseMessagingTypes.Module) {
         // Request user permission for Firebase notifications
@@ -165,7 +177,6 @@ function App() {
 
         const updateListener = UpdateModule.addListener("onDownloadProgress", data => {
             if (data.status === "started") {
-                setIsContentBlurred(true);
                 setOverlay("downloading");
                 setProgress(0);
             } else if (data.status === "downloading") {
@@ -173,11 +184,9 @@ function App() {
             } else if (data.status === "installing") {
                 setOverlay("none");
                 setProgress(1);
-                setIsContentBlurred(false);
             } else if (data.status === "error") {
                 setOverlay("none");
                 setProgress(0);
-                setIsContentBlurred(false);
                 showNotification("Error", "Failed to download update");
             }
         });
@@ -228,6 +237,6 @@ function App() {
             </SafeAreaProvider>
         </TranslationProvider>
     );
-}
+});
 
 export default App;

@@ -5,6 +5,7 @@
 import { SERVER } from "@env";
 import notifee, { AndroidCategory, AndroidImportance, AndroidStyle } from "@notifee/react-native";
 import { getMessaging, setBackgroundMessageHandler } from "@react-native-firebase/messaging";
+import { appRef } from "@services/OverlayService";
 import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
 import App from "./src/App";
@@ -58,4 +59,8 @@ setBackgroundMessageHandler(messaging, async remoteMessage => {
     });
 });
 
-AppRegistry.registerComponent(appName, () => App);
+function AppWrapper() {
+    return <App ref={appRef} />;
+}
+
+AppRegistry.registerComponent(appName, () => AppWrapper);

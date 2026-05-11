@@ -8,8 +8,9 @@ import Icon from "@components/Icon";
 import InputField from "@components/InputField";
 import { navigate } from "@services/NavigationService";
 import { showNotification } from "@services/NotifyService";
+import { setOverlay } from "@services/OverlayService";
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { ZoomInDown, ZoomInUp, ZoomOutDown, ZoomOutUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -64,17 +65,20 @@ function SignPage() {
     const Styles = useAppStyles(createGlobalStyles);
 
     async function SignIn() {
+        setOverlay("loading");
         const result = await Auth.login(emailValue, passwordValue);
         if (result.success) {
             navigate("Home");
         } else {
             showNotification("Failed :(", result.message);
         }
+        setOverlay("none");
     }
 
     async function SignUp() {
+        setOverlay("loading");
         if (passwordValue !== confirmPasswordValue) {
-            Alert.alert("Passwords do not match");
+            showNotification("Failed :(", "Passwords do not match");
             return;
         }
         const result = await Auth.register(loginValue, emailValue, passwordValue);
@@ -84,6 +88,7 @@ function SignPage() {
         } else {
             showNotification("Failed :(", result.message);
         }
+        setOverlay("none");
     }
 
     return (
