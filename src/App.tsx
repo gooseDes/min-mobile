@@ -3,7 +3,7 @@ import Notification from "@components/Notification";
 import Overlay from "@components/Overlay";
 import PressableOverlay from "@components/PressableOverlay";
 import migrations from "@drizzle/migrations";
-import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, SERVER, VERSION } from "@env";
+import { SERVER } from "@env";
 import notifee from "@notifee/react-native";
 import ProfilePage from "@pages/ProfilePage";
 import SettingsPage from "@pages/SettingsPage";
@@ -25,7 +25,7 @@ import { overlayRef, setOverlay, setProgress } from "@services/OverlayService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { Alert, StatusBar } from "react-native";
+import { StatusBar } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
@@ -36,9 +36,9 @@ import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
 import Storage from "./Storage";
 import { useThemeStore } from "./Style";
-import Translation, { t } from "./Translation";
+import Translation from "./Translation";
 import { TranslationProvider } from "./TranslationContext";
-import { CreateDatabase, CreateRemoteMessagePayload } from "./Utils";
+import { checkForUpdates, CreateDatabase, CreateRemoteMessagePayload } from "./Utils";
 
 enableScreens();
 
@@ -91,39 +91,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
     };
 
     useEffect(() => {
-        async function checkVersion() {
-            if (VERSION) {
-                if (AUTO_UPDATE === "true") {
-                    const result = await fetch(`https://api.github.com/repos/${REPO_AUTHOR}/${REPO_NAME}/releases/latest`);
-                    const data = await result.json();
-                    const latestVersion = data.tag_name?.slice(1);
-                    if (latestVersion && latestVersion !== VERSION) {
-                        const confirmUpdate = () => {
-                            const downloadUrl = data?.assets?.[0]?.browser_download_url;
-                            console.log("Downloading", downloadUrl);
-                            if (downloadUrl) {
-                                UpdateModule?.downloadAndInstall(downloadUrl);
-                            }
-                        };
-                        Alert.alert(
-                            t.update_available || "",
-                            (t.update_popup_content || "").replace("[version]", latestVersion),
-                            [
-                                {
-                                    text: t.update,
-                                    onPress: () => {
-                                        confirmUpdate();
-                                    },
-                                },
-                                { text: t.later },
-                            ],
-                        );
-                    }
-                }
-            }
-        }
-
-        checkVersion();
+        checkForUpdates(true);
 
         async function migrateDatabaseAndLoadDefaultPage() {
             if (Storage.getBoolean("createNewDB")) {

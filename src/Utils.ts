@@ -1,4 +1,7 @@
 import migrations from "@drizzle/migrations";
+import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, VERSION } from "@env";
+import { setOverlay } from "@services/OverlayService";
+import { UpdateModule } from "@specs/UpdateModule";
 import { sql } from "drizzle-orm";
 import { Alert } from "react-native";
 import db, { sqliteClient } from "./db/Client";
@@ -130,4 +133,35 @@ export function getShadow(theme: ThemeData): string {
     return `${theme.shadowInset ? "inset " : ""}${theme.shadowOffsetX}px ${theme.shadowOffsetY}px ${theme.shadowBlur}px ${
         theme.shadowSpread
     }px ${theme.shadowColor}`;
+}
+
+// Check for updates and prompt the user to update if necessary
+export async function checkForUpdates(silent: boolean = false) {
+    if (!silent) setOverlay("loading");
+    if (VERSION) {
+        if (AUTO_UPDATE === "true") {
+            const result = await fetch(`https://api.github.com/repos/${REPO_AUTHOR}/${REPO_NAME}/releases/latest`);
+            const data = await result.json();
+            const latestVersion = data.tag_name?.slice(1);
+            if (latestVersion && latestVersion !== VERSION) {
+                const confirmUpdate = () => {
+                    const downloadUrl = data?.assets?.[0]?.browser_download_url;
+                    console.log("Downloading", downloadUrl);
+                    if (downloadUrl) {
+                        UpdateModule?.downloadAndInstall(downloadUrl);
+                    }
+                };
+                Alert.alert(t.update_available || "", (t.update_popup_content || "").replace("[version]", latestVersion), [
+                    {
+                        text: t.update,
+                        onPress: () => {
+                            confirmUpdate();
+                        },
+                    },
+                    { text: t.later },
+                ]);
+            }
+        }
+    }
+    if (!silent) setOverlay("none");
 }

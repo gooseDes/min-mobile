@@ -1,8 +1,9 @@
 interface SettingsItem {
     title?: string;
-    type: "language" | "cache" | "switch" | "custom";
+    type: "language" | "cache" | "switch" | "custom" | "button";
     storageKey?: string;
     component?: React.ComponentType<any>;
+    onPress?: () => void;
 }
 
 interface SettingsSection {

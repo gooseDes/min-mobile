@@ -1,4 +1,5 @@
 import ThemeSettings from "@components/Settings/ThemeSettings";
+import { checkForUpdates } from "./Utils";
 
 export const settings: Settings = {
     sections: [
@@ -9,6 +10,11 @@ export const settings: Settings = {
                 {
                     title: "cache",
                     type: "cache",
+                },
+                {
+                    title: "check_for_updates",
+                    type: "button",
+                    onPress: () => checkForUpdates(),
                 },
             ],
         },

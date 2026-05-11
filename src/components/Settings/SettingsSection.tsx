@@ -3,6 +3,7 @@ import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore }
 import Translation from "@/Translation";
 import { useTranslation } from "@/TranslationContext";
 import { ClearCache, getShadow } from "@/Utils";
+import Button from "@components/Button";
 import Icon from "@components/Icon";
 import Switch from "@components/Switch";
 import { openDropdown } from "@services/DropdownService";
@@ -266,6 +267,8 @@ function SettingsSection(props: SettingsSectionProps) {
                                     </View>
                                 </View>
                             );
+                        } else if (item.type === "button") {
+                            component = <Button text={itemTitle(item.title)} onPress={item.onPress} style={{ height: 60 }} />;
                         } else if (item.component) {
                             component = <item.component />;
                         }

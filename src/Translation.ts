@@ -41,6 +41,7 @@ export interface Language {
     settings_language_time?: string;
     settings_appearance?: string;
     settings_cache?: string;
+    settings_check_for_updates?: string;
     settings_language?: string;
     settings_24_hour_time?: string;
     settings_preview?: string;
@@ -108,6 +109,7 @@ class Translation {
         settings_language_time: "Language & Time",
         settings_appearance: "Appearance",
         settings_cache: "Cache",
+        settings_check_for_updates: "Check for Updates",
         settings_language: "Language",
         settings_24_hour_time: "Force 24-hour time",
         settings_preview: "Preview",
@@ -172,6 +174,7 @@ class Translation {
         settings_language_time: "Язык и время",
         settings_appearance: "Внешний вид",
         settings_cache: "Кэш",
+        settings_check_for_updates: "Проверить на обновления",
         settings_language: "Язык",
         settings_24_hour_time: "Принудительный 24-часовой формат",
         settings_preview: "Предпросмотр",
@@ -236,6 +239,7 @@ class Translation {
         settings_language_time: "Мова та час",
         settings_appearance: "Зовнішній вигляд",
         settings_cache: "Кеш",
+        settings_check_for_updates: "Перевірити на оновлення",
         settings_language: "Мова",
         settings_24_hour_time: "Примусовий 24-годинний формат",
         settings_preview: "Попередній перегляд",
