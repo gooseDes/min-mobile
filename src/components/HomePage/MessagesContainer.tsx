@@ -1,16 +1,11 @@
 import { useStorage } from "@/Storage";
 import { Constants } from "@/Style";
-import { BlurTarget } from "@danielsaraldi/react-native-blur-view";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import Message from "./Message";
 
 const styles = StyleSheet.create({
-    blurTarget: {
-        width: "100%",
-        flex: 1,
-    },
     messagesContainer: {
         flex: 1,
         width: "100%",
@@ -102,25 +97,23 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
     };
 
     return (
-        <BlurTarget id="chat-blur-target" style={styles.blurTarget}>
-            <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
-                <Animated.FlatList
-                    style={styles.messagesContainer}
-                    contentContainerStyle={[
-                        styles.contentContainerStyle,
-                        { paddingTop: bottomGap, pointerEvents: disabled === true ? "none" : "auto" },
-                    ]}
-                    data={reversedMessages}
-                    renderItem={renderMessage}
-                    keyExtractor={msg => msg.id.toString()}
-                    ItemSeparatorComponent={splitter}
-                    inverted={true}
-                    initialNumToRender={15}
-                    windowSize={10}
-                    {...props}
-                />
-            </Animated.View>
-        </BlurTarget>
+        <Animated.View exiting={FadeOut} layout={Constants.layoutTransition} style={styles.messagesContainer}>
+            <Animated.FlatList
+                style={styles.messagesContainer}
+                contentContainerStyle={[
+                    styles.contentContainerStyle,
+                    { paddingTop: bottomGap, pointerEvents: disabled === true ? "none" : "auto" },
+                ]}
+                data={reversedMessages}
+                renderItem={renderMessage}
+                keyExtractor={msg => msg.id.toString()}
+                ItemSeparatorComponent={splitter}
+                inverted={true}
+                initialNumToRender={15}
+                windowSize={10}
+                {...props}
+            />
+        </Animated.View>
     );
 });
 

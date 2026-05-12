@@ -104,12 +104,12 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
         const screenWidth = entireScreenWidth - insets.left - insets.right;
         const screenHeight = entireScreenHeight - insets.top - insets.bottom - keyboardHeight;
         if (isOpened) {
-            width.value = screenWidth - 20;
-            height.value = screenHeight - 20;
+            width.value = screenWidth - 18;
+            height.value = screenHeight - 30;
             borderRadius.value = theme.rounding;
             backgroundColor.value = theme.backgroundPanelColorOpaque;
-            right.value = -2;
-            bottom.value = -2;
+            right.value = -3;
+            bottom.value = -4;
             buttonStateOpacity.value = 0;
             popupStateOpacity.value = 1;
         } else {

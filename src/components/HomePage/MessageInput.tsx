@@ -1,4 +1,5 @@
 import Auth from "@/Auth";
+import { chatBlurTargetRef } from "@/GlobalRefs";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { getShadow, setAlphaForColor } from "@/Utils";
@@ -124,9 +125,8 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
             <Animated.View style={styles.container}>
                 <BlurView
                     style={StyleSheet.absoluteFill}
-                    targetId="chat-blur-target"
-                    type={theme.isDark ? "dark" : "light"}
-                    overlayColor={setAlphaForColor(theme.backgroundPanelColor, 0.6)}
+                    blurTarget={chatBlurTargetRef}
+                    androidColor={setAlphaForColor(theme.messageBackgroundColor, 0.5)}
                 >
                     <View style={[StyleSheet.absoluteFill, styles.actualContent]}>
                         <View style={styles.button}>
