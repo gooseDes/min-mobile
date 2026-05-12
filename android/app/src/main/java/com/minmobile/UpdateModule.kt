@@ -11,6 +11,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
 import java.io.File
+import android.os.Build
 
 class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -28,7 +29,7 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
     @ReactMethod
     fun downloadAndInstall(url: String) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val manager = reactApplicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val uri = Uri.parse(url)
 
