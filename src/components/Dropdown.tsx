@@ -103,18 +103,24 @@ const Dropdown = forwardRef<DropdownHandler, DropdownProps>((props, ref) => {
         setLocalItems(items || []);
     }, [items]);
 
-    function makePositionSafe(coords: Position, width: number, height: number): Position {
+    function makePositionSafe(
+        coords: Position,
+        width: number,
+        height: number,
+        paddingX: number = 10,
+        paddingY: number = 30,
+    ): Position {
         let safeX = coords.x;
         let safeY = coords.y;
-        if (coords.x + width > windowWidth - insets.right) {
-            safeX = windowWidth - insets.right - width;
-        } else if (coords.x < insets.left) {
-            safeX = insets.left;
+        if (coords.x + width > windowWidth - insets.right - paddingX) {
+            safeX = windowWidth - insets.right - width - paddingX;
+        } else if (coords.x < insets.left + paddingX) {
+            safeX = insets.left + paddingX;
         }
-        if (coords.y + height > windowHeight - insets.bottom) {
-            safeY = windowHeight - insets.bottom - height;
-        } else if (coords.y < insets.top) {
-            safeY = insets.top;
+        if (coords.y + height > windowHeight - insets.bottom - paddingY) {
+            safeY = windowHeight - insets.bottom - height - paddingY;
+        } else if (coords.y < insets.top + paddingY) {
+            safeY = insets.top + paddingY;
         }
 
         return {
