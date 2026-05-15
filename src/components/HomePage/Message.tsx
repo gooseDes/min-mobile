@@ -10,9 +10,9 @@ import { SERVER } from "@env";
 import { openDropdown } from "@services/DropdownService";
 import { setMessagePrefix } from "@services/InputControlService";
 import { eq } from "drizzle-orm";
-import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View, ViewProps } from "react-native";
-import Markdown, { MarkedStyles } from "react-native-marked";
+import React, { ReactNode, useEffect, useState } from "react";
+import { Image, ImageStyle, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewProps } from "react-native";
+import Markdown, { MarkedStyles, Renderer, RendererInterface } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 const createStyles = (theme: ThemeData) =>
@@ -74,6 +74,34 @@ const markdownFlatListProps: any = {
         marginTop: -4,
     },
 };
+
+function MarkdownImage({ uri, alt, style }: { uri: string; alt?: string; style?: ImageStyle }) {
+    const [ratio, setRatio] = useState<number>(1);
+    const { width: windowWidth } = useWindowDimensions();
+    const [width, setWidth] = useState<number>(windowWidth * 0.6);
+
+    useEffect(() => {
+        Image.getSize(uri, (width, height) => {
+            if (width && height) {
+                setRatio(width / height);
+            }
+        });
+    }, [uri]);
+
+    useEffect(() => {
+        setWidth(Math.min(windowWidth * 0.6, 250));
+    }, [windowWidth]);
+
+    return <Image source={{ uri }} alt={alt} style={[{ width, height: width / ratio }, style]} resizeMode="contain" />;
+}
+
+class MarkdownRenderer extends Renderer implements RendererInterface {
+    image(uri: string, alt?: string, style?: ImageStyle): ReactNode {
+        return <MarkdownImage key={this.getKey()} uri={uri} alt={alt} style={style} />;
+    }
+}
+
+const markdownRenderer = new MarkdownRenderer();
 
 interface MessageProps extends ViewProps {
     author_name?: string;
@@ -249,7 +277,12 @@ function MessageBase(props: MessageProps) {
                         </Text>
                     )}
 
-                    <Markdown styles={markdownStyles} flatListProps={markdownFlatListProps} value={textWithoutCommand} />
+                    <Markdown
+                        renderer={markdownRenderer || undefined}
+                        styles={markdownStyles}
+                        flatListProps={markdownFlatListProps}
+                        value={textWithoutCommand}
+                    />
 
                     {sentAt && (
                         <Text style={[Styles.secondaryText, styles.sentAtText, { marginTop: marginTop }]}>

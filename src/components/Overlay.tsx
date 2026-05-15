@@ -76,8 +76,10 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
             ]}
         >
             {overlayState === "loading" && (
-                <Animated.View style={spinnerAnimatedStyle} entering={ZoomIn} exiting={ZoomOut}>
-                    <Icon name="arrows-rotate" size={48} color="white" />
+                <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+                    <Animated.View style={spinnerAnimatedStyle}>
+                        <Icon name="arrows-rotate" size={48} color="white" />
+                    </Animated.View>
                 </Animated.View>
             )}
             {overlayState === "downloading" && (
