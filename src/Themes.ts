@@ -34,7 +34,7 @@ export const OneishLightTheme: ThemeData = {
     messageBackgroundColor: "#f2f1f7",
     primaryTextColor: "#030303",
     secondaryTextColor: "#88878c",
-    rippleColor: "#000000aa",
+    rippleColor: "#999999aa",
     rounding: 16,
     borderWidth: 2,
     fontFamily: "Rubik",

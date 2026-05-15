@@ -87,6 +87,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const [profileId, setProfileId] = useState<number>(-1);
     const [containerSize, setContainerSize] = useState<Size>({ width: 0, height: 0 });
     const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: 0, height: 0 });
+    const [chatTabBottomGap, setChatTabBottomGap] = useState<number>(65);
     const lastBackButtonPress = useRef<number>(0);
     const { t, changeLanguage } = useTranslation();
     const insets = useSafeAreaInsets();
@@ -370,10 +371,18 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         currentTabRef.current = "profile";
     }
 
+    function handleInputUpdate(text: string) {
+        if (text.startsWith("/reply")) {
+            setChatTabBottomGap(85);
+        } else {
+            setChatTabBottomGap(65);
+        }
+    }
+
     useEffect(() => {
         setInsideContainerSize({
-            width: containerSize.width - Styles.container.padding * 2,
-            height: containerSize.height - Styles.container.padding * 2 - insets.top - insets.bottom,
+            width: containerSize.width - Styles.container.paddingHorizontal * 2,
+            height: containerSize.height - Styles.container.paddingVertical * 2 - insets.top - insets.bottom,
         });
     }, [containerSize, insets.top, insets.bottom]);
 
@@ -448,7 +457,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                         layout={Constants.layoutTransition}
                     >
                         {/* Chat Tab */}
-                        {currentTab === "chat" && <MessagesContainer bottomGap={65} ref={messagesRef} />}
+                        {currentTab === "chat" && <MessagesContainer bottomGap={chatTabBottomGap} ref={messagesRef} />}
 
                         {/* Chats Tab */}
                         {currentTab === "chats" && (
@@ -479,7 +488,12 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             {currentTab === "chat" && (
                 <MessageInput
                     ref={messageInputRef}
-                    style={{ position: "absolute", bottom: 35 + keyboardHeight, width: insideContainerSize.width - 20 }}
+                    style={{
+                        position: "absolute",
+                        bottom: Styles.container.paddingVertical + 25 + keyboardHeight,
+                        width: insideContainerSize.width - 20,
+                    }}
+                    onTextChanged={handleInputUpdate}
                     onSend={sendMessage}
                 />
             )}

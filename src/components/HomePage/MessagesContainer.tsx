@@ -102,7 +102,11 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
                 style={styles.messagesContainer}
                 contentContainerStyle={[
                     styles.contentContainerStyle,
-                    { paddingTop: bottomGap, pointerEvents: disabled === true ? "none" : "auto" },
+                    {
+                        paddingTop: bottomGap,
+                        pointerEvents: disabled === true ? "none" : "auto",
+                        transition: "paddingTop 0.3s ease",
+                    },
                 ]}
                 data={reversedMessages}
                 renderItem={renderMessage}

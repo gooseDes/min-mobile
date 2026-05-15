@@ -57,7 +57,6 @@
         "babel-plugin-inline-import": "^3.0.0",
         "drizzle-kit": "^0.31.8",
         "eslint": "^8.19.0",
-        "eslint-plugin-hooks": "^0.4.3",
         "jest": "^29.6.3",
         "prettier": "2.8.8",
         "prettier-plugin-organize-imports": "^4.3.0",
@@ -85,24 +84,7 @@
                     "caughtErrorsIgnorePattern": "^_",
                     "destructuredArrayIgnorePattern": "^_"
                 }
-            ],
-            "hooks/sort": [
-                2,
-                {
-                    "groups": [
-                        "useReducer",
-                        "useContext",
-                        "useState",
-                        "useRef",
-                        "useDispatch",
-                        "useCallback",
-                        "useEffect"
-                    ]
-                }
             ]
-        },
-        "plugins": [
-            "hooks"
-        ]
+        }
     }
 }

@@ -7,16 +7,15 @@ import Icon from "@components/Icon";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
 import { SERVER } from "@env";
-import { forwardRef, useImperativeHandle, useState } from "react";
-import { Alert, StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { Alert, Pressable, StyleProp, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
-import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
+import Animated, { SlideInDown, SlideOutDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 
 const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
         container: {
             width: "100%",
-            height: 50,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -41,12 +40,11 @@ const createStyles = (theme: ThemeData) =>
             overflow: "hidden",
             margin: 10,
         },
-        actualContent: {
+        horizontalRow: {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "row",
-            flex: 1,
         },
     });
 
@@ -68,15 +66,20 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
     const styles = createStyles(theme);
     const Styles = useAppStyles(createGlobalStyles);
 
+    const hasPrefix = prefix.startsWith("/reply");
+
     useImperativeHandle(ref, () => ({
         setMessagePrefix: (messagePrefix: string) => {
             setPrefix(messagePrefix);
         },
     }));
 
+    useEffect(() => {
+        props.onTextChanged?.(prefix + value);
+    }, [prefix, value]);
+
     function onChangeText(text: string) {
         setValue(text);
-        props.onTextChanged?.(text);
     }
 
     function send() {
@@ -122,30 +125,51 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
             exiting={SlideOutDown}
             layout={Constants.layoutTransition}
         >
-            <Animated.View style={styles.container}>
+            <Animated.View style={[styles.container, { height: hasPrefix ? 70 : 50, transition: "height 0.3s ease-in-out" }]}>
                 <BlurView
                     style={StyleSheet.absoluteFill}
                     blurTarget={chatBlurTargetRef}
                     androidColor={setAlphaForColor(theme.messageBackgroundColor, 0.5)}
                 >
-                    <View style={[StyleSheet.absoluteFill, styles.actualContent]}>
-                        <View style={styles.button}>
-                            <TouchableOpacity onPress={attach}>
-                                <Icon name="paperclip" size={24} color={theme.secondaryTextColor} />
-                            </TouchableOpacity>
-                        </View>
-                        <TextInput
-                            style={[styles.input, Styles.primaryText]}
-                            placeholder={t.your_message}
-                            placeholderTextColor={theme.secondaryTextColor}
-                            multiline={true}
-                            onChangeText={onChangeText}
-                            value={value}
-                        />
-                        <View style={styles.button}>
-                            <TouchableOpacity onPress={send}>
-                                <Icon name="paper-plane" size={24} color={theme.secondaryTextColor} />
-                            </TouchableOpacity>
+                    <View style={StyleSheet.absoluteFill}>
+                        {hasPrefix && (
+                            <Animated.View
+                                entering={ZoomIn}
+                                exiting={ZoomOut}
+                                style={[styles.horizontalRow, { height: 20, gap: 4, paddingHorizontal: 12 }]}
+                            >
+                                <Icon name="reply" size={12} color={theme.secondaryTextColor} />
+                                <Text style={[Styles.secondaryText, { fontSize: 14 }]}>{t.replying_to}</Text>
+                                <Pressable
+                                    style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }}
+                                    android_ripple={{ color: theme.rippleColor }}
+                                    onPress={() => {
+                                        setPrefix("");
+                                    }}
+                                >
+                                    <Icon name="x" size={12} color={theme.secondaryTextColor} />
+                                </Pressable>
+                            </Animated.View>
+                        )}
+                        <View style={[styles.horizontalRow, { flex: 1 }]}>
+                            <View style={styles.button}>
+                                <TouchableOpacity onPress={attach}>
+                                    <Icon name="paperclip" size={24} color={theme.secondaryTextColor} />
+                                </TouchableOpacity>
+                            </View>
+                            <TextInput
+                                style={[styles.input, Styles.primaryText]}
+                                placeholder={t.your_message}
+                                placeholderTextColor={theme.secondaryTextColor}
+                                multiline={true}
+                                onChangeText={onChangeText}
+                                value={value}
+                            />
+                            <View style={styles.button}>
+                                <TouchableOpacity onPress={send}>
+                                    <Icon name="paper-plane" size={24} color={theme.secondaryTextColor} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                 </BlurView>

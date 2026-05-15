@@ -16,6 +16,7 @@ export interface Language {
     confirm_password?: string;
     you?: string;
     your_message?: string;
+    replying_to?: string;
     private_chat?: string;
     group_chat?: string;
     relogin?: string;
@@ -84,6 +85,7 @@ class Translation {
         confirm_password: "Confirm Password",
         you: "You",
         your_message: "Your Message",
+        replying_to: "Replying to message",
         private_chat: "Private Chat",
         group_chat: "Group Chat",
         relogin: "Relogin",
@@ -149,6 +151,7 @@ class Translation {
         confirm_password: "Подтвердите пароль",
         you: "Вы",
         your_message: "Ваше сообщение",
+        replying_to: "Ответ на сообщение",
         private_chat: "Личный чат",
         group_chat: "Групповой чат",
         relogin: "Перелогинтесь",
@@ -214,6 +217,7 @@ class Translation {
         confirm_password: "Підтвердіть пароль",
         you: "Ви",
         your_message: "Ваше повідомлення",
+        replying_to: "Відповідь на повідомлення",
         private_chat: "Особистий чат",
         group_chat: "Груповий чат",
         relogin: "Перелогинтесь",

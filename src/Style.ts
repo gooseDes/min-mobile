@@ -117,7 +117,8 @@ export const createGlobalStyles = (theme: ThemeData) =>
             justifyContent: "center",
             alignItems: "center",
             flex: 1,
-            padding: 10,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
         },
         primaryText: {
             color: theme.primaryTextColor,
