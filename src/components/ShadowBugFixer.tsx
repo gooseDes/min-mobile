@@ -14,18 +14,21 @@ function ShadowBugFixer(props: ShadowBugFixerProps) {
             horizontal
             onLayout={e => setContainerSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
             style={{ flex: 1, width: "100%", height: "100%", overflow: "visible" }}
+            contentContainerStyle={{ justifyContent: "center", alignItems: "center" }}
             data={[1]}
             renderItem={() => (
-                <View
-                    style={{
-                        width: props.parentSize?.width ?? containerSize.width,
-                        height: props.parentSize?.height ?? containerSize.height,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        overflow: "visible",
-                    }}
-                >
-                    {props.children}
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <View
+                        style={{
+                            width: props.parentSize?.width ?? containerSize.width,
+                            height: props.parentSize?.height ?? containerSize.height,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            overflow: "visible",
+                        }}
+                    >
+                        {props.children}
+                    </View>
                 </View>
             )}
         />

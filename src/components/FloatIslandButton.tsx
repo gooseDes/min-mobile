@@ -1,7 +1,8 @@
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import { ZoomIn, ZoomOut } from "react-native-reanimated";
 import Icon from "./Icon";
+import SurelyAnimatedView from "./SurelyAnimatedView";
 
 interface FloatIslandButtonProps {
     icon: string;
@@ -30,12 +31,12 @@ const FloatIslandButton = ({ icon, text, onPress }: FloatIslandButtonProps) => {
     const Styles = useAppStyles(createGlobalStyles);
 
     return (
-        <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
+        <SurelyAnimatedView layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
             <TouchableOpacity onPress={onPress} style={styles.touchable}>
                 <Icon name={icon} size={16} color={theme.primaryTextColor} />
                 <Text style={[Styles.primaryText, styles.text]}>{text}</Text>
             </TouchableOpacity>
-        </Animated.View>
+        </SurelyAnimatedView>
     );
 };
 
