@@ -10,7 +10,7 @@ import { SERVER } from "@env";
 import { openDropdown } from "@services/DropdownService";
 import { setMessagePrefix } from "@services/InputControlService";
 import { eq } from "drizzle-orm";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { Image, ImageStyle, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewProps } from "react-native";
 import Markdown, { MarkedStyles, Renderer, RendererInterface } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
@@ -81,11 +81,17 @@ function MarkdownImage({ uri, alt, style }: { uri: string; alt?: string; style?:
     const [width, setWidth] = useState<number>(windowWidth * 0.6);
 
     useEffect(() => {
+        let isMounted = true;
+
         Image.getSize(uri, (width, height) => {
-            if (width && height) {
+            if (isMounted && width && height) {
                 setRatio(width / height);
             }
         });
+
+        return () => {
+            isMounted = false;
+        };
     }, [uri]);
 
     useEffect(() => {
@@ -132,10 +138,17 @@ function MessageBase(props: MessageProps) {
     const shown = props.shown === undefined ? true : props.shown;
     const side = props.side || "left";
     const { sentAt, msg_id } = props;
-    const [text, setText] = useState<string>(props.text?.toString() || "");
-    const [textWithoutCommand, setTextWithoutCommand] = useState<string>(withoutCommand(text));
-    const [marginTop, setMarginTop] = useState<number>(0);
-    const is_reply = text.startsWith("/reply");
+
+    const textStr = props.text?.toString() || "";
+    const is_reply = textStr.startsWith("/reply");
+
+    const { textWithoutCommand, marginTop } = useMemo(() => {
+        const cleanText = withoutCommand(textStr);
+        return {
+            textWithoutCommand: cleanText,
+            marginTop: calculateMargin(cleanText),
+        };
+    }, [textStr]);
 
     const [replyText, setReplyText] = useState<string>("");
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
@@ -145,25 +158,28 @@ function MessageBase(props: MessageProps) {
     const styles = useAppStyles(createStyles);
     const Styles = useAppStyles(createGlobalStyles);
 
-    const markdownStyles: MarkedStyles = {
-        table: { borderWidth: theme.borderWidth, borderColor: theme.borderColor },
-        blockquote: { marginTop: 8, ...Styles.primaryText },
-        text: { ...Styles.primaryText },
-        strong: { ...Styles.primaryBoldText },
-        strikethrough: { ...Styles.primaryText },
-        em: { ...Styles.primaryText },
-        image: { borderRadius: theme.rounding - styles.messageContent.paddingHorizontal },
-        li: { ...Styles.primaryText },
-        h1: { ...Styles.primaryBoldText },
-        h2: { ...Styles.primaryText },
-        h3: { ...Styles.primaryText },
-        h4: { ...Styles.primaryText },
-        h5: { ...Styles.primaryText },
-        h6: { ...Styles.primaryText },
-    };
+    const markdownStyles = useMemo<MarkedStyles>(
+        () => ({
+            table: { borderWidth: theme.borderWidth, borderColor: theme.borderColor },
+            blockquote: { marginTop: 8, ...Styles.primaryText },
+            text: { ...Styles.primaryText },
+            strong: { ...Styles.primaryBoldText },
+            strikethrough: { ...Styles.primaryText },
+            em: { ...Styles.primaryText },
+            image: { borderRadius: theme.rounding - styles.messageContent.paddingHorizontal },
+            li: { ...Styles.primaryText },
+            h1: { ...Styles.primaryBoldText },
+            h2: { ...Styles.primaryText },
+            h3: { ...Styles.primaryText },
+            h4: { ...Styles.primaryText },
+            h5: { ...Styles.primaryText },
+            h6: { ...Styles.primaryText },
+        }),
+        [theme, Styles, styles.messageContent.paddingHorizontal],
+    );
 
     async function getReplyText() {
-        const replyId = parseInt(text.split("\n")[0].split(" ")[1], 10);
+        const replyId = parseInt(textStr.split("\n")[0].split(" ")[1], 10);
         const socket = await getSocket();
         socket.on("requestedMessage", (msgData: any) => {
             socket.on("userInfo", (userData: any) => {
@@ -185,12 +201,6 @@ function MessageBase(props: MessageProps) {
     useEffect(() => {
         if (is_reply) getReplyText();
     }, [is_reply]);
-
-    useEffect(() => {
-        setText(props.text?.toString() || "");
-        setTextWithoutCommand(withoutCommand(text));
-        setMarginTop(calculateMargin(textWithoutCommand));
-    }, [props.text]);
 
     const opacity = useSharedValue(shown ? 1 : 0);
     const translateX = useSharedValue(shown ? 0 : side === "left" ? -100 : 100);
@@ -252,7 +262,6 @@ function MessageBase(props: MessageProps) {
             )}
             <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
                 <Animated.View
-                    layout={Constants.layoutTransition}
                     style={[
                         styles.messageContent,
                         props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
