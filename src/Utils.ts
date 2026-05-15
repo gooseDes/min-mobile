@@ -124,6 +124,16 @@ export function setAlphaForColor(color: string, alpha: number): string {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+// Converts hex color to rgba
+export function hexToRgba(hex: string): string {
+    const hexWithoutHash = hex.replace("#", "");
+    const r = parseInt(hexWithoutHash.substring(0, 2), 16);
+    const g = parseInt(hexWithoutHash.substring(2, 4), 16);
+    const b = parseInt(hexWithoutHash.substring(4, 6), 16);
+    const a = parseInt(hexWithoutHash.substring(6, 8), 16) / 255;
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
 export function countChars(str: string, char: string): number {
     return str.split(char).length - 1;
 }

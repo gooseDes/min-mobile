@@ -47,7 +47,7 @@ const createStyles = (theme: ThemeData) =>
             boxShadow: getShadow(theme),
         },
         topPanel: {
-            gap: 20,
+            padding: 0,
             flexDirection: "row",
             zIndex: 1,
             boxShadow: getShadow(theme),
@@ -77,6 +77,7 @@ const createStyles = (theme: ThemeData) =>
 
 export interface HomePageHandler {
     getCurrentChat: () => ChatData;
+    getCurrentTab: () => Tabs;
 }
 
 type Tabs = "chat" | "chats" | "profile";
@@ -88,7 +89,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const messagesRef = useRef<MessagesContainerHandle>(null);
     const chatsRef = useRef<ChatsContainerHandle>(null);
     const [currentTab, setCurrentTab] = useState<Tabs>("chats");
-    const currentTabRef = useRef<string>(currentTab);
+    const currentTabRef = useRef<Tabs>(currentTab);
     const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
     const currentChatRef = useRef<ChatData | null>(null);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -105,6 +106,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
     useImperativeHandle(ref, () => ({
         getCurrentChat: () => currentChatRef.current || CreateChat({}),
+        getCurrentTab: () => currentTabRef.current,
     }));
 
     // Back button/gesture handler
@@ -147,6 +149,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         height: { chat: 60, chats: 60, profile: "100%" },
         bottom: { chat: 0, chats: 10, profile: 10 },
         borderRadius: { chat: 16, chats: 999, profile: 16 },
+        paddingHorizontal: { chat: 0, chats: 10, profile: 10 },
     };
 
     function tabStylesToAnimatedStyle(style: TabStyles) {

@@ -1,4 +1,4 @@
-import { createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { useTranslation } from "@/TranslationContext";
 import { setAlphaForColor } from "@/Utils";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -42,6 +42,7 @@ export interface OverlayProps {}
 const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
     const [overlayState, setOverlayState] = useState<OverlayState>("none");
     const [progress, setProgress] = useState<number>(0);
+    const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
     const Styles = useAppStyles(createGlobalStyles);
     const { t } = useTranslation();
@@ -78,7 +79,7 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
             {overlayState === "loading" && (
                 <Animated.View entering={ZoomIn} exiting={ZoomOut}>
                     <Animated.View style={spinnerAnimatedStyle}>
-                        <Icon name="arrows-rotate" size={48} color="white" />
+                        <Icon name="arrows-rotate" size={48} color={theme.primaryTextColor} />
                     </Animated.View>
                 </Animated.View>
             )}

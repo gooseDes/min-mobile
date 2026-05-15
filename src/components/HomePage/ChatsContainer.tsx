@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
         display: "flex",
-        padding: 10,
+        padding: 4,
     },
 });
 
@@ -70,7 +70,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
         />
     );
 
-    const splitter = () => <View style={{ height: 20 }} />;
+    const splitter = () => <View style={{ height: 4 }} />;
 
     return (
         <Animated.View exiting={FadeOut} style={styles.chatsContainer}>
