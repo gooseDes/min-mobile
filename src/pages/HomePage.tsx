@@ -65,6 +65,14 @@ const createStyles = (theme: ThemeData) =>
             alignItems: "center",
             overflow: "visible",
         },
+        container: {
+            flex: 1,
+            width: "100%",
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.backgroundColor,
+        },
     });
 
 export interface HomePageHandler {
@@ -388,7 +396,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
     return (
         <View
-            style={{ flex: 1, width: "100%", height: "100%", justifyContent: "center", alignItems: "center" }}
+            style={styles.container}
             onLayout={event =>
                 setContainerSize({ width: event.nativeEvent.layout.width, height: event.nativeEvent.layout.height })
             }
