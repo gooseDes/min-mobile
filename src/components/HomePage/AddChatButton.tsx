@@ -1,11 +1,11 @@
 import { getSocket } from "@/Socket";
 import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
-import { useTranslation } from "@/TranslationContext";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import InputField from "@components/InputField";
 import PopupButton, { PopupButtonHandler } from "@components/PopupButton";
+import { useTranslation } from "@contexts/TranslationContext";
 import { showNotification } from "@services/NotifyService";
 import { useRef, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";

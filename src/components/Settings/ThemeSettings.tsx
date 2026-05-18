@@ -1,9 +1,9 @@
 import Auth from "@/Auth";
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { midnightTheme, OneishDarkTheme, OneishLightTheme } from "@/Themes";
-import { useTranslation } from "@/TranslationContext";
+import { AdaptiveTheme, generateAdaptiveTheme, midnightTheme, OneishDarkTheme, OneishLightTheme } from "@/Themes";
 import Button from "@components/Button";
 import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
+import { useTranslation } from "@contexts/TranslationContext";
 import { openDropdown } from "@services/DropdownService";
 import { useEffect, useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -36,7 +36,8 @@ function ThemeSettings() {
     const messagesRef = useRef<MessagesContainerHandle>(null);
 
     function applyTheme(theme: ThemeData) {
-        Object.entries(theme).forEach(([key, value]) => {
+        const newTheme = theme.name === "adaptive" ? generateAdaptiveTheme() : theme;
+        Object.entries(newTheme).forEach(([key, value]) => {
             setTheme(key as keyof ThemeData, value);
         });
     }
@@ -110,6 +111,10 @@ function ThemeSettings() {
                             {
                                 text: "Oneish Light",
                                 onPress: () => applyTheme(OneishLightTheme),
+                            },
+                            {
+                                text: "Adaptive",
+                                onPress: () => applyTheme(AdaptiveTheme),
                             },
                         ])
                     }

@@ -1,11 +1,11 @@
 import Auth from "@/Auth";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
-import { useTranslation } from "@/TranslationContext";
 import { getShadow } from "@/Utils";
 import Button from "@components/Button";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import InputField from "@components/InputField";
+import { useTranslation } from "@contexts/TranslationContext";
 import { navigate } from "@services/NavigationService";
 import { showNotification } from "@services/NotifyService";
 import { setOverlay } from "@services/OverlayService";

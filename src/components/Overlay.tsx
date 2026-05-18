@@ -1,6 +1,6 @@
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { useTranslation } from "@/TranslationContext";
 import { setAlphaForColor } from "@/Utils";
+import { useTranslation } from "@contexts/TranslationContext";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { StyleSheet, Text } from "react-native";
 import Animated, {

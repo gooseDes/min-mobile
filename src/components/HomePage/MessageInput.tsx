@@ -1,10 +1,10 @@
 import Auth from "@/Auth";
 import { chatBlurTargetRef } from "@/GlobalRefs";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { useTranslation } from "@/TranslationContext";
 import { getShadow, setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
+import { useTranslation } from "@contexts/TranslationContext";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
 import { SERVER } from "@env";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";

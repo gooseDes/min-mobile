@@ -52,23 +52,25 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
         },
     }));
 
-    const renderChat = ({ item: chat, index }: { item: ChatData; index: number }) => (
-        <ClickableProfile
-            text={chat.title}
-            image={`${SERVER}/avatars/${
-                chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
-            }.webp`}
-            anim={index % 2 === 0 ? "left" : "right"}
-            shown={animProgress >= index}
-            onPress={() => {
-                if (handler) {
-                    handler(chat);
-                } else {
-                    Alert.alert(index.toString());
-                }
-            }}
-        />
-    );
+    const renderChat = ({ item: chat, index }: { item: ChatData; index: number }) => {
+        return (
+            <ClickableProfile
+                text={chat.title}
+                image={`${SERVER}/avatars/${
+                    chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
+                }.webp`}
+                anim={index % 2 === 0 ? "left" : "right"}
+                shown={animProgress >= index}
+                onPress={() => {
+                    if (handler) {
+                        handler(chat);
+                    } else {
+                        Alert.alert(index.toString());
+                    }
+                }}
+            />
+        );
+    };
 
     const splitter = () => <View style={{ height: 4 }} />;
 

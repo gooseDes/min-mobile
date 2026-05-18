@@ -2,6 +2,7 @@ import Dropdown from "@components/Dropdown";
 import Notification from "@components/Notification";
 import Overlay from "@components/Overlay";
 import PressableOverlay from "@components/PressableOverlay";
+import { TranslationProvider } from "@contexts/TranslationContext";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
 import notifee from "@notifee/react-native";
@@ -25,7 +26,7 @@ import { overlayRef, setOverlay, setProgress } from "@services/OverlayService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { StatusBar } from "react-native";
+import { StatusBar, useColorScheme } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
@@ -35,9 +36,9 @@ import HomePage, { HomePageHandler } from "./pages/HomePage";
 import SignPage from "./pages/SignPage";
 import { getSocket } from "./Socket";
 import Storage from "./Storage";
-import { useThemeStore } from "./Style";
+import { ThemeData, useThemeStore } from "./Style";
+import { generateAdaptiveTheme } from "./Themes";
 import Translation from "./Translation";
-import { TranslationProvider } from "./TranslationContext";
 import { checkForUpdates, CreateDatabase, CreateRemoteMessagePayload } from "./Utils";
 
 enableScreens();
@@ -59,7 +60,8 @@ export interface AppProps {}
 const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
     const homePageRef = useRef<HomePageHandler | null>(null);
     const [isContentBlurred, setIsContentBlurred] = useState<boolean>(false);
-    const theme = useThemeStore(s => s.theme);
+    const systemColorScheme = useColorScheme();
+    const { theme, setTheme } = useThemeStore();
 
     useImperativeHandle(ref, () => ({
         setBlurEnabled: (enabled: boolean) => {
@@ -128,7 +130,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             notificationRef.current?.setTitle(data.authorName);
             notificationRef.current?.setText(data.text);
             notificationRef.current?.setImage(`${SERVER}/avatars/${data.authorAvatar}.webp` || null);
-            if (homePageRef.current?.getCurrentChat().id !== data.chatId) {
+            if (homePageRef.current?.getCurrentChat().id !== data.chatId || homePageRef.current?.getCurrentTab() !== "chat") {
                 notificationRef.current?.show();
             }
         });
@@ -164,6 +166,15 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             updateListener.remove();
         };
     }, []);
+
+    useEffect(() => {
+        if (theme.name === "adaptive") {
+            const newTheme = generateAdaptiveTheme();
+            Object.entries(newTheme).forEach(([key, value]) => {
+                setTheme(key as keyof ThemeData, value);
+            });
+        }
+    }, [systemColorScheme]);
 
     return (
         <TranslationProvider>

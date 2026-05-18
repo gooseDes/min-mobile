@@ -1,4 +1,7 @@
+import { Appearance } from "react-native";
+import MaterialYou from "react-native-material-you-colors";
 import { ThemeData } from "./Style";
+import { setAlphaForColor } from "./Utils";
 
 export const midnightTheme: ThemeData = {
     name: "midnight",
@@ -69,6 +72,37 @@ export const OneishDarkTheme: ThemeData = {
     shadowInset: false,
 };
 
+export function generateAdaptiveTheme(): ThemeData {
+    const palette = MaterialYou.getMaterialYouPalette();
+    const systemTheme = Appearance.getColorScheme();
+    const isDark = systemTheme !== "light";
+
+    return {
+        name: "adaptive",
+        isDark: isDark,
+        backgroundColor: palette.system_neutral1[isDark ? 11 : 1],
+        backgroundPanelColor: setAlphaForColor(palette.system_neutral1[isDark ? 10 : 2], 0.9),
+        backgroundPanelColorOpaque: palette.system_neutral1[isDark ? 10 : 2],
+        borderColor: "transparent",
+        dividerColor: palette.system_accent1[isDark ? 9 : 3],
+        messageBackgroundColor: palette.system_neutral1[isDark ? 9 : 2],
+        primaryTextColor: palette.system_accent1[isDark ? 6 : 6],
+        secondaryTextColor: palette.system_accent2[isDark ? 5 : 5],
+        rippleColor: palette.system_neutral1[isDark ? 5 : 5],
+        rounding: 16,
+        borderWidth: 2,
+        fontFamily: "Rubik",
+        shadowColor: setAlphaForColor(palette.system_accent1[isDark ? 9 : 3], 0.8),
+        shadowOffsetX: 0,
+        shadowOffsetY: 4,
+        shadowBlur: 4,
+        shadowSpread: 0,
+        shadowInset: false,
+    };
+}
+
+export const AdaptiveTheme: ThemeData = generateAdaptiveTheme();
+
 export interface ThemesType {
     [key: string]: ThemeData;
 }
@@ -76,4 +110,5 @@ export const themes: ThemesType = {
     midnight: midnightTheme,
     "oneish-light": OneishLightTheme,
     "oneish-dark": OneishDarkTheme,
+    adaptive: AdaptiveTheme,
 };

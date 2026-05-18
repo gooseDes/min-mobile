@@ -1,11 +1,11 @@
 import Auth from "@/Auth";
 import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { t } from "@/Translation";
 import { getShadow } from "@/Utils";
 import Divider from "@components/Divider";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import IconButton from "@components/IconButton";
+import { useTranslation } from "@contexts/TranslationContext";
 import { SERVER } from "@env";
 import { goBack, navigate } from "@services/NavigationService";
 import { useEffect, useState } from "react";
@@ -121,6 +121,7 @@ function ProfilePage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [avatarPreview, setAvatarPreview] = useState<Asset | undefined>(undefined);
     const [avatar, setAvatar] = useState<string>(`${SERVER}/avatars/${Storage.getString("avatar")}.webp`);
+    const { t } = useTranslation();
     const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
     const Styles = useAppStyles(createGlobalStyles);

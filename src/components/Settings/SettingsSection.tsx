@@ -1,11 +1,11 @@
 import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import Translation from "@/Translation";
-import { useTranslation } from "@/TranslationContext";
 import { ClearCache, getShadow } from "@/Utils";
 import Button from "@components/Button";
 import Icon from "@components/Icon";
 import Switch from "@components/Switch";
+import { useTranslation } from "@contexts/TranslationContext";
 import { openDropdown } from "@services/DropdownService";
 import { goBack } from "@services/NavigationService";
 import { JSX, useEffect, useRef, useState } from "react";

@@ -1,6 +1,6 @@
-import { useTranslation } from "@/TranslationContext";
 import { checkForUpdates } from "@/Utils";
 import Button from "@components/Button";
+import { useTranslation } from "@contexts/TranslationContext";
 
 function CheckForUpdates() {
     const { t } = useTranslation();

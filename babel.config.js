@@ -12,6 +12,7 @@ module.exports = {
                     "@services": "./src/services",
                     "@drizzle": "./drizzle",
                     "@specs": "./src/specs",
+                    "@contexts": "./src/contexts",
                     "@": "./src",
                 },
             },
