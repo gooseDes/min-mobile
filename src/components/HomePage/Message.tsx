@@ -267,10 +267,10 @@ function MessageBase(props: MessageProps) {
                         props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
                         {
                             transition: "boxShadow 0.3s ease-in-out, transform 0.3s ease-in-out",
-                            boxShadow: dropdownOpen ? `0px 0px 16px ${theme.borderColor}` : getShadow(theme),
+                            boxShadow: dropdownOpen ? `0px 0px 8px ${theme.secondaryTextColor}` : getShadow(theme),
                             transform: [
                                 { scale: dropdownOpen ? 1.1 : 1 },
-                                { translateX: dropdownOpen ? (side === "left" ? 8 : -8) : 0 },
+                                { translateX: dropdownOpen ? (side === "left" ? 16 : -16) : 0 },
                             ],
                         },
                     ]}
