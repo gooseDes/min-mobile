@@ -501,7 +501,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     ref={messageInputRef}
                     style={{
                         position: "absolute",
-                        bottom: Styles.container.paddingVertical + 25 + keyboardHeight,
+                        bottom: Styles.container.paddingVertical + insets.bottom + 10 + keyboardHeight,
                         width: insideContainerSize.width - 20,
                     }}
                     onTextChanged={handleInputUpdate}
