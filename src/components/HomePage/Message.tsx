@@ -2,16 +2,17 @@ import Auth from "@/Auth";
 import db from "@/db/Client";
 import { messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
-import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { countChars, dateToString, getShadow } from "@/Utils";
 import Icon from "@components/Icon";
 import { useTranslation } from "@contexts/TranslationContext";
+import FastImage from "@d11/react-native-fast-image";
 import { SERVER } from "@env";
 import { openDropdown } from "@services/DropdownService";
 import { setMessagePrefix } from "@services/InputControlService";
 import { eq } from "drizzle-orm";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { Image, ImageStyle, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewProps } from "react-native";
+import { ImageStyle, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewProps } from "react-native";
 import Markdown, { MarkedStyles, Renderer, RendererInterface } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
@@ -75,35 +76,31 @@ const markdownFlatListProps: any = {
     },
 };
 
-function MarkdownImage({ uri, alt, style }: { uri: string; alt?: string; style?: ImageStyle }) {
-    const [ratio, setRatio] = useState<number>(1);
+function MarkdownImage({ uri, style }: { uri: string; style?: any }) {
+    const [ratio, setRatio] = useState<number | undefined>();
     const { width: windowWidth } = useWindowDimensions();
-    const [width, setWidth] = useState<number>(windowWidth * 0.6);
+    const [width, setWidth] = useState<number>(0);
 
     useEffect(() => {
-        let isMounted = true;
+        setWidth(ratio ? Math.min(windowWidth * 0.6, 250) : 0);
+    }, [windowWidth, ratio]);
 
-        Image.getSize(uri, (width, height) => {
-            if (isMounted && width && height) {
+    return (
+        <FastImage
+            source={{ uri }}
+            style={[{ width, height: width / (ratio ?? 1) }, style]}
+            resizeMode={FastImage.resizeMode.contain}
+            onLoad={e => {
+                const { width, height } = e.nativeEvent;
                 setRatio(width / height);
-            }
-        });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [uri]);
-
-    useEffect(() => {
-        setWidth(Math.min(windowWidth * 0.6, 250));
-    }, [windowWidth]);
-
-    return <Image source={{ uri }} alt={alt} style={[{ width, height: width / ratio }, style]} resizeMode="contain" />;
+            }}
+        />
+    );
 }
 
 class MarkdownRenderer extends Renderer implements RendererInterface {
     image(uri: string, alt?: string, style?: ImageStyle): ReactNode {
-        return <MarkdownImage key={this.getKey()} uri={uri} alt={alt} style={style} />;
+        return <MarkdownImage key={this.getKey()} uri={uri} style={style} />;
     }
 }
 
@@ -255,10 +252,9 @@ function MessageBase(props: MessageProps) {
     return (
         <Animated.View
             style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
-            layout={Constants.layoutTransition}
         >
             {showAvatar && (
-                <Image source={{ uri: `${SERVER}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
+                <FastImage source={{ uri: `${SERVER}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
             )}
             <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
                 <Animated.View

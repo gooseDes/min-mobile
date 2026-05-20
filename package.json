@@ -14,6 +14,7 @@
         "apk": "export $(grep -v '^#' .env | xargs -d '\n') && cd android && ./gradlew assembleRelease && adb install ./app/build/outputs/apk/release/app-release.apk && cd .."
     },
     "dependencies": {
+        "@d11/react-native-fast-image": "^8.13.0",
         "@danielsaraldi/react-native-blur-view": "^2.3.2",
         "@notifee/react-native": "^9.1.8",
         "@op-engineering/op-sqlite": "^15.2.2",

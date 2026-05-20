@@ -75,7 +75,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
         const showAvatar = prevMessage ? prevMessage.sender.id !== message.sender.id : true;
 
         return (
-            <Animated.View layout={Constants.layoutTransition} entering={FadeIn} exiting={FadeOut}>
+            <Animated.View entering={FadeIn} exiting={FadeOut}>
                 <Message
                     author_name={message.sender.username}
                     author_id={message.sender.id}
@@ -115,6 +115,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
                 inverted={true}
                 initialNumToRender={15}
                 windowSize={10}
+                itemLayoutAnimation={Constants.layoutTransition}
                 {...props}
             />
         </Animated.View>

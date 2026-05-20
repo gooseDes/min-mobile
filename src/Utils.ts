@@ -1,3 +1,4 @@
+import FastImage from "@d11/react-native-fast-image";
 import migrations from "@drizzle/migrations";
 import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, VERSION } from "@env";
 import { setOverlay } from "@services/OverlayService";
@@ -80,6 +81,8 @@ export async function CreateDatabase() {
 export async function ClearCache() {
     sqliteClient.delete();
     Storage.set("createNewDB", true);
+    FastImage.clearDiskCache();
+    FastImage.clearMemoryCache();
     Alert.alert("Cache Cleared", "Now we need you to restart the app");
 }
 
