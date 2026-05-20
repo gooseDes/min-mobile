@@ -40,7 +40,9 @@ const FloatIslandButton = ({ icon, text, onPress }: FloatIslandButtonProps) => {
         <SurelyAnimatedView layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
             <PressableWithEffect onPress={onPress} style={styles.touchable}>
                 <Icon name={icon} size={16} color={theme.primaryTextColor} />
-                <Text style={[Styles.primaryText, styles.text]}>{text}</Text>
+                <Text style={[Styles.primaryText, styles.text, { fontSize: 12 }]} numberOfLines={1}>
+                    {text}
+                </Text>
             </PressableWithEffect>
         </SurelyAnimatedView>
     );

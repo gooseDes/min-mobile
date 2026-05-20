@@ -9,7 +9,7 @@ import { useTranslation } from "@contexts/TranslationContext";
 import { openDropdown } from "@services/DropdownService";
 import { goBack } from "@services/NavigationService";
 import { JSX, useEffect, useRef, useState } from "react";
-import { BackHandler, Dimensions, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BackHandler, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import Animated, {
     Easing,
     FadeIn,
@@ -19,6 +19,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CustomZoomIn = new Keyframe({
     0: {
@@ -122,7 +123,8 @@ interface SettingsSectionProps {
 }
 
 function SettingsSection(props: SettingsSectionProps) {
-    const { width, height } = Dimensions.get("window");
+    const { width, height } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
     const [expanded, setExpanded] = useState<boolean>(false);
     const expandedRef = useRef(expanded);
 
@@ -142,8 +144,10 @@ function SettingsSection(props: SettingsSectionProps) {
     // Update styles
     useEffect(() => {
         contentPosition.value = expanded ? "absolute" : "relative";
-        contentWidth.value = withSpring(expanded ? width - 20 : width - 40);
-        contentHeight.value = withSpring(expanded ? height - 60 : 50);
+        contentWidth.value = withSpring(expanded ? width - Styles.container.paddingHorizontal * 2 : width - 40);
+        contentHeight.value = withSpring(
+            expanded ? height - insets.top - insets.bottom - Styles.container.paddingVertical * 2 : 50,
+        );
         contentBottom.value = withSpring(expanded ? -20 : 0);
         contentBgColor.value = withSpring(expanded ? theme.backgroundPanelColorOpaque : "#ffffff00");
         contentBorderWidth.value = withSpring(expanded ? theme.borderWidth : 0);
