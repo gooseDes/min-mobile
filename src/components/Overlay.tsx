@@ -1,8 +1,8 @@
-import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { setAlphaForColor } from "@/Utils";
 import { useTranslation } from "@contexts/TranslationContext";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -12,6 +12,7 @@ import Animated, {
     ZoomIn,
     ZoomOut,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "./Icon";
 import ProgressBar from "./ProgressBar";
 
@@ -28,7 +29,6 @@ const createStyles = (theme: ThemeData) =>
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: setAlphaForColor(theme.backgroundColor, 0.5),
         },
     });
 
@@ -42,6 +42,8 @@ export interface OverlayProps {}
 const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
     const [overlayState, setOverlayState] = useState<OverlayState>("none");
     const [progress, setProgress] = useState<number>(0);
+    const [downloadTextEnabled, setDownloadTextEnabled] = useState<boolean>(true);
+    const insets = useSafeAreaInsets();
     const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
     const Styles = useAppStyles(createGlobalStyles);
@@ -60,6 +62,13 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
         );
     }, []);
 
+    useEffect(() => {
+        if (overlayState === "downloading") {
+            setDownloadTextEnabled(true);
+            setTimeout(() => setDownloadTextEnabled(false), 5000);
+        }
+    }, [overlayState]);
+
     useImperativeHandle(ref, () => ({
         setOverlay: (overlay: OverlayState) => setOverlayState(overlay),
         setProgress: (newProgress: number) => setProgress(newProgress),
@@ -70,9 +79,15 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
             style={[
                 styles.container,
                 {
-                    pointerEvents: overlayState === "none" ? "none" : "auto",
+                    pointerEvents: overlayState === "none" || overlayState === "downloading" ? "none" : "auto",
                     opacity: overlayState === "none" ? 0 : 1,
-                    transition: "opacity 0.3s ease-in-out",
+                    backgroundColor:
+                        overlayState === "downloading"
+                            ? setAlphaForColor(theme.backgroundColor, 0)
+                            : setAlphaForColor(theme.backgroundColor, 0.5),
+                    transition: "opacity 0.3s ease-in-out, backgroundColor 0.3s ease-in-out",
+                    paddingHorizontal: Styles.container.paddingHorizontal + 10 + insets.left + insets.right,
+                    paddingVertical: Styles.container.paddingVertical + 10 + insets.top + insets.bottom,
                 },
             ]}
         >
@@ -85,12 +100,31 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
             )}
             {overlayState === "downloading" && (
                 <Animated.View
-                    style={{ justifyContent: "center", alignItems: "center", width: 200 }}
+                    style={{
+                        ...Styles.bgAndBorder,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        position: "absolute",
+                        top: downloadTextEnabled ? undefined : insets.top - 20,
+                    }}
                     entering={ZoomIn}
                     exiting={ZoomOut}
+                    layout={Constants.layoutTransition}
                 >
-                    <Text style={[Styles.primaryCenter, { fontSize: 16 }]}>{t.downloading_started}</Text>
-                    <ProgressBar progress={progress} />
+                    {downloadTextEnabled && (
+                        <Animated.Text
+                            layout={Constants.layoutTransition}
+                            entering={ZoomIn}
+                            exiting={ZoomOut}
+                            style={[Styles.primaryCenter, { fontSize: 16 }]}
+                        >
+                            {t.downloading_started}
+                        </Animated.Text>
+                    )}
+                    <Animated.View style={{ width: "100%" }} layout={Constants.layoutTransition}>
+                        <ProgressBar progress={progress} />
+                    </Animated.View>
                 </Animated.View>
             )}
         </Animated.View>

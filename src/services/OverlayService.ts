@@ -8,7 +8,7 @@ export const appRef = React.createRef<AppHandler>();
 export const setOverlay = (overlay: OverlayState) => {
     if (overlayRef.current) {
         if (appRef.current) {
-            if (overlay === "none") {
+            if (overlay === "none" || overlay === "downloading") {
                 appRef.current.setBlurEnabled(false);
             } else {
                 appRef.current.setBlurEnabled(true);
