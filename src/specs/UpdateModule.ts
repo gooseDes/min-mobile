@@ -1,3 +1,4 @@
+import { t } from "@/Translation";
 import { NativeEventEmitter, NativeModules } from "react-native";
 import NativeUpdateModule from "./NativeUpdateModule";
 
@@ -22,7 +23,7 @@ const emitter = new UpdateModuleEmitter(NativeModules.UpdateModule);
 
 export const UpdateModule = {
     downloadAndInstall: (url: string) => {
-        NativeUpdateModule?.downloadAndInstall(url);
+        NativeUpdateModule?.downloadAndInstall(url, t.download_completed, t.tap_to_install);
     },
     addListener: <K extends keyof ModuleEvents>(event: K, listener: ModuleEvents[K]) => {
         return emitter.addListener(event, listener);

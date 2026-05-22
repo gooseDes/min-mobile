@@ -8,6 +8,7 @@ import IconButton from "@components/IconButton";
 import { useTranslation } from "@contexts/TranslationContext";
 import { SERVER } from "@env";
 import { goBack, navigate } from "@services/NavigationService";
+import { setOverlay } from "@services/OverlayService";
 import { useEffect, useState } from "react";
 import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
 import { Asset, launchImageLibrary } from "react-native-image-picker";
@@ -147,6 +148,7 @@ function ProfilePage() {
     useEffect(() => {
         (async () => {
             if (!isEditMode && avatarPreview) {
+                setOverlay("loading");
                 fetch(`${SERVER}/upload-avatar`, {
                     method: "POST",
                     headers: {
@@ -164,6 +166,7 @@ function ProfilePage() {
                 })
                     .then(res => res.json())
                     .then(data => {
+                        setOverlay("none");
                         Storage.set("avatar", data.avatar);
                         setAvatarPreview(undefined);
                         setAvatar(`${SERVER}${data.url}`);

@@ -2,7 +2,7 @@ import type { TurboModule } from "react-native";
 import { TurboModuleRegistry } from "react-native";
 
 export interface Spec extends TurboModule {
-    downloadAndInstall(url: string): void;
+    downloadAndInstall(url: string, notificationTitle?: string, notificationBody?: string): void;
     addListener(eventName: string): void;
     removeListeners(count: number): void;
 }

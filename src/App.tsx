@@ -152,7 +152,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                 setOverlayProgress(0);
             } else if (data.status === "downloading") {
                 setOverlayProgress(data.progress / 100);
-            } else if (data.status === "installing") {
+            } else if (data.status === "installing" || data.status === "completed") {
                 setOverlay("none");
                 setOverlayProgress(1);
             } else if (data.status === "error") {

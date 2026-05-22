@@ -64,6 +64,8 @@ export interface Language {
     later?: string;
     update_popup_content?: string;
     downloading_started?: string;
+    download_completed?: string;
+    tap_to_install?: string;
 }
 
 class Translation {
@@ -132,7 +134,9 @@ class Translation {
         update: "Update",
         later: "Later",
         update_popup_content: "Version [version] is available. Updating is highly recommended.",
-        downloading_started: "Downloading started. Dont't leave the app.",
+        downloading_started: "Downloading started. Wait for the notification.",
+        download_completed: "Download completed",
+        tap_to_install: "Tap to install",
     };
 
     static ru: Language = {
@@ -198,7 +202,9 @@ class Translation {
         update: "Обновить",
         later: "Позже",
         update_popup_content: "Версия [version] готова к загрузке. Обновите, как только будет возможность.",
-        downloading_started: "Загрузка началась. Не выходите из приложения.",
+        downloading_started: "Загрузка началась. Ожидайте уведомления.",
+        download_completed: "Загрузка завершена",
+        tap_to_install: "Нажмите, чтобы установить",
     };
 
     static ua: Language = {
@@ -264,7 +270,9 @@ class Translation {
         update: "Оновити",
         later: "Пізніше",
         update_popup_content: "Версія [version] готова до завантаження. Оновіть, як тільки буде можливість.",
-        downloading_started: "Завантаження розпочато. Не виходьте з додатку.",
+        downloading_started: "Завантаження розпочато. Очікуйте на повідомлення.",
+        download_completed: "Завантаження завершено",
+        tap_to_install: "Натисніть, щоб встановити",
     };
 
     static getCurrentTranslation(): Language {

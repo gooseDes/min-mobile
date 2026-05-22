@@ -28,8 +28,18 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
 
     @ReactMethod
-    fun downloadAndInstall(url: String) {
+    fun downloadAndInstall(
+        url: String,
+        notificationTitle: String = "Download Completed",
+        notificationBody: String = "Tap to install"
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            reactApplicationContext.getSharedPreferences("update_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putString("notif_title", notificationTitle)
+                .putString("notif_body", notificationBody)
+                .apply()
+
             val manager = reactApplicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val uri = Uri.parse(url)
 
@@ -47,10 +57,9 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
             Thread {
                 var isDownloading = true
-
                 while (isDownloading) {
                     val query = DownloadManager.Query().setFilterById(downloadId)
-                    val cursor: Cursor = manager.query(query)
+                    val cursor = manager.query(query)
 
                     if (cursor.moveToFirst()) {
                         val bytesDownloaded = cursor.getLong(
@@ -66,8 +75,7 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
                         when (downloadStatus) {
                             DownloadManager.STATUS_RUNNING -> {
                                 val progress = if (bytesTotal > 0)
-                                    (bytesDownloaded * 100 / bytesTotal).toInt()
-                                else 0
+                                    (bytesDownloaded * 100 / bytesTotal).toInt() else 0
                                 sendEvent("onDownloadProgress", progress, "downloading")
                             }
 
@@ -87,33 +95,14 @@ class UpdateModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
                     if (isDownloading) Thread.sleep(300)
                 }
             }.start()
-
-            val onComplete = object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    val apkUri = manager.getUriForDownloadedFile(downloadId)
-                    if (apkUri != null) {
-                        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-                            setDataAndType(apkUri, "application/vnd.android.package-archive")
-                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
-                        context.startActivity(installIntent)
-                    }
-                    context.unregisterReceiver(this)
-                }
-            }
-
-            reactApplicationContext.registerReceiver(
-                onComplete,
-                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
-                Context.RECEIVER_EXPORTED
-            )
         }
     }
 
     @ReactMethod
-    fun addListener(eventName: String) {}
+    fun addListener(eventName: String) {
+    }
 
     @ReactMethod
-    fun removeListeners(count: Double) {}
+    fun removeListeners(count: Double) {
+    }
 }
