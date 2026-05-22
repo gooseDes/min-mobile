@@ -3,16 +3,15 @@
     "include": ["**/*.ts", "**/*.tsx"],
     "exclude": ["**/node_modules", "**/Pods"],
     "compilerOptions": {
-        "baseUrl": ".",
         "paths": {
-            "@components/*": ["src/components/*"],
-            "@pages/*": ["src/pages/*"],
-            "@types/*": ["src/types/*"],
-            "@services/*": ["src/services/*"],
-            "@drizzle/*": ["drizzle/*"],
-            "@specs/*": ["src/specs/*"],
-            "@contexts/*": ["src/contexts/*"],
-            "@/*": ["src/*"]
+            "@components/*": ["./src/components/*"],
+            "@pages/*": ["./src/pages/*"],
+            "@types/*": ["./src/types/*"],
+            "@services/*": ["./src/services/*"],
+            "@drizzle/*": ["./drizzle/*"],
+            "@specs/*": ["./src/specs/*"],
+            "@contexts/*": ["./src/contexts/*"],
+            "@/*": ["./src/*"]
         }
     }
 }
