@@ -10,9 +10,10 @@ import FastImage from "@d11/react-native-fast-image";
 import { SERVER } from "@env";
 import { openDropdown } from "@services/DropdownService";
 import { setMessagePrefix } from "@services/InputControlService";
+import { setOverlayImage } from "@services/OverlayService";
 import { eq } from "drizzle-orm";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { ImageStyle, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewProps } from "react-native";
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ImageStyle, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewProps } from "react-native";
 import Markdown, { MarkedStyles, Renderer, RendererInterface } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
@@ -77,24 +78,53 @@ const markdownFlatListProps: any = {
 };
 
 function MarkdownImage({ uri, style }: { uri: string; style?: any }) {
-    const [ratio, setRatio] = useState<number | undefined>();
+    const [ratio, setRatio] = useState<number>(1);
     const { width: windowWidth } = useWindowDimensions();
-    const [width, setWidth] = useState<number>(0);
+    const [imageWidth, setImageWidth] = useState<number>(0);
+    const [isImageVisible, setIsImageVisible] = useState<boolean>(true);
+    const ref = useRef<View>(null);
 
     useEffect(() => {
-        setWidth(ratio ? Math.min(windowWidth * 0.6, 250) : 0);
+        setImageWidth(ratio ? Math.min(windowWidth * 0.6, 250) : 0);
     }, [windowWidth, ratio]);
 
     return (
-        <FastImage
-            source={{ uri }}
-            style={[{ width, height: width / (ratio ?? 1) }, style]}
-            resizeMode={FastImage.resizeMode.contain}
-            onLoad={e => {
-                const { width, height } = e.nativeEvent;
-                setRatio(width / height);
+        <Pressable
+            onPress={() => {
+                if (ref.current) {
+                    ref.current.measure((_x, _y, width, height, pageX, pageY) => {
+                        setOverlayImage(
+                            uri,
+                            {
+                                x: pageX,
+                                y: pageY,
+                                width,
+                                height,
+                            },
+                            isShown => setIsImageVisible(!isShown),
+                        );
+                    });
+                }
             }}
-        />
+        >
+            <View ref={ref} style={{ borderRadius: 8, overflow: "hidden", opacity: isImageVisible ? 1 : 0 }}>
+                <FastImage
+                    source={{ uri }}
+                    style={[
+                        {
+                            width: imageWidth,
+                            height: imageWidth / ratio,
+                        },
+                        style,
+                    ]}
+                    resizeMode={FastImage.resizeMode.contain}
+                    onLoad={e => {
+                        const { width: imgWidth, height: imgHeight } = e.nativeEvent;
+                        setRatio(imgWidth / imgHeight);
+                    }}
+                />
+            </View>
+        </Pressable>
     );
 }
 

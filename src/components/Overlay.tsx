@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "./Icon";
 import ProgressBar from "./ProgressBar";
 
-const createStyles = (theme: ThemeData) =>
+const createStyles = (_theme: ThemeData) =>
     StyleSheet.create({
         container: {
             position: "absolute",

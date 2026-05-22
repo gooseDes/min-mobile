@@ -1,25 +1,45 @@
 import { AppHandler } from "@/App";
+import { ImageOverlayHandler } from "@components/ImageOverlay";
 import { OverlayHandler } from "@components/Overlay";
 import React from "react";
+import { BackHandler } from "react-native";
 
 export const overlayRef = React.createRef<OverlayHandler>();
+export const imageOverlayRef = React.createRef<ImageOverlayHandler>();
 export const appRef = React.createRef<AppHandler>();
 
-export const setOverlay = (overlay: OverlayState) => {
+function blurApp(blur: boolean) {
+    if (appRef.current) {
+        appRef.current.setBlurEnabled(blur);
+    }
+}
+
+export function setOverlay(overlay: OverlayState) {
     if (overlayRef.current) {
-        if (appRef.current) {
-            if (overlay === "none" || overlay === "downloading") {
-                appRef.current.setBlurEnabled(false);
-            } else {
-                appRef.current.setBlurEnabled(true);
-            }
-        }
+        blurApp(overlay !== "none" && overlay !== "downloading");
         overlayRef.current.setOverlay(overlay);
     }
-};
+}
 
-export const setProgress = (progress: number) => {
+export function setOverlayProgress(progress: number) {
     if (overlayRef.current) {
         overlayRef.current.setProgress(progress);
     }
-};
+}
+
+export function setOverlayImage(image: string, animateFrom?: Rect, onShow?: (isShown: boolean) => void) {
+    if (imageOverlayRef.current) {
+        imageOverlayRef.current.setAnimateFrom(animateFrom);
+        imageOverlayRef.current.setOnShow(onShow);
+        imageOverlayRef.current.setImage(image);
+        setTimeout(() => blurApp(image !== ""), 100);
+        if (image) {
+            const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+                imageOverlayRef.current?.close();
+                blurApp(false);
+                sub.remove();
+                return true;
+            });
+        }
+    }
+}

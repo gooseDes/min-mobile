@@ -1,4 +1,5 @@
 import Dropdown from "@components/Dropdown";
+import ImageOverlay from "@components/ImageOverlay";
 import Notification from "@components/Notification";
 import Overlay from "@components/Overlay";
 import PressableOverlay from "@components/PressableOverlay";
@@ -22,7 +23,7 @@ import { dropdownRef } from "@services/DropdownService";
 import { pressableOverlayRef } from "@services/InterceptClickService";
 import { initialRouteName, navigate, navigationRef } from "@services/NavigationService";
 import { notificationRef, showNotification } from "@services/NotifyService";
-import { overlayRef, setOverlay, setProgress } from "@services/OverlayService";
+import { imageOverlayRef, overlayRef, setOverlay, setOverlayProgress } from "@services/OverlayService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -148,15 +149,15 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
         const updateListener = UpdateModule.addListener("onDownloadProgress", data => {
             if (data.status === "started") {
                 setOverlay("downloading");
-                setProgress(0);
+                setOverlayProgress(0);
             } else if (data.status === "downloading") {
-                setProgress(data.progress / 100);
+                setOverlayProgress(data.progress / 100);
             } else if (data.status === "installing") {
                 setOverlay("none");
-                setProgress(1);
+                setOverlayProgress(1);
             } else if (data.status === "error") {
                 setOverlay("none");
-                setProgress(0);
+                setOverlayProgress(0);
                 showNotification("Error", "Failed to download update");
             }
         });
@@ -204,6 +205,9 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                         </Stack.Navigator>
                     </NavigationContainer>
                 </Animated.View>
+
+                {/* For fullscreening images */}
+                <ImageOverlay ref={imageOverlayRef} />
 
                 {/* This thing can intercept any clicks */}
                 <PressableOverlay ref={pressableOverlayRef} />

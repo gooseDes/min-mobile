@@ -10,3 +10,10 @@ interface Size {
     width: number;
     height: number;
 }
+
+interface Rect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
