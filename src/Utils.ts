@@ -173,6 +173,8 @@ export async function checkForUpdates(silent: boolean = false) {
                     },
                     { text: t.later },
                 ]);
+            } else if (!silent) {
+                Alert.alert(t.no_update_available || "", t.no_update_popup_content || "");
             }
         }
     }

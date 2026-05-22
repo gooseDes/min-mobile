@@ -66,6 +66,8 @@ export interface Language {
     downloading_started?: string;
     download_completed?: string;
     tap_to_install?: string;
+    no_update_available?: string;
+    no_update_popup_content?: string;
 }
 
 class Translation {
@@ -137,6 +139,8 @@ class Translation {
         downloading_started: "Downloading started. Wait for the notification.",
         download_completed: "Download completed",
         tap_to_install: "Tap to install",
+        no_update_available: "No update available",
+        no_update_popup_content: "You are using the latest version.",
     };
 
     static ru: Language = {
@@ -205,6 +209,8 @@ class Translation {
         downloading_started: "Загрузка началась. Ожидайте уведомления.",
         download_completed: "Загрузка завершена",
         tap_to_install: "Нажмите, чтобы установить",
+        no_update_available: "Нет обновлений",
+        no_update_popup_content: "Вы используете последнюю версию.",
     };
 
     static ua: Language = {
@@ -273,6 +279,8 @@ class Translation {
         downloading_started: "Завантаження розпочато. Очікуйте на повідомлення.",
         download_completed: "Завантаження завершено",
         tap_to_install: "Натисніть, щоб встановити",
+        no_update_available: "Немає оновлень",
+        no_update_popup_content: "Ви використовуєте останню версію.",
     };
 
     static getCurrentTranslation(): Language {
