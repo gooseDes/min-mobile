@@ -27,6 +27,7 @@
         "react": "19.1.1",
         "react-native": "0.82.1",
         "react-native-dotenv": "^3.4.11",
+        "react-native-gesture-handler": "^2.31.2",
         "react-native-image-picker": "^8.2.1",
         "react-native-keychain": "^10.0.0",
         "react-native-marked": "^7.1.1",
@@ -68,7 +69,8 @@
         "typescript": "^5.8.3"
     },
     "overrides": {
-        "esbuild": "0.25.0"
+        "esbuild": "0.25.0",
+        "uuid": ">=11.1.1"
     },
     "engines": {
         "node": ">=20"

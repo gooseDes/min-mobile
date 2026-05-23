@@ -28,6 +28,7 @@ import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StatusBar, useColorScheme } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
@@ -179,45 +180,47 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
 
     return (
         <TranslationProvider>
-            <SafeAreaProvider style={{ backgroundColor: theme.backgroundColor }}>
-                <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
-                <Animated.View
-                    style={{
-                        flex: 1,
-                        filter: isContentBlurred ? "blur(8px)" : "blur(0px)",
-                        transition: "filter 0.3s ease-in-out",
-                    }}
-                >
-                    <NavigationContainer ref={navigationRef} onReady={() => navigate(initialRouteName)}>
-                        <Stack.Navigator initialRouteName="Home">
-                            <Stack.Screen name="Home" options={stackOptions}>
-                                {() => <HomePage ref={homePageRef} />}
-                            </Stack.Screen>
-                            <Stack.Screen name="Sign" options={stackOptions}>
-                                {() => <SignPage />}
-                            </Stack.Screen>
-                            <Stack.Screen name="Settings" options={stackOptions}>
-                                {() => <SettingsPage />}
-                            </Stack.Screen>
-                            <Stack.Screen name="Profile" options={stackOptions}>
-                                {() => <ProfilePage />}
-                            </Stack.Screen>
-                        </Stack.Navigator>
-                    </NavigationContainer>
-                </Animated.View>
+            <GestureHandlerRootView>
+                <SafeAreaProvider style={{ backgroundColor: theme.backgroundColor }}>
+                    <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
+                    <Animated.View
+                        style={{
+                            flex: 1,
+                            filter: isContentBlurred ? "blur(8px)" : "blur(0px)",
+                            transition: "filter 0.3s ease-in-out",
+                        }}
+                    >
+                        <NavigationContainer ref={navigationRef} onReady={() => navigate(initialRouteName)}>
+                            <Stack.Navigator initialRouteName="Home">
+                                <Stack.Screen name="Home" options={stackOptions}>
+                                    {() => <HomePage ref={homePageRef} />}
+                                </Stack.Screen>
+                                <Stack.Screen name="Sign" options={stackOptions}>
+                                    {() => <SignPage />}
+                                </Stack.Screen>
+                                <Stack.Screen name="Settings" options={stackOptions}>
+                                    {() => <SettingsPage />}
+                                </Stack.Screen>
+                                <Stack.Screen name="Profile" options={stackOptions}>
+                                    {() => <ProfilePage />}
+                                </Stack.Screen>
+                            </Stack.Navigator>
+                        </NavigationContainer>
+                    </Animated.View>
 
-                {/* For fullscreening images */}
-                <ImageOverlay ref={imageOverlayRef} />
+                    {/* For fullscreening images */}
+                    <ImageOverlay ref={imageOverlayRef} />
 
-                {/* This thing can intercept any clicks */}
-                <PressableOverlay ref={pressableOverlayRef} />
+                    {/* This thing can intercept any clicks */}
+                    <PressableOverlay ref={pressableOverlayRef} />
 
-                {/* This one is for displaying some processes (e.g. loading) */}
-                <Overlay ref={overlayRef} />
+                    {/* This one is for displaying some processes (e.g. loading) */}
+                    <Overlay ref={overlayRef} />
 
-                <Notification ref={notificationRef} title="Default Title" text="Default Text" />
-                <Dropdown ref={dropdownRef} />
-            </SafeAreaProvider>
+                    <Notification ref={notificationRef} title="Default Title" text="Default Text" />
+                    <Dropdown ref={dropdownRef} />
+                </SafeAreaProvider>
+            </GestureHandlerRootView>
         </TranslationProvider>
     );
 });
