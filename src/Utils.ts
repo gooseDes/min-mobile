@@ -1,10 +1,12 @@
 import FastImage from "@d11/react-native-fast-image";
 import migrations from "@drizzle/migrations";
 import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, VERSION } from "@env";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { setOverlay } from "@services/OverlayService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { sql } from "drizzle-orm";
 import { Alert } from "react-native";
+import RNFS from "react-native-fs";
 import db, { sqliteClient } from "./db/Client";
 import Storage from "./Storage";
 import { ThemeData } from "./Style";
@@ -179,4 +181,12 @@ export async function checkForUpdates(silent: boolean = false) {
         }
     }
     if (!silent) setOverlay("none");
+}
+
+export async function saveImageToGallery(uri: string) {
+    const ext = uri.split(".").pop() || "jpg";
+    const dest = `${RNFS.TemporaryDirectoryPath}/temp_image.${ext}`;
+
+    await RNFS.downloadFile({ fromUrl: uri, toFile: dest }).promise;
+    await CameraRoll.saveAsset(`file://${dest}`, { type: "photo" });
 }

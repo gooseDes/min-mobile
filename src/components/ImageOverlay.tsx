@@ -1,10 +1,23 @@
-import { createGlobalStyles, ThemeData, useAppStyles } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { saveImageToGallery } from "@/Utils";
 import FastImage from "@d11/react-native-fast-image";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, { clamp, Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, {
+    clamp,
+    Easing,
+    FadeIn,
+    FadeOut,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+    withTiming,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { runOnJS } from "react-native-worklets";
+import Icon from "./Icon";
+import IconButton from "./IconButton";
 
 export interface ImageOverlayHandler {
     setImage: (uri: string) => void;
@@ -15,7 +28,7 @@ export interface ImageOverlayHandler {
 
 export interface ImageOverlayProps {}
 
-const createStyles = (_theme: ThemeData) =>
+const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
         container: {
             position: "absolute",
@@ -34,6 +47,21 @@ const createStyles = (_theme: ThemeData) =>
             borderRadius: 8,
             overflow: "hidden",
         },
+        panel: {
+            height: 60,
+            overflow: "hidden",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        saveIcon: {
+            position: "absolute",
+            pointerEvents: "none",
+            backgroundColor: theme.backgroundColor,
+            aspectRatio: 1,
+            padding: 16,
+            borderRadius: theme.rounding,
+        },
     });
 
 const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props, ref) => {
@@ -44,6 +72,8 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
     const doOnShow = useRef<((isShown: boolean) => void) | undefined>(undefined);
     const animateOnLoad = useRef<boolean>(false);
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
+    const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
     const Styles = useAppStyles(createGlobalStyles);
 
@@ -136,6 +166,44 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
 
     const gesture = Gesture.Simultaneous(zoomGesture, moveGesture);
 
+    const playSaveAnimation = () => {
+        saveAnimOpacity.value = 0;
+        saveAnimBlur.value = 8;
+        saveAnimScale.value = 3;
+        saveAnimTranslateX.value = 0;
+        saveAnimTranslateY.value = 0;
+
+        saveAnimOpacity.value = withSpring(1);
+        saveAnimBlur.value = withSpring(0);
+        saveAnimScale.value = withSpring(1);
+        saveAnimTranslateX.value = withSpring(0);
+        saveAnimTranslateY.value = withSpring(0);
+
+        setTimeout(() => {
+            saveAnimOpacity.value = withTiming(0, { duration: 300, easing: Easing.cubic });
+            saveAnimBlur.value = withSpring(0);
+            saveAnimScale.value = withSpring(1);
+            saveAnimTranslateX.value = withSpring(0);
+            saveAnimTranslateY.value = withTiming(screenHeight / 2, { duration: 300, easing: Easing.in(Easing.cubic) });
+        }, 1000);
+    };
+
+    const saveAnimOpacity = useSharedValue<number>(0);
+    const saveAnimBlur = useSharedValue<number>(8);
+    const saveAnimScale = useSharedValue<number>(3);
+    const saveAnimTranslateX = useSharedValue<number>(0);
+    const saveAnimTranslateY = useSharedValue<number>(0);
+
+    const saveAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: saveAnimOpacity.value,
+        filter: `blur(${saveAnimBlur.value}px)`,
+        transform: [
+            { scale: saveAnimScale.value },
+            { translateX: saveAnimTranslateX.value },
+            { translateY: saveAnimTranslateY.value },
+        ],
+    }));
+
     return (
         <Animated.View style={[styles.container, { pointerEvents: isBlockingInput ? "auto" : "none" }]}>
             <GestureDetector gesture={gesture}>
@@ -170,6 +238,31 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
                     />
                 </Animated.View>
             </GestureDetector>
+
+            {isShown && (
+                <Animated.View
+                    entering={FadeIn}
+                    exiting={FadeOut}
+                    style={[
+                        Styles.bgAndBorder,
+                        styles.panel,
+                        { bottom: -screenHeight / 2 + styles.panel.height / 2 + 8 + insets.bottom, width: screenWidth - 16 },
+                    ]}
+                >
+                    <IconButton
+                        icon="download"
+                        style={{ flex: 1, aspectRatio: 1 }}
+                        onPress={() => {
+                            saveImageToGallery(image);
+                            playSaveAnimation();
+                        }}
+                    />
+                </Animated.View>
+            )}
+
+            <Animated.View style={[styles.saveIcon, saveAnimatedStyle]}>
+                <Icon name="save" size={48} color={theme.primaryTextColor} />
+            </Animated.View>
         </Animated.View>
     );
 });
