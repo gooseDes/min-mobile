@@ -1,4 +1,4 @@
-import { AppHandler } from "@/App";
+import { blurApp } from "@/Utils";
 import { ImageOverlayHandler } from "@components/ImageOverlay";
 import { OverlayHandler } from "@components/Overlay";
 import React from "react";
@@ -6,13 +6,6 @@ import { BackHandler } from "react-native";
 
 export const overlayRef = React.createRef<OverlayHandler>();
 export const imageOverlayRef = React.createRef<ImageOverlayHandler>();
-export const appRef = React.createRef<AppHandler>();
-
-function blurApp(blur: boolean) {
-    if (appRef.current) {
-        appRef.current.setBlurEnabled(blur);
-    }
-}
 
 export function setOverlay(overlay: OverlayState) {
     if (overlayRef.current) {

@@ -3,14 +3,19 @@ import migrations from "@drizzle/migrations";
 import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, VERSION } from "@env";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { setOverlay } from "@services/OverlayService";
+import { showPopup } from "@services/PopupService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { sql } from "drizzle-orm";
+import React from "react";
 import { Alert } from "react-native";
 import RNFS from "react-native-fs";
+import { AppHandler } from "./App";
 import db, { sqliteClient } from "./db/Client";
 import Storage from "./Storage";
 import { ThemeData } from "./Style";
 import { t } from "./Translation";
+
+export const appRef = React.createRef<AppHandler>();
 
 export function CreateUserData(obj: any = {}): UserData {
     const o = obj || {};
@@ -166,21 +171,22 @@ export async function checkForUpdates(silent: boolean = false) {
                         UpdateModule?.downloadAndInstall(downloadUrl);
                     }
                 };
-                Alert.alert(t.update_available || "", (t.update_popup_content || "").replace("[version]", latestVersion), [
+                if (!silent) setOverlay("none");
+                showPopup(t.update_available, (t.update_popup_content || "").replace("[version]", latestVersion), [
                     {
-                        text: t.update,
+                        text: t.update || "",
                         onPress: () => {
                             confirmUpdate();
                         },
                     },
-                    { text: t.later },
+                    { text: t.later || "" },
                 ]);
             } else if (!silent) {
-                Alert.alert(t.no_update_available || "", t.no_update_popup_content || "");
+                setOverlay("none");
+                showPopup(t.no_update_available, t.no_update_popup_content);
             }
         }
     }
-    if (!silent) setOverlay("none");
 }
 
 export async function saveImageToGallery(uri: string) {
@@ -189,4 +195,10 @@ export async function saveImageToGallery(uri: string) {
 
     await RNFS.downloadFile({ fromUrl: uri, toFile: dest }).promise;
     await CameraRoll.saveAsset(`file://${dest}`, { type: "photo" });
+}
+
+export function blurApp(blur: boolean) {
+    if (appRef.current) {
+        appRef.current.setBlurEnabled(blur);
+    }
 }

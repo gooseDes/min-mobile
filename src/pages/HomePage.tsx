@@ -25,9 +25,10 @@ import { SERVER } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
 import { messageInputRef } from "@services/InputControlService";
 import { navigate } from "@services/NavigationService";
+import { showPopup } from "@services/PopupService";
 import { eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { Alert, BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
+import { BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -285,7 +286,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             });
             socket.on("connect_error", err => {
                 if (err.message.includes("Invalid token")) {
-                    Alert.alert(t.relogin || "", t.relogin_msg, [{ text: t.ok, onPress: () => navigate("Sign") }]);
+                    showPopup(t.relogin, t.relogin_msg, [{ text: t.ok, onPress: () => navigate("Sign") }]);
                 } else {
                     console.log("Connection Error:", err);
                 }

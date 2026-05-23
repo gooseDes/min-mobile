@@ -2,6 +2,7 @@ import Dropdown from "@components/Dropdown";
 import ImageOverlay from "@components/ImageOverlay";
 import Notification from "@components/Notification";
 import Overlay from "@components/Overlay";
+import Popup from "@components/Popup";
 import PressableOverlay from "@components/PressableOverlay";
 import { TranslationProvider } from "@contexts/TranslationContext";
 import migrations from "@drizzle/migrations";
@@ -24,6 +25,7 @@ import { pressableOverlayRef } from "@services/InterceptClickService";
 import { initialRouteName, navigate, navigationRef } from "@services/NavigationService";
 import { notificationRef, showNotification } from "@services/NotifyService";
 import { imageOverlayRef, overlayRef, setOverlay, setOverlayProgress } from "@services/OverlayService";
+import { popupRef } from "@services/PopupService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/op-sqlite/migrator";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -217,8 +219,9 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                     {/* This one is for displaying some processes (e.g. loading) */}
                     <Overlay ref={overlayRef} />
 
-                    <Notification ref={notificationRef} title="Default Title" text="Default Text" />
+                    <Popup ref={popupRef} />
                     <Dropdown ref={dropdownRef} />
+                    <Notification ref={notificationRef} title="Default Title" text="Default Text" />
                 </SafeAreaProvider>
             </GestureHandlerRootView>
         </TranslationProvider>

@@ -7,8 +7,9 @@ import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
 import { SERVER } from "@env";
+import { showPopup } from "@services/PopupService";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { Alert, Pressable, StyleProp, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import { Pressable, StyleProp, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 import Animated, { SlideInDown, SlideOutDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 
@@ -112,7 +113,7 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                         value + value ? " " : "" + data.urls.map((att: string) => `![attachment](${SERVER}${att})`).join("\n"),
                     );
                 } else {
-                    Alert.alert("Error", data.msg);
+                    showPopup("Error", data.msg);
                 }
             }
         }

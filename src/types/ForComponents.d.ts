@@ -5,3 +5,8 @@ interface DropdownItemData {
 }
 
 type OverlayState = "none" | "downloading" | "loading";
+
+interface PopupButton {
+    text?: string;
+    onPress?: () => void;
+}
