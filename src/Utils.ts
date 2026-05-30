@@ -191,7 +191,7 @@ export async function checkForUpdates(silent: boolean = false) {
 
 export async function saveImageToGallery(uri: string) {
     const ext = uri.split(".").pop() || "jpg";
-    const dest = `${RNFS.TemporaryDirectoryPath}/temp_image.${ext}`;
+    const dest = `${RNFS.TemporaryDirectoryPath}/min_${Date.now()}.${ext}`;
 
     await RNFS.downloadFile({ fromUrl: uri, toFile: dest }).promise;
     await CameraRoll.saveAsset(`file://${dest}`, { type: "photo" });
