@@ -1,4 +1,5 @@
 import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -48,6 +49,7 @@ function Switch(props: SwitchProps) {
                 onChange?.(!isChecked);
                 setIsChecked(!isChecked);
                 setIsPressing(false);
+                vibrateEffectPreset("quick_fall");
             }}
         >
             <View style={styles.switchBg}>
