@@ -1,11 +1,15 @@
-import { SERVER } from "@env";
 import * as Keychain from "react-native-keychain";
-import { resetSocket } from "./Socket";
+import { apiClient, resetSocket } from "./Socket";
 import Storage from "./Storage";
 
-export class AuthResult {
-    constructor(public success: boolean, public message: string = "") {}
-}
+export type AuthResult =
+    | {
+          success: true;
+      }
+    | {
+          success: false;
+          message: string;
+      };
 
 export default class Auth {
     static id: number | null;
@@ -24,56 +28,39 @@ export default class Auth {
     }
 
     static async login(email: string, password: string): Promise<AuthResult> {
-        const response = await fetch(`${SERVER}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email, password: password }),
-        });
-        const json = await response.json();
-        if (response.ok) {
-            await this.setInStorage("token", json.token);
-            await this.setInStorage("username", json.username);
-            await this.setInStorage("email", email);
-            await this.setInStorage("id", json.id.toString());
-            Auth.username = json.username;
-            Storage.set("user.username", json.username);
-            Auth.id = json.id;
-            Storage.set("user.id", json.id);
+        const result = await apiClient.login(email, password);
+        if (result.success) {
+            await this.setInStorage("id", result.user.id.toString());
+            await this.setInStorage("email", result.user.email);
+            await this.setInStorage("username", result.user.username);
+            await this.setInStorage("token", result.token);
+            Storage.set("user.id", result.user.id);
+            Storage.set("user.username", result.user.username);
+            Auth.id = result.user.id;
+            Auth.username = result.user.username;
             resetSocket();
+            return { success: true };
         } else {
-            const error = new AuthResult(false, json.msg || "");
-            console.error(`Faliled :( ${error.message}`);
-            return error;
+            return { success: false, message: result.message };
         }
-        console.log("Logined!");
-        return new AuthResult(true);
     }
 
     static async register(login: string, email: string, password: string): Promise<AuthResult> {
-        const response = await fetch(`${SERVER}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: login, email: email, password: password }),
-        });
-        const json = await response.json();
-        if (response.ok) {
-            console.log(json);
-            await this.setInStorage("token", json.token);
-            await this.setInStorage("username", login);
-            await this.setInStorage("email", email);
-            await this.setInStorage("id", json.id.toString());
-            Auth.username = login;
+        const result = await apiClient.register(login, email, password);
+        if (result.success) {
+            await this.setInStorage("id", result.user.id.toString());
+            await this.setInStorage("email", result.user.email);
+            await this.setInStorage("username", result.user.username);
+            await this.setInStorage("token", result.token);
+            Storage.set("user.id", result.user.id);
             Storage.set("user.username", login);
-            Auth.id = json.id;
-            Storage.set("user.id", json.id);
+            Auth.id = result.user.id;
+            Auth.username = login;
             resetSocket();
+            return { success: true };
         } else {
-            const error = new AuthResult(false, json.msg || "");
-            console.error(`Faliled :( ${error.message}`);
-            return error;
+            return { success: false, message: result.message };
         }
-        console.log("Registered!");
-        return new AuthResult(true);
     }
 
     static async getAllFromStorage(): Promise<any> {

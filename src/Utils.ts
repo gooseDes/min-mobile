@@ -2,6 +2,7 @@ import FastImage from "@d11/react-native-fast-image";
 import migrations from "@drizzle/migrations";
 import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, VERSION } from "@env";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { showNotification } from "@services/NotifyService";
 import { setOverlay } from "@services/OverlayService";
 import { showPopup } from "@services/PopupService";
 import { UpdateModule } from "@specs/UpdateModule";
@@ -190,11 +191,15 @@ export async function checkForUpdates(silent: boolean = false) {
 }
 
 export async function saveImageToGallery(uri: string) {
-    const ext = uri.split(".").pop() || "jpg";
-    const dest = `${RNFS.TemporaryDirectoryPath}/min_${Date.now()}.${ext}`;
+    try {
+        const ext = uri.split(".").pop() || "jpg";
+        const dest = `${RNFS.TemporaryDirectoryPath}/min_${Date.now()}.${ext}`;
 
-    await RNFS.downloadFile({ fromUrl: uri, toFile: dest }).promise;
-    await CameraRoll.saveAsset(`file://${dest}`, { type: "photo" });
+        await RNFS.downloadFile({ fromUrl: uri, toFile: dest }).promise;
+        await CameraRoll.saveAsset(`file://${dest}`, { type: "photo" });
+    } catch {
+        showNotification("Error");
+    }
 }
 
 export function blurApp(blur: boolean) {

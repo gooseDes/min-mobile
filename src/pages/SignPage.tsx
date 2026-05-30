@@ -82,7 +82,6 @@ function SignPage() {
             return;
         }
         const result = await Auth.register(loginValue, emailValue, passwordValue);
-        console.log(result);
         if (result.success) {
             navigate("Home");
         } else {
