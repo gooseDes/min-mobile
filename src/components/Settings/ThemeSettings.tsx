@@ -3,10 +3,11 @@ import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/St
 import { AdaptiveTheme, generateAdaptiveTheme, midnightTheme, OneishDarkTheme, OneishLightTheme } from "@/Themes";
 import Button from "@components/Button";
 import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
+import PressableWithEffect from "@components/PressableWithEffect";
 import { useTranslation } from "@contexts/TranslationContext";
 import { openDropdown } from "@services/DropdownService";
 import { useEffect, useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 const styles = StyleSheet.create({
     previewContainer: {
@@ -97,7 +98,7 @@ function ThemeSettings() {
 
             {/* Theme selection */}
             <View style={styles.themeSelectionContainer}>
-                <Pressable
+                <PressableWithEffect
                     onPress={e =>
                         openDropdown(e.nativeEvent.pageX, e.nativeEvent.pageY, [
                             {
@@ -120,10 +121,10 @@ function ThemeSettings() {
                     }
                 >
                     <Text style={[{ fontSize: 16 }, Styles.primaryText]}>{t.settings_change_theme}</Text>
-                </Pressable>
-                <Pressable onPress={resetTheme}>
+                </PressableWithEffect>
+                <PressableWithEffect onPress={resetTheme}>
                     <Text style={[{ fontSize: 16 }, Styles.primaryText]}>{t.settings_reset_theme}</Text>
-                </Pressable>
+                </PressableWithEffect>
             </View>
         </View>
     );

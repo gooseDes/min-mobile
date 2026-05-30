@@ -3,13 +3,14 @@ import { chatBlurTargetRef } from "@/GlobalRefs";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { getShadow, setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
+import PressableWithEffect from "@components/PressableWithEffect";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { BlurView } from "@danielsaraldi/react-native-blur-view";
 import { SERVER } from "@env";
 import { showPopup } from "@services/PopupService";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { Pressable, StyleProp, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import { Pressable, StyleProp, StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 import Animated, { SlideInDown, SlideOutDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 
@@ -153,11 +154,9 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                             </Animated.View>
                         )}
                         <View style={[styles.horizontalRow, { flex: 1 }]}>
-                            <View style={styles.button}>
-                                <TouchableOpacity onPress={attach}>
-                                    <Icon name="paperclip" size={24} color={theme.secondaryTextColor} />
-                                </TouchableOpacity>
-                            </View>
+                            <PressableWithEffect style={styles.button} onPress={attach}>
+                                <Icon name="paperclip" size={24} color={theme.secondaryTextColor} />
+                            </PressableWithEffect>
                             <TextInput
                                 style={[styles.input, Styles.primaryText]}
                                 placeholder={t.your_message}
@@ -166,11 +165,9 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                                 onChangeText={onChangeText}
                                 value={value}
                             />
-                            <View style={styles.button}>
-                                <TouchableOpacity onPress={send}>
-                                    <Icon name="paper-plane" size={24} color={theme.secondaryTextColor} />
-                                </TouchableOpacity>
-                            </View>
+                            <PressableWithEffect defaultHaptic={false} style={styles.button} onPress={send}>
+                                <Icon name="paper-plane" size={24} color={theme.secondaryTextColor} />
+                            </PressableWithEffect>
                         </View>
                     </View>
                 </BlurView>

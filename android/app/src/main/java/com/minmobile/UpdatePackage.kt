@@ -7,10 +7,12 @@ import com.facebook.react.uimanager.ViewManager
 
 class UpdatePackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        return listOf(UpdateModule(reactContext))
+        return listOf(UpdateModule(reactContext), HapticsModule(reactContext))
     }
 
-    override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
+    override fun createViewManagers(
+            reactContext: ReactApplicationContext
+    ): List<ViewManager<*, *>> {
         return emptyList()
     }
 }

@@ -3,13 +3,15 @@ import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore }
 import Translation from "@/Translation";
 import { ClearCache, getShadow } from "@/Utils";
 import Button from "@components/Button";
+import HapticPressable from "@components/HapticPressable";
 import Icon from "@components/Icon";
 import Switch from "@components/Switch";
 import { useTranslation } from "@contexts/TranslationContext";
 import { openDropdown } from "@services/DropdownService";
 import { goBack } from "@services/NavigationService";
+import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { JSX, useEffect, useRef, useState } from "react";
-import { BackHandler, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { BackHandler, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import Animated, {
     Easing,
     FadeIn,
@@ -195,7 +197,13 @@ function SettingsSection(props: SettingsSectionProps) {
             {/* Button Mode */}
             {!expanded && (
                 <Animated.View entering={CustomZoomIn} exiting={FadeOut}>
-                    <TouchableOpacity style={styles.button} onPress={expand}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            expand();
+                            vibrateEffectPreset("slow_rise");
+                        }}
+                    >
                         {props.section.icon && <Icon name={props.section.icon} size={24} color={theme.primaryTextColor} />}
                         <Text style={[Styles.primaryText, styles.buttonText]}>{itemTitle(props.section.title)}</Text>
                     </TouchableOpacity>
@@ -218,7 +226,7 @@ function SettingsSection(props: SettingsSectionProps) {
                                         <Icon name="earth-americas" size={24} color={theme.secondaryTextColor} />
                                         <Text style={[Styles.secondaryCenter, { fontSize: 18 }]}>{t.language_name}</Text>
                                         <View style={{ flex: 1 }} />
-                                        <Pressable
+                                        <HapticPressable
                                             style={styles.languageSelectorPressable}
                                             android_ripple={{ color: theme.rippleColor, foreground: true }}
                                             onPress={e =>
@@ -239,7 +247,7 @@ function SettingsSection(props: SettingsSectionProps) {
                                             }
                                         >
                                             <Icon name="chevron-right" size={24} color={theme.secondaryTextColor} />
-                                        </Pressable>
+                                        </HapticPressable>
                                     </View>
                                 </View>
                             );

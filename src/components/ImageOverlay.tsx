@@ -1,6 +1,7 @@
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { saveImageToGallery } from "@/Utils";
 import FastImage from "@d11/react-native-fast-image";
+import { vibrateEffect } from "@specs/HapticsModule";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -173,6 +174,7 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
         saveAnimTranslateX.value = 0;
         saveAnimTranslateY.value = 0;
 
+        vibrateEffect("slow_rise");
         saveAnimOpacity.value = withSpring(1);
         saveAnimBlur.value = withSpring(0);
         saveAnimScale.value = withSpring(1);
@@ -180,6 +182,7 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
         saveAnimTranslateY.value = withSpring(0);
 
         setTimeout(() => {
+            vibrateEffect("quick_fall");
             saveAnimOpacity.value = withTiming(0, { duration: 300, easing: Easing.cubic });
             saveAnimBlur.value = withSpring(0);
             saveAnimScale.value = withSpring(1);

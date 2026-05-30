@@ -3,6 +3,7 @@ import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { getShadow } from "@/Utils";
 import Divider from "@components/Divider";
+import HapticPressable from "@components/HapticPressable";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import IconButton from "@components/IconButton";
 import { useTranslation } from "@contexts/TranslationContext";
@@ -10,7 +11,7 @@ import { SERVER } from "@env";
 import { goBack, navigate } from "@services/NavigationService";
 import { setOverlay } from "@services/OverlayService";
 import { useEffect, useState } from "react";
-import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
+import { BackHandler, StyleSheet, Text, View } from "react-native";
 import { Asset, launchImageLibrary } from "react-native-image-picker";
 import Animated, { ZoomInEasyDown, ZoomInEasyUp, ZoomOutEasyDown, ZoomOutEasyUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -93,7 +94,7 @@ function ActionButton(props: ActionButtonProps) {
 
     return (
         <Animated.View style={styles.actionButton} layout={Constants.layoutTransition}>
-            <Pressable
+            <HapticPressable
                 android_ripple={{ color: theme.rippleColor, foreground: true, borderless: true }}
                 style={styles.actionButtonPressable}
                 onPress={onPress}
@@ -113,7 +114,7 @@ function ActionButton(props: ActionButtonProps) {
                     entering={ZoomInEasyUp}
                     exiting={ZoomOutEasyDown}
                 />
-            </Pressable>
+            </HapticPressable>
         </Animated.View>
     );
 }
@@ -204,7 +205,7 @@ function ProfilePage() {
                 <View style={[Styles.content, { justifyContent: "flex-start", paddingVertical: 32 }]}>
                     {/* Profile */}
                     <View style={styles.avatarContainerContainer}>
-                        <Pressable
+                        <HapticPressable
                             android_ripple={{ color: theme.rippleColor, foreground: true, borderless: true }}
                             style={styles.avatarContainer}
                             onPress={() => uploadAvatar()}
@@ -219,7 +220,7 @@ function ProfilePage() {
                                     } as any,
                                 ]}
                             />
-                        </Pressable>
+                        </HapticPressable>
                         <AnimatedIcon
                             name="upload"
                             color={"#fff"}

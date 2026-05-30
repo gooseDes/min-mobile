@@ -1,15 +1,17 @@
 import { useThemeStore } from "@/Style";
 import { setAlphaForColor } from "@/Utils";
+import { vibratePreset } from "@specs/HapticsModule";
 import { Pressable, PressableProps } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SpringConfig } from "react-native-reanimated/lib/typescript/animation/spring";
 
 export interface PressableWithEffectProps extends PressableProps {
+    defaultHaptic?: boolean;
     scaleWhenPressed?: number;
 }
 
 function PressableWithEffect(props: PressableWithEffectProps) {
-    const { children, onPressIn, onPressOut, scaleWhenPressed = 0.8, ...rest } = props;
+    const { children, onPressIn, onPressOut, onPress, scaleWhenPressed = 0.8, defaultHaptic = true, ...rest } = props;
     const theme = useThemeStore(s => s.theme);
 
     const backgroundColor = useSharedValue(setAlphaForColor(theme.rippleColor, 0));
@@ -25,6 +27,7 @@ function PressableWithEffect(props: PressableWithEffectProps) {
     return (
         <Animated.View style={[animatedStyle, { borderRadius: theme.rounding }]}>
             <Pressable
+                hitSlop={8}
                 onPressIn={e => {
                     backgroundColor.value = withSpring(setAlphaForColor(theme.rippleColor, 0.2));
                     scale.value = withSpring(scaleWhenPressed, springConfig);
@@ -34,6 +37,10 @@ function PressableWithEffect(props: PressableWithEffectProps) {
                     backgroundColor.value = withSpring(setAlphaForColor(theme.rippleColor, 0));
                     scale.value = withSpring(1, springConfig);
                     onPressOut?.(e);
+                }}
+                onPress={e => {
+                    if (defaultHaptic) vibratePreset("tap");
+                    onPress?.(e);
                 }}
                 {...rest}
             >

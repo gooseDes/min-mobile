@@ -4,6 +4,7 @@ import { messagesTable, usersTable } from "@/db/Schema";
 import { getSocket } from "@/Socket";
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { countChars, dateToString, getShadow } from "@/Utils";
+import HapticPressable from "@components/HapticPressable";
 import Icon from "@components/Icon";
 import { useTranslation } from "@contexts/TranslationContext";
 import FastImage from "@d11/react-native-fast-image";
@@ -13,7 +14,7 @@ import { setMessagePrefix } from "@services/InputControlService";
 import { setOverlayImage } from "@services/OverlayService";
 import { eq } from "drizzle-orm";
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { ImageStyle, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewProps } from "react-native";
+import { ImageStyle, Pressable, StyleSheet, Text, useWindowDimensions, View, ViewProps } from "react-native";
 import Markdown, { MarkedStyles, Renderer, RendererInterface } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
@@ -325,7 +326,7 @@ function MessageBase(props: MessageProps) {
                         </Text>
                     )}
                 </Animated.View>
-                <TouchableOpacity
+                <HapticPressable
                     style={styles.dropdownTrigger}
                     onPress={e => {
                         setDropdownOpen(true);

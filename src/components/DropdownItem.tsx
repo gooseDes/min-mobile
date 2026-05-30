@@ -1,8 +1,8 @@
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { setAlphaForColor } from "@/Utils";
-import { Pressable, StyleSheet, Text } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { StyleSheet, Text } from "react-native";
+import Animated from "react-native-reanimated";
 import Icon from "./Icon";
+import PressableWithEffect from "./PressableWithEffect";
 
 export interface DropdownItemProps {
     text?: string;
@@ -42,45 +42,19 @@ const createStyles = (theme: ThemeData) =>
 function DropdownItem(props: DropdownItemProps) {
     const { text, icon } = props;
 
-    const scale = useSharedValue(1);
-    const backgroundColor = useSharedValue("#ffffff00");
-
     const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
     const Styles = useAppStyles(createGlobalStyles);
 
-    const containerAnimatedStyle = useAnimatedStyle(() => {
-        return {
-            backgroundColor: backgroundColor.value,
-        };
-    });
-
-    const labelAnimatedStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ scale: scale.value }],
-        };
-    });
-
     return (
-        <Pressable
-            style={styles.touchable}
-            onPress={props.onClick}
-            onPressIn={() => {
-                scale.value = withSpring(0.8, { velocity: 2, damping: 50 });
-                backgroundColor.value = withSpring(setAlphaForColor(theme.rippleColor, 0.2));
-            }}
-            onPressOut={() => {
-                scale.value = withSpring(1, { velocity: 2, damping: 50 });
-                backgroundColor.value = withSpring(setAlphaForColor(theme.rippleColor, 0));
-            }}
-        >
-            <Animated.View style={[styles.container, containerAnimatedStyle]}>
-                <Animated.View style={[styles.labelContainer, labelAnimatedStyle]}>
+        <PressableWithEffect style={styles.touchable} onPress={props.onClick}>
+            <Animated.View style={styles.container}>
+                <Animated.View style={styles.labelContainer}>
                     {icon && <Icon color={theme.primaryTextColor} name={icon} size={styles.text.fontSize * 0.75} />}
                     {text && <Text style={[Styles.primaryText, styles.text]}>{text}</Text>}
                 </Animated.View>
             </Animated.View>
-        </Pressable>
+        </PressableWithEffect>
     );
 }
 

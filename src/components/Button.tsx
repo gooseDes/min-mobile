@@ -1,7 +1,8 @@
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { getShadow } from "@/Utils";
-import { GestureResponderEvent, Pressable, StyleSheet, Text, ViewProps } from "react-native";
+import { GestureResponderEvent, StyleSheet, Text, ViewProps } from "react-native";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import HapticPressable from "./HapticPressable";
 
 const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
@@ -38,9 +39,13 @@ function Button(props: ButtonProps) {
 
     return (
         <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} {...rest}>
-            <Pressable style={styles.button} onPress={onPress} android_ripple={{ color: theme.rippleColor, foreground: true }}>
+            <HapticPressable
+                style={styles.button}
+                onPress={onPress}
+                android_ripple={{ color: theme.rippleColor, foreground: true }}
+            >
                 <Text style={[Styles.primaryText, styles.text]}>{text || "Button"}</Text>
-            </Pressable>
+            </HapticPressable>
         </Animated.View>
     );
 }

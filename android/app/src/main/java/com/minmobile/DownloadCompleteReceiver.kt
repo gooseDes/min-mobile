@@ -22,28 +22,30 @@ class DownloadCompleteReceiver : BroadcastReceiver() {
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val apkUri = manager.getUriForDownloadedFile(downloadId) ?: return
 
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(apkUri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val installIntent =
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(apkUri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
 
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            installIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        0,
+                        installIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
 
         val channelId = "minmobile_update_channel"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "MinMobile Updates",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notifications about app updates"
-            }
+            val channel =
+                    NotificationChannel(
+                                    channelId,
+                                    "MinMobile Updates",
+                                    NotificationManager.IMPORTANCE_HIGH
+                            )
+                            .apply { description = "Notifications about app updates" }
             val nm = context.getSystemService(NotificationManager::class.java)
             nm.createNotificationChannel(channel)
         }
@@ -52,15 +54,16 @@ class DownloadCompleteReceiver : BroadcastReceiver() {
         val title = prefs.getString("notif_title", "Update downloaded") ?: "Update downloaded"
         val body = prefs.getString("notif_body", "Tap to install") ?: "Tap to install"
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setFullScreenIntent(pendingIntent, true)
-            .build()
+        val notification =
+                NotificationCompat.Builder(context, channelId)
+                        .setContentTitle(title)
+                        .setContentText(body)
+                        .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setFullScreenIntent(pendingIntent, true)
+                        .build()
 
         NotificationManagerCompat.from(context).notify(1001, notification)
     }

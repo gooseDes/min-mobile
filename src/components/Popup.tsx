@@ -1,4 +1,5 @@
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -83,6 +84,7 @@ const Popup = forwardRef<PopupHandler, PopupProps>((props, ref) => {
                 shadowColor.value = withSpring(visible ? theme.shadowColor : "rgba(0, 0, 0, 0)");
             }
         });
+        vibrateEffectPreset(visible ? "quick_fall" : "quick_rise");
     }, [visible]);
 
     const opacity = useSharedValue<number>(1);

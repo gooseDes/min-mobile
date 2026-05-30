@@ -26,6 +26,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { messageInputRef } from "@services/InputControlService";
 import { navigate } from "@services/NavigationService";
 import { showPopup } from "@services/PopupService";
+import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
@@ -306,6 +307,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                             sentAt: timestampToDate(message.sent_at),
                         }),
                     );
+                    vibrateEffectPreset("quick_fall");
                     db.insert(messagesTable)
                         .values({
                             id: message.id,
