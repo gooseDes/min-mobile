@@ -11,12 +11,13 @@
         "generate_sql": "drizzle-kit generate",
         "assets": "npx react-native-asset",
         "release": "git push origin main:release -f",
-        "apk": "export $(grep -v '^#' .env | xargs -d '\n') && cd android && ./gradlew assembleRelease && adb install ./app/build/outputs/apk/release/app-release.apk && cd .."
+        "apk": "export $(grep -v '^#' .env | xargs -d '\n') && cd android && ./gradlew assembleRelease && adb install ./app/build/outputs/apk/release/app-release.apk && cd ..",
+        "update_api": "npm i github:gooseDes/min-node-api-client#build --prefer-online"
     },
     "dependencies": {
-        "@min/api-client": "github:gooseDes/min-node-api-client",
         "@d11/react-native-fast-image": "^8.13.0",
         "@danielsaraldi/react-native-blur-view": "^2.3.2",
+        "@min/api-client": "github:gooseDes/min-node-api-client#build",
         "@notifee/react-native": "^9.1.8",
         "@op-engineering/op-sqlite": "^15.2.2",
         "@react-native-camera-roll/camera-roll": "^7.10.2",
