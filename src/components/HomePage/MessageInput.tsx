@@ -1,5 +1,6 @@
 import Auth from "@/Auth";
 import { chatBlurTargetRef } from "@/GlobalRefs";
+import { apiClient } from "@/Socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { getShadow, setAlphaForColor } from "@/Utils";
 import Icon from "@components/Icon";
@@ -96,26 +97,17 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
         if (!result.assets) return;
         const asset = result.assets[0];
         if (asset.uri && asset.fileName && asset.type) {
-            const response = await fetch(`${SERVER}/attach`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${await Auth.getFromStorage("token")}`,
-                },
-                body: (() => {
-                    const formData = new FormData();
-                    formData.append("attachments", { uri: asset.uri, name: asset.fileName, type: asset.type });
-                    return formData;
-                })(),
+            const response = await apiClient.attachImage(await Auth.getFromStorage("token"), {
+                uri: asset.uri,
+                name: asset.fileName,
+                type: asset.type,
             });
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success) {
-                    setValue(
-                        value + value ? " " : "" + data.urls.map((att: string) => `![attachment](${SERVER}${att})`).join("\n"),
-                    );
-                } else {
-                    showPopup("Error", data.msg);
-                }
+            if (response.success) {
+                setValue(
+                    value + value ? " " : "" + response.urls.map((att: string) => `![attachment](${SERVER}${att})`).join("\n"),
+                );
+            } else {
+                showPopup("Error", response.message);
             }
         }
     }

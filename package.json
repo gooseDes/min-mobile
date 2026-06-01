@@ -95,5 +95,10 @@
                 }
             ]
         }
+    },
+    "allowScripts": {
+        "@firebase/util@1.13.0": true,
+        "esbuild@0.25.0": true,
+        "protobufjs@7.5.8": true
     }
 }
