@@ -1,4 +1,5 @@
 import Auth from "@/Auth";
+import { apiClient } from "@/Socket";
 import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { getShadow } from "@/Utils";
@@ -10,6 +11,7 @@ import { useTranslation } from "@contexts/TranslationContext";
 import { SERVER } from "@env";
 import { goBack, navigate } from "@services/NavigationService";
 import { setOverlay } from "@services/OverlayService";
+import { showPopup } from "@services/PopupService";
 import { useEffect, useState } from "react";
 import { BackHandler, StyleSheet, Text, View } from "react-native";
 import { Asset, launchImageLibrary } from "react-native-image-picker";
@@ -150,31 +152,22 @@ function ProfilePage() {
         (async () => {
             if (!isEditMode && avatarPreview) {
                 setOverlay("loading");
-                fetch(`${SERVER}/upload-avatar`, {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${await Auth.getFromStorage("token")}`,
-                    },
-                    body: (() => {
-                        const formData = new FormData();
-                        formData.append("avatar", {
-                            uri: avatarPreview.uri,
-                            name: avatarPreview.fileName,
-                            type: avatarPreview.type,
-                        });
-                        return formData;
-                    })(),
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        setOverlay("none");
-                        Storage.set("avatar", data.avatar);
-                        setAvatarPreview(undefined);
-                        setAvatar(`${SERVER}${data.url}`);
-                    });
+                if (!avatarPreview.uri || !avatarPreview.fileName || !avatarPreview.type) return;
+                const response = await apiClient.uploadAvatar(await Auth.getFromStorage("token"), {
+                    uri: avatarPreview.uri,
+                    name: avatarPreview.fileName,
+                    type: avatarPreview.type,
+                });
+                if (response.success) {
+                    setAvatar(`${SERVER}${response.url}`);
+                    Storage.set("avatar", response.avatar);
+                } else {
+                    showPopup("Error", response.message);
+                }
+                setOverlay("none");
             }
         })();
-    }, [isEditMode]);
+    }, [isEditMode, avatarPreview]);
 
     async function logOut() {
         await Auth.clearStorage();
