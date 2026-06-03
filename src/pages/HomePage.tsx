@@ -22,6 +22,7 @@ import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { BlurTarget } from "@danielsaraldi/react-native-blur-view";
 import { SERVER } from "@env";
+import { getMessaging, getToken } from "@react-native-firebase/messaging";
 import { useFocusEffect } from "@react-navigation/native";
 import { messageInputRef } from "@services/InputControlService";
 import { navigate } from "@services/NavigationService";
@@ -282,8 +283,16 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
         async function initSocket() {
             const socket = await getSocket();
-            socket.on("connect", () => {
+            socket.on("connect", async () => {
                 console.log("Connected to server");
+
+                const messaging = getMessaging();
+
+                // Get Firebase token
+                const token = await getToken(messaging);
+
+                // Send Firebase token to server
+                socket.emit("addFcmToken", { token });
             });
             socket.on("connect_error", err => {
                 if (err.message.includes("Invalid token")) {

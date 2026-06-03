@@ -14,6 +14,7 @@ module.exports = {
                     "@specs": "./src/specs",
                     "@contexts": "./src/contexts",
                     "@": "./src",
+                    "@index": "./index.js",
                 },
             },
         ],

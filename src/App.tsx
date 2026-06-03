@@ -7,14 +7,14 @@ import PressableOverlay from "@components/PressableOverlay";
 import { TranslationProvider } from "@contexts/TranslationContext";
 import migrations from "@drizzle/migrations";
 import { SERVER } from "@env";
-import notifee from "@notifee/react-native";
+import { setActiveBackgroundHandler } from "@index";
+import notifee, { AndroidCategory, AndroidImportance, AndroidStyle } from "@notifee/react-native";
 import ProfilePage from "@pages/ProfilePage";
 import SettingsPage from "@pages/SettingsPage";
 import {
     AuthorizationStatus,
     FirebaseMessagingTypes,
     getMessaging,
-    getToken,
     onMessage,
     requestPermission,
 } from "@react-native-firebase/messaging";
@@ -80,20 +80,46 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
 
         // Send Firebase token to server
         if (enabled) {
-            sendFirebaseToken(messaging);
+            initializeFirebase();
         }
-
-        // Request user permission for Notifee notifications
-        await notifee.requestPermission();
     }
 
-    const sendFirebaseToken = async (messaging: FirebaseMessagingTypes.Module) => {
-        // Get Firebase token
-        const token = await getToken(messaging);
+    const initializeFirebase = async () => {
+        setActiveBackgroundHandler(async (remoteMessage: any) => {
+            if (!remoteMessage.data) return;
+            const data = CreateRemoteMessagePayload(remoteMessage.data);
 
-        // Send Firebase token to server
-        const socket = await getSocket();
-        socket.emit("addFcmToken", { token });
+            await notifee.displayNotification({
+                android: {
+                    smallIcon: "ic_notification",
+                    channelId: "min",
+                    largeIcon: `${SERVER}/avatars/${data.authorAvatar}.webp`,
+                    importance: AndroidImportance.HIGH,
+                    category: AndroidCategory.MESSAGE,
+                    showTimestamp: true,
+
+                    style: {
+                        type: AndroidStyle.MESSAGING,
+                        person: {
+                            name: "me",
+                        },
+                        messages: [
+                            {
+                                text: data.text,
+                                timestamp: data.sentAt * 1000,
+                                person: {
+                                    name: data.authorName,
+                                    icon: `${SERVER}/avatars/${data.authorAvatar}.webp`,
+                                },
+                            },
+                        ],
+                    },
+                    pressAction: {
+                        id: "default",
+                    },
+                },
+            });
+        });
     };
 
     useEffect(() => {
