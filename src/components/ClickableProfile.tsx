@@ -79,7 +79,7 @@ function ClickableProfile(props: ClickableProfileProps) {
         <Animated.View entering={ZoomIn} exiting={ZoomOut}>
             <Animated.View style={[animatedStyle, rest.style]}>
                 <PressableWithEffect
-                    scaleWhenPressed={0.9}
+                    scaleWhenPressed={1}
                     onPress={onPress}
                     style={{ borderRadius: theme.rounding, flex: 1, padding: 8 }}
                 >

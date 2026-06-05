@@ -118,7 +118,7 @@ export const createGlobalStyles = (theme: ThemeData) =>
             alignItems: "center",
             flex: 1,
             paddingHorizontal: 10,
-            paddingVertical: 6,
+            paddingVertical: 4,
         },
         primaryText: {
             color: theme.primaryTextColor,

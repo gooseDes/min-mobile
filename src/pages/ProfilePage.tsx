@@ -25,6 +25,7 @@ const createStyles = (theme: ThemeData) =>
             borderColor: theme.borderColor,
             borderWidth: theme.borderWidth,
             borderRadius: theme.rounding,
+            boxShadow: getShadow(theme),
             padding: 10,
             margin: 10,
             display: "flex",

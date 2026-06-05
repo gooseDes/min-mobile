@@ -75,7 +75,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
         const showAvatar = prevMessage ? prevMessage.sender.id !== message.sender.id : true;
 
         return (
-            <Animated.View entering={FadeIn} exiting={FadeOut}>
+            <Animated.View style={{ paddingHorizontal: 5 }} entering={FadeIn} exiting={FadeOut}>
                 <Message
                     author_name={message.sender.username}
                     author_id={message.sender.id}

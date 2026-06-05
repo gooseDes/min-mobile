@@ -3,7 +3,7 @@ import ClickableProfile from "@components/ClickableProfile";
 import { SERVER } from "@env";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
-import Animated, { FadeOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
     chatsContainer: {
@@ -54,21 +54,23 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
 
     const renderChat = ({ item: chat, index }: { item: ChatData; index: number }) => {
         return (
-            <ClickableProfile
-                text={chat.title}
-                image={`${SERVER}/avatars/${
-                    chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
-                }.webp`}
-                anim={index % 2 === 0 ? "left" : "right"}
-                shown={animProgress >= index}
-                onPress={() => {
-                    if (handler) {
-                        handler(chat);
-                    } else {
-                        Alert.alert(index.toString());
-                    }
-                }}
-            />
+            <Animated.View style={{ paddingHorizontal: 5 }} entering={FadeIn} exiting={FadeOut}>
+                <ClickableProfile
+                    text={chat.title}
+                    image={`${SERVER}/avatars/${
+                        chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
+                    }.webp`}
+                    anim={index % 2 === 0 ? "left" : "right"}
+                    shown={animProgress >= index}
+                    onPress={() => {
+                        if (handler) {
+                            handler(chat);
+                        } else {
+                            Alert.alert(index.toString());
+                        }
+                    }}
+                />
+            </Animated.View>
         );
     };
 

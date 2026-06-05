@@ -120,6 +120,7 @@ const Popup = forwardRef<PopupHandler, PopupProps>((props, ref) => {
                         <PressableWithEffect
                             key={index}
                             style={styles.pressable}
+                            defaultHaptic={false}
                             onPress={() => {
                                 button.onPress?.();
                                 setVisible(false);

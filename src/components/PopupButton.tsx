@@ -1,4 +1,4 @@
-import { ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { getShadow } from "@/Utils";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Keyboard, StyleSheet, TouchableOpacity, TouchableOpacityProps, useWindowDimensions } from "react-native";
@@ -21,6 +21,7 @@ const createStyles = (theme: ThemeData) =>
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            boxShadow: getShadow(theme),
         },
         content: {
             position: "absolute",
@@ -54,6 +55,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
     const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
     const { right: rightProp, bottom: bottomProp, children, icon, iconSize, style, ...rest } = props;
     const theme = useThemeStore(s => s.theme);
+    const Styles = useAppStyles(createGlobalStyles);
     const styles = useAppStyles(createStyles);
 
     useImperativeHandle(
@@ -70,13 +72,11 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
     const width = useSharedValue(100);
     const height = useSharedValue(100);
     const borderRadius = useSharedValue(50);
-    const boxShadow = useSharedValue(getShadow(theme));
     const backgroundColor = useSharedValue(theme.backgroundPanelColor);
     const animatedContentStyle = useAnimatedStyle(() => ({
         width: withSpring(width.value),
         height: withSpring(height.value),
         borderRadius: withSpring(borderRadius.value),
-        boxShadow: withSpring(boxShadow.value),
         backgroundColor: withSpring(backgroundColor.value),
     }));
 
@@ -101,11 +101,12 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
 
     // Update styles
     useEffect(() => {
-        const screenWidth = entireScreenWidth - insets.left - insets.right;
-        const screenHeight = entireScreenHeight - insets.top - insets.bottom - keyboardHeight;
+        const screenWidth = entireScreenWidth - insets.left - insets.right - Styles.container.paddingHorizontal * 2;
+        const screenHeight =
+            entireScreenHeight - insets.top - insets.bottom - Styles.container.paddingVertical * 2 - keyboardHeight;
         if (isOpened) {
-            width.value = screenWidth - 18;
-            height.value = screenHeight - 30;
+            width.value = screenWidth;
+            height.value = screenHeight;
             borderRadius.value = theme.rounding;
             backgroundColor.value = theme.backgroundPanelColorOpaque;
             right.value = -3;

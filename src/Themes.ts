@@ -1,17 +1,16 @@
 import { Appearance } from "react-native";
 import MaterialYou from "react-native-material-you-colors";
 import { ThemeData } from "./Style";
-import { setAlphaForColor } from "./Utils";
 
 export const midnightTheme: ThemeData = {
     name: "midnight",
     isDark: true,
     backgroundColor: "#131317",
-    backgroundPanelColor: "#1f1f23dd",
+    backgroundPanelColor: "#1f1f23",
     backgroundPanelColorOpaque: "#1e1e20",
     borderColor: "#2d2d32dd",
     dividerColor: "#2d2d32dd",
-    messageBackgroundColor: "#1f1f23c2",
+    messageBackgroundColor: "#1f1e23",
     primaryTextColor: "#ffffff",
     secondaryTextColor: "#aaaaaa",
     rippleColor: "#ffffffaa",
@@ -30,7 +29,7 @@ export const OneishLightTheme: ThemeData = {
     name: "oneish-light",
     isDark: false,
     backgroundColor: "#f2f1f7",
-    backgroundPanelColor: "#fcfbffdd",
+    backgroundPanelColor: "#fcfbff",
     backgroundPanelColorOpaque: "#fcfbff",
     borderColor: "#f2f1f7",
     dividerColor: "#d9d9db",
@@ -81,7 +80,7 @@ export function generateAdaptiveTheme(): ThemeData {
         name: "adaptive",
         isDark: isDark,
         backgroundColor: palette.system_neutral1[isDark ? 11 : 1],
-        backgroundPanelColor: setAlphaForColor(palette.system_neutral1[isDark ? 10 : 2], 0.9),
+        backgroundPanelColor: palette.system_neutral1[isDark ? 10 : 2],
         backgroundPanelColorOpaque: palette.system_neutral1[isDark ? 10 : 2],
         borderColor: "transparent",
         dividerColor: palette.system_accent1[isDark ? 9 : 3],
@@ -92,11 +91,11 @@ export function generateAdaptiveTheme(): ThemeData {
         rounding: 16,
         borderWidth: 2,
         fontFamily: "Rubik",
-        shadowColor: setAlphaForColor(palette.system_accent1[isDark ? 9 : 3], 0.8),
+        shadowColor: palette.system_accent1[isDark ? 9 : 3],
         shadowOffsetX: 0,
-        shadowOffsetY: 4,
+        shadowOffsetY: 0,
         shadowBlur: 4,
-        shadowSpread: 0,
+        shadowSpread: 1,
         shadowInset: false,
     };
 }

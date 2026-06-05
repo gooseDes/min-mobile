@@ -1,13 +1,11 @@
 import Auth from "@/Auth";
-import { chatBlurTargetRef } from "@/GlobalRefs";
 import { apiClient } from "@/Socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { getShadow, setAlphaForColor } from "@/Utils";
+import { getShadow } from "@/Utils";
 import Icon from "@components/Icon";
 import PressableWithEffect from "@components/PressableWithEffect";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
-import { BlurView } from "@danielsaraldi/react-native-blur-view";
 import { SERVER } from "@env";
 import { showPopup } from "@services/PopupService";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -25,7 +23,7 @@ const createStyles = (theme: ThemeData) =>
             borderWidth: theme.borderWidth,
             borderColor: theme.borderColor,
             borderRadius: theme.rounding,
-            backgroundColor: theme.backgroundPanelColor,
+            backgroundColor: theme.messageBackgroundColor,
             overflow: "hidden",
             boxShadow: getShadow(theme),
         },
@@ -120,49 +118,43 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
             layout={Constants.layoutTransition}
         >
             <Animated.View style={[styles.container, { height: hasPrefix ? 70 : 50, transition: "height 0.3s ease-in-out" }]}>
-                <BlurView
-                    style={StyleSheet.absoluteFill}
-                    blurTarget={chatBlurTargetRef}
-                    androidColor={setAlphaForColor(theme.messageBackgroundColor, 0.5)}
-                >
-                    <View style={StyleSheet.absoluteFill}>
-                        {hasPrefix && (
-                            <Animated.View
-                                entering={ZoomIn}
-                                exiting={ZoomOut}
-                                style={[styles.horizontalRow, { height: 20, gap: 4, paddingHorizontal: 12 }]}
+                <View style={StyleSheet.absoluteFill}>
+                    {hasPrefix && (
+                        <Animated.View
+                            entering={ZoomIn}
+                            exiting={ZoomOut}
+                            style={[styles.horizontalRow, { height: 20, gap: 4, paddingHorizontal: 12 }]}
+                        >
+                            <Icon name="reply" size={12} color={theme.secondaryTextColor} />
+                            <Text style={[Styles.secondaryText, { fontSize: 14 }]}>{t.replying_to}</Text>
+                            <Pressable
+                                style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }}
+                                android_ripple={{ color: theme.rippleColor }}
+                                onPress={() => {
+                                    setPrefix("");
+                                }}
                             >
-                                <Icon name="reply" size={12} color={theme.secondaryTextColor} />
-                                <Text style={[Styles.secondaryText, { fontSize: 14 }]}>{t.replying_to}</Text>
-                                <Pressable
-                                    style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }}
-                                    android_ripple={{ color: theme.rippleColor }}
-                                    onPress={() => {
-                                        setPrefix("");
-                                    }}
-                                >
-                                    <Icon name="x" size={12} color={theme.secondaryTextColor} />
-                                </Pressable>
-                            </Animated.View>
-                        )}
-                        <View style={[styles.horizontalRow, { flex: 1 }]}>
-                            <PressableWithEffect style={styles.button} onPress={attach}>
-                                <Icon name="paperclip" size={24} color={theme.secondaryTextColor} />
-                            </PressableWithEffect>
-                            <TextInput
-                                style={[styles.input, Styles.primaryText]}
-                                placeholder={t.your_message}
-                                placeholderTextColor={theme.secondaryTextColor}
-                                multiline={true}
-                                onChangeText={onChangeText}
-                                value={value}
-                            />
-                            <PressableWithEffect defaultHaptic={false} style={styles.button} onPress={send}>
-                                <Icon name="paper-plane" size={24} color={theme.secondaryTextColor} />
-                            </PressableWithEffect>
-                        </View>
+                                <Icon name="x" size={12} color={theme.secondaryTextColor} />
+                            </Pressable>
+                        </Animated.View>
+                    )}
+                    <View style={[styles.horizontalRow, { flex: 1 }]}>
+                        <PressableWithEffect style={styles.button} onPress={attach}>
+                            <Icon name="paperclip" size={24} color={theme.secondaryTextColor} />
+                        </PressableWithEffect>
+                        <TextInput
+                            style={[styles.input, Styles.primaryText]}
+                            placeholder={t.your_message}
+                            placeholderTextColor={theme.secondaryTextColor}
+                            multiline={true}
+                            onChangeText={onChangeText}
+                            value={value}
+                        />
+                        <PressableWithEffect defaultHaptic={false} style={styles.button} onPress={send}>
+                            <Icon name="paper-plane" size={24} color={theme.secondaryTextColor} />
+                        </PressableWithEffect>
                     </View>
-                </BlurView>
+                </View>
             </Animated.View>
         </SurelyAnimatedView>
     );

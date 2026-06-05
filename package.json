@@ -16,7 +16,6 @@
     },
     "dependencies": {
         "@d11/react-native-fast-image": "^8.13.0",
-        "@danielsaraldi/react-native-blur-view": "^2.3.2",
         "@min/api-client": "github:gooseDes/min-node-api-client#build",
         "@notifee/react-native": "^9.1.8",
         "@op-engineering/op-sqlite": "^15.2.2",
