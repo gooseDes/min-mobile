@@ -1,7 +1,7 @@
 import Auth from "@/Auth";
 import db from "@/db/Client";
 import { messagesTable, usersTable } from "@/db/Schema";
-import { getSocket } from "@/Socket";
+import { apiClient } from "@/Socket";
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { countChars, dateToString, getShadow } from "@/Utils";
 import HapticPressable from "@components/HapticPressable";
@@ -208,21 +208,26 @@ function MessageBase(props: MessageProps) {
 
     async function getReplyText() {
         const replyId = parseInt(textStr.split("\n")[0].split(" ")[1], 10);
-        const socket = await getSocket();
-        socket.on("requestedMessage", (msgData: any) => {
-            socket.on("userInfo", (userData: any) => {
-                setReplyText(`${userData.user.name}: ${msgData.message.content}`);
-                socket.off("userInfo");
-            });
-            socket.emit("getUserInfo", { msg_id: msgData.message.sender_id });
-            socket.off("requestedMessage");
-        });
+        apiClient.socket.subscribe(
+            "requestedMessage",
+            (msgData: any) => {
+                apiClient.socket.subscribe(
+                    "userInfo",
+                    (userData: any) => {
+                        setReplyText(`${userData.user.name}: ${msgData.message.content}`);
+                    },
+                    { once: true },
+                );
+                apiClient.socket.emit("getUserInfo", { msg_id: msgData.message.sender_id });
+            },
+            { once: true },
+        );
         const replyMessage = await db.query.messagesTable.findFirst({ where: eq(messagesTable.id, replyId) });
         if (replyMessage) {
             const sender = await db.query.usersTable.findFirst({ where: eq(usersTable.id, replyMessage.senderId) });
             setReplyText(`${sender?.username || replyMessage.senderId}: ${withoutCommand(replyMessage.content || "")}`);
         } else {
-            socket.emit("getMessage", { messageId: replyId });
+            apiClient.socket.emit("getMessage", { messageId: replyId });
         }
     }
 
@@ -248,8 +253,7 @@ function MessageBase(props: MessageProps) {
     }));
 
     async function deleteMessage() {
-        const socket = await getSocket();
-        socket.emit("deleteMessage", { message: msg_id });
+        apiClient.socket.emit("deleteMessage", { message: msg_id });
     }
 
     function calculateMargin(md: string) {

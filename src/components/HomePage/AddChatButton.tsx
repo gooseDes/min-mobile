@@ -1,4 +1,4 @@
-import { getSocket } from "@/Socket";
+import { apiClient } from "@/Socket";
 import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
@@ -35,18 +35,20 @@ function AddChatButton() {
 
     async function createChat() {
         Keyboard.dismiss();
-        const socket = await getSocket();
-        socket.on("createChatResult", data => {
-            if (data.success) {
-                setUsername("");
-                popupRef.current?.close();
-                socket.emit("getChats", {});
-            } else {
-                showNotification("Failed to create chat", data.msg);
-            }
-            socket.off("createChatResult");
-        });
-        socket.emit("createChat", { nickname: username.trim().replace("@", "") });
+        apiClient.socket.subscribe(
+            "createChatResult",
+            data => {
+                if (data.success) {
+                    setUsername("");
+                    popupRef.current?.close();
+                    apiClient.socket.emit("getChats", {});
+                } else {
+                    showNotification("Failed to create chat", data.msg);
+                }
+            },
+            { once: true },
+        );
+        apiClient.socket.emit("createChat", { nickname: username.trim().replace("@", "") });
     }
 
     return (

@@ -1,6 +1,6 @@
 import db from "@/db/Client";
 import { usersTable } from "@/db/Schema";
-import { getSocket } from "@/Socket";
+import { apiClient } from "@/Socket";
 import { Constants, createGlobalStyles, useAppStyles } from "@/Style";
 import { CreateUserData } from "@/Utils";
 import { SERVER } from "@env";
@@ -45,12 +45,14 @@ function Profile(props: ProfileProps) {
             setUser(CreateUserData(userData[0]));
 
             // Get user info from socket
-            const socket = await getSocket();
-            socket.on("userInfo", data => {
-                setUser(CreateUserData({ id: data.user?.id, username: data.user?.name, avatar: data.user?.avatar }));
-                socket.off("userInfo");
-            });
-            socket.emit("getUserInfo", { id: props.id });
+            apiClient.socket.subscribe(
+                "userInfo",
+                data => {
+                    setUser(CreateUserData({ id: data.user?.id, username: data.user?.name, avatar: data.user?.avatar }));
+                },
+                { once: true },
+            );
+            apiClient.socket.emit("getUserInfo", { id: props.id });
         }
         fetchUser();
     }, [props.id]);

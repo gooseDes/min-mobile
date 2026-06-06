@@ -1,5 +1,5 @@
 import * as Keychain from "react-native-keychain";
-import { apiClient, resetSocket } from "./Socket";
+import { apiClient, initSocket } from "./Socket";
 import Storage from "./Storage";
 
 export type AuthResult =
@@ -38,7 +38,7 @@ export default class Auth {
             Storage.set("user.username", result.user.username);
             Auth.id = result.user.id;
             Auth.username = result.user.username;
-            resetSocket();
+            initSocket();
             return { success: true };
         } else {
             return { success: false, message: result.message };
@@ -56,7 +56,7 @@ export default class Auth {
             Storage.set("user.username", login);
             Auth.id = result.user.id;
             Auth.username = login;
-            resetSocket();
+            initSocket();
             return { success: true };
         } else {
             return { success: false, message: result.message };

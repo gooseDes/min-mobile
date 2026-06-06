@@ -38,7 +38,7 @@ import Auth from "./Auth";
 import db from "./db/Client";
 import HomePage, { HomePageHandler } from "./pages/HomePage";
 import SignPage from "./pages/SignPage";
-import { getSocket } from "./Socket";
+import { apiClient, initSocket } from "./Socket";
 import Storage from "./Storage";
 import { ThemeData, useThemeStore } from "./Style";
 import { generateAdaptiveTheme } from "./Themes";
@@ -63,6 +63,7 @@ export interface AppProps {}
 
 const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
     const homePageRef = useRef<HomePageHandler | null>(null);
+    const [canContinue, setCanContinue] = useState<boolean>(false);
     const [isContentBlurred, setIsContentBlurred] = useState<boolean>(false);
     const systemColorScheme = useColorScheme();
     const { theme, setTheme } = useThemeStore();
@@ -148,6 +149,19 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
 
         Auth.init();
         Translation.init();
+        initSocket().then(() => {
+            setCanContinue(true);
+            apiClient.socket.subscribe(
+                "userInfo",
+                data => {
+                    if (data.user.id === Auth.id) {
+                        Storage.set("avatar", data.user.avatar);
+                    }
+                },
+                { once: true },
+            );
+            apiClient.socket.emit("getUserInfo", { id: Auth.id });
+        });
         migrateDatabaseAndLoadDefaultPage();
 
         const messaging = getMessaging();
@@ -163,16 +177,6 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             if (homePageRef.current?.getCurrentChat().id !== data.chatId || homePageRef.current?.getCurrentTab() !== "chat") {
                 notificationRef.current?.show();
             }
-        });
-
-        getSocket().then(socket => {
-            socket.on("userInfo", data => {
-                if (data.user.id === Auth.id) {
-                    Storage.set("avatar", data.user.avatar);
-                }
-                socket.off("userInfo");
-            });
-            socket.emit("getUserInfo", { id: Auth.id });
         });
 
         const updateListener = UpdateModule.addListener("onDownloadProgress", data => {
@@ -205,6 +209,8 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             });
         }
     }, [systemColorScheme]);
+
+    if (!canContinue) return null;
 
     return (
         <TranslationProvider>

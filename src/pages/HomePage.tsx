@@ -2,7 +2,7 @@ import Auth from "@/Auth";
 import db from "@/db/Client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Schema";
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/Utils";
-import { getSocket } from "@/Socket";
+import { apiClient } from "@/Socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import Translation from "@/Translation";
 import { CreateChat, CreateMessage, getShadow, timestampToDate } from "@/Utils";
@@ -197,29 +197,31 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             });
 
         // Initialize messages from socket
-        const socket = await getSocket();
-        socket.on("history", async data => {
-            if (data.messages.length > 0) {
-                const lastMessage = await db.query.messagesTable.findFirst({
-                    where: eq(messagesTable.chatId, currentChat?.id || 0),
-                    orderBy: (messages, { desc }) => [desc(messages.id)],
-                });
-                const lastSocketMessage = data.messages.findIndex((msg: any) => msg.id === lastMessage?.id);
-                const diff = data.messages.length - ((lastSocketMessage || 0) + 1);
-                if (lastSocketMessage !== -1) {
-                    messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
-                    messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
+        apiClient.socket.subscribe(
+            "history",
+            async data => {
+                if (data.messages.length > 0) {
+                    const lastMessage = await db.query.messagesTable.findFirst({
+                        where: eq(messagesTable.chatId, currentChat?.id || 0),
+                        orderBy: (messages, { desc }) => [desc(messages.id)],
+                    });
+                    const lastSocketMessage = data.messages.findIndex((msg: any) => msg.id === lastMessage?.id);
+                    const diff = data.messages.length - ((lastSocketMessage || 0) + 1);
+                    if (lastSocketMessage !== -1) {
+                        messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
+                        messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
+                    } else {
+                        messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
+                        messagesRef.current?.show();
+                    }
                 } else {
                     messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
                     messagesRef.current?.show();
                 }
-            } else {
-                messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
-                messagesRef.current?.show();
-            }
-            socket.off("history");
-        });
-        socket.emit("getChatHistory", { chat: currentChat?.id || 1 });
+            },
+            { once: true },
+        );
+        apiClient.socket.emit("getChatHistory", { chat: currentChat?.id || 1 });
     }
 
     async function requestChats() {
@@ -247,9 +249,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             });
 
         // Initialize chats from socket
-        const socket = await getSocket();
-        socket.off("chats");
-        socket.on("chats", async data => {
+        apiClient.socket.subscribe("chats", async data => {
             // Clear db
             try {
                 await db.delete(chatsTable);
@@ -269,67 +269,62 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             } else {
                 chatsRef.current?.show();
             }
-            //socket.off("chats");
         });
-        socket.emit("getChats", {});
+        apiClient.socket.emit("getChats", {});
     }
 
     useEffect(() => {
         changeLanguage(Translation.getCurrentLanguage());
 
-        async function initSocket() {
-            const socket = await getSocket();
-            socket.on("connect", async () => {
-                console.log("Connected to server");
+        const connectSub = apiClient.socket.subscribe("connect", async () => {
+            console.log("Connected to server");
 
-                const messaging = getMessaging();
+            const messaging = getMessaging();
 
-                // Get Firebase token
-                const token = await getToken(messaging);
+            // Get Firebase token
+            const token = await getToken(messaging);
 
-                // Send Firebase token to server
-                socket.emit("addFcmToken", { token });
-            });
-            socket.on("connect_error", err => {
-                if (err.message.includes("Invalid token")) {
-                    showPopup(t.relogin, t.relogin_msg, [{ text: t.ok, onPress: () => navigate("Sign") }]);
-                } else {
-                    console.log("Connection Error:", err);
-                }
-            });
-            socket.on("error", data => {
-                if (data.hidden) return;
-                console.error(data);
-            });
-            socket.on("message", (message: any) => {
-                if (message.chat && parseInt(message.chat, 10) === currentChatRef.current?.id) {
-                    messagesRef.current?.addMessage(
-                        CreateMessage({
-                            id: message.id,
-                            text: message.text,
-                            sender: { id: message.author_id, username: message.author, avatar: message.author_avatar },
-                            chatId: message.chat,
-                            sentAt: timestampToDate(message.sent_at),
-                        }),
-                    );
-                    vibrateEffectPreset("quick_fall");
-                    db.insert(messagesTable)
-                        .values({
-                            id: message.id,
-                            content: message.text,
-                            senderId: message.author_id,
-                            chatId: message.chat,
-                            sentAt: timestampToDate(message.sent_at),
-                        })
-                        .run();
-                }
-            });
-            socket.on("deleteMessage", (data: any) => {
-                messagesRef.current?.deleteMessage(data.message);
-                db.delete(messagesTable).where(eq(messagesTable.id, data.message)).run();
-            });
-        }
-        initSocket();
+            // Send Firebase token to server
+            apiClient.socket.emit("addFcmToken", { token });
+        });
+        const connectErrorSub = apiClient.socket.subscribe("connect_error", err => {
+            if (err.message.includes("Invalid token")) {
+                showPopup(t.relogin, t.relogin_msg, [{ text: t.ok, onPress: () => navigate("Sign") }]);
+            } else {
+                console.log("Connection Error:", err);
+            }
+        });
+        const errorSub = apiClient.socket.subscribe("error", data => {
+            if (data.hidden) return;
+            console.error(data);
+        });
+        const messageSub = apiClient.socket.subscribe("message", (message: any) => {
+            if (message.chat && parseInt(message.chat, 10) === currentChatRef.current?.id) {
+                messagesRef.current?.addMessage(
+                    CreateMessage({
+                        id: message.id,
+                        text: message.text,
+                        sender: { id: message.author_id, username: message.author, avatar: message.author_avatar },
+                        chatId: message.chat,
+                        sentAt: timestampToDate(message.sent_at),
+                    }),
+                );
+                vibrateEffectPreset("quick_fall");
+                db.insert(messagesTable)
+                    .values({
+                        id: message.id,
+                        content: message.text,
+                        senderId: message.author_id,
+                        chatId: message.chat,
+                        sentAt: timestampToDate(message.sent_at),
+                    })
+                    .run();
+            }
+        });
+        const deleteMessageSub = apiClient.socket.subscribe("deleteMessage", (data: any) => {
+            messagesRef.current?.deleteMessage(data.message);
+            db.delete(messagesTable).where(eq(messagesTable.id, data.message)).run();
+        });
 
         // Handling keyboard height
         const showSubscription = Keyboard.addListener("keyboardDidShow", e => {
@@ -342,14 +337,11 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         return () => {
             showSubscription.remove();
             hideSubscription.remove();
-            async function uninitSocket() {
-                const socket = await getSocket();
-                socket.off("message");
-                socket.off("connect");
-                socket.off("connect_error");
-                socket.off("error");
-            }
-            uninitSocket();
+            connectSub.unsubscribe();
+            connectErrorSub.unsubscribe();
+            errorSub.unsubscribe();
+            messageSub.unsubscribe();
+            deleteMessageSub.unsubscribe();
         };
     }, []);
 
@@ -380,8 +372,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     async function sendMessage(message: string) {
         if (!currentChatRef.current) return;
         const chatId = currentChatRef.current.id;
-        const socket = await getSocket();
-        socket.emit("msg", { text: message, chat: chatId });
+        apiClient.socket.emit("msg", { text: message, chat: chatId });
     }
 
     function openProfile(id: number) {
