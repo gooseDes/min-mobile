@@ -3,6 +3,7 @@ import db from "@/db/Client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/Schema";
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/Utils";
 import { apiClient } from "@/Socket";
+import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import Translation from "@/Translation";
 import { CreateChat, CreateMessage, getShadow, timestampToDate } from "@/Utils";
@@ -249,27 +250,31 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             });
 
         // Initialize chats from socket
-        apiClient.socket.subscribe("chats", async data => {
-            // Clear db
-            try {
-                await db.delete(chatsTable);
-            } catch {}
-            try {
-                await db.delete(chatUsersTable);
-            } catch {}
-            try {
-                await db.delete(usersTable);
-            } catch {}
+        apiClient.socket.subscribe(
+            "chats",
+            async data => {
+                // Clear db
+                try {
+                    await db.delete(chatsTable);
+                } catch {}
+                try {
+                    await db.delete(chatUsersTable);
+                } catch {}
+                try {
+                    await db.delete(usersTable);
+                } catch {}
 
-            // Save chats to db, reformat and show them
-            const prevChats = chatsRef.current?.getChats();
-            chatsRef.current?.setChats(await ProcessChatsAndReturn(data));
-            if (prevChats?.length) {
-                chatsRef.current?.showWithoutAnimation();
-            } else {
-                chatsRef.current?.show();
-            }
-        });
+                // Save chats to db, reformat and show them
+                const prevChats = chatsRef.current?.getChats();
+                chatsRef.current?.setChats(await ProcessChatsAndReturn(data));
+                if (prevChats?.length) {
+                    chatsRef.current?.showWithoutAnimation();
+                } else {
+                    chatsRef.current?.show();
+                }
+            },
+            { once: true },
+        );
         apiClient.socket.emit("getChats", {});
     }
 
@@ -278,6 +283,9 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
         const connectSub = apiClient.socket.subscribe("connect", async () => {
             console.log("Connected to server");
+
+            apiClient.socket.subscribe("userInfo", (data: any) => Storage.set("avatar", data.user.avatar), { once: true });
+            apiClient.socket.emit("getUserInfo", { id: Auth.id });
 
             const messaging = getMessaging();
 
@@ -337,11 +345,11 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         return () => {
             showSubscription.remove();
             hideSubscription.remove();
-            connectSub.unsubscribe();
-            connectErrorSub.unsubscribe();
-            errorSub.unsubscribe();
-            messageSub.unsubscribe();
-            deleteMessageSub.unsubscribe();
+            connectSub.remove();
+            connectErrorSub.remove();
+            errorSub.remove();
+            messageSub.remove();
+            deleteMessageSub.remove();
         };
     }, []);
 

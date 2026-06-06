@@ -137,6 +137,8 @@ function ProfilePage() {
             return true;
         });
 
+        setAvatar(`${SERVER}/avatars/${Storage.getString("avatar")}.webp`);
+
         return () => listener.remove();
     }, []);
 
