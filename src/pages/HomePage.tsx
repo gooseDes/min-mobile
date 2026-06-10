@@ -28,7 +28,7 @@ import { showPopup } from "@services/PopupService";
 import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { eq } from "drizzle-orm";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, View, ViewStyle } from "react-native";
+import { BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, useWindowDimensions, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -51,12 +51,14 @@ const createStyles = (theme: ThemeData) =>
             padding: 0,
             flexDirection: "row",
             zIndex: 1,
+            margin: 0,
             boxShadow: getShadow(theme),
         },
         contentPanel: {
             flex: 1,
             overflow: "visible",
             padding: 0,
+            margin: 0,
         },
         sizedContainer: {
             display: "flex",
@@ -64,6 +66,7 @@ const createStyles = (theme: ThemeData) =>
             justifyContent: "center",
             alignItems: "center",
             overflow: "visible",
+            gap: 10,
         },
         container: {
             flex: 1,
@@ -94,8 +97,9 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const currentChatRef = useRef<ChatData | null>(null);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [profileId, setProfileId] = useState<number>(-1);
-    const [containerSize, setContainerSize] = useState<Size>({ width: 0, height: 0 });
-    const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: 0, height: 0 });
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+    const [containerSize, setContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
+    const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
     const [chatTabBottomGap, setChatTabBottomGap] = useState<number>(70);
     const lastBackButtonPress = useRef<number>(0);
     const { t, changeLanguage } = useTranslation();
@@ -409,7 +413,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     styles.sizedContainer,
                     {
                         left: insets.left + Styles.container.paddingHorizontal,
-                        top: insets.top, // Looks better without + Styles.container.paddingVertical, idk why
+                        top: insets.top + Styles.container.paddingVertical,
                         ...insideContainerSize,
                     },
                 ]}
