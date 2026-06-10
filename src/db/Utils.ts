@@ -1,54 +1,57 @@
-import { CreateChat, CreateMessage, CreateUserData, timestampToDate } from "@/Utils";
+import { CreateChat, CreateMessage, CreateUserData } from "@/Utils";
+import { FetchChatMessagesResult, FetchChatsResult } from "@min/api-client";
 import db from "./Client";
 import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./Schema";
 
-export function ProcessHistoryAndReturn(history_payload: any): Promise<MessageData[]> {
+export function ProcessHistoryAndReturn(history_payload: FetchChatMessagesResult): Promise<MessageData[]> {
+    if (!history_payload.success) return Promise.resolve([]);
+    const messages = history_payload.messages;
+
     return Promise.all(
-        history_payload.messages.slice().map(async (msg: any) => {
+        messages.slice().map(async msg => {
             await db
                 .insert(usersTable)
-                .values({
-                    id: msg.author_id,
-                    username: msg.author,
-                    avatar: msg.author_avatar,
-                })
+                .values(msg.sender)
                 .onConflictDoUpdate({
                     target: [usersTable.id],
                     set: {
-                        username: msg.author,
-                        avatar: msg.author_avatar,
+                        username: msg.sender.username,
+                        avatar: msg.sender.avatar,
                     },
                 });
             await db
                 .insert(messagesTable)
                 .values({
                     id: msg.id,
-                    content: msg.text,
-                    senderId: msg.author_id,
-                    chatId: msg.chat_id,
-                    sentAt: timestampToDate(msg.sent_at),
+                    content: msg.content,
+                    senderId: msg.sender.id,
+                    chatId: msg.chatId,
+                    sentAt: msg.sentAt,
                 })
                 .onConflictDoUpdate({
                     target: [messagesTable.id],
                     set: {
-                        content: msg.text,
-                        senderId: msg.author_id,
-                        chatId: msg.chat_id,
-                        sentAt: timestampToDate(msg.sent_at),
+                        content: msg.content,
+                        senderId: msg.sender.id,
+                        chatId: msg.chatId,
+                        sentAt: msg.sentAt,
                     },
                 });
             return CreateMessage({
                 id: msg.id,
-                text: msg.text,
-                sender: CreateUserData({ id: msg.author_id, username: msg.author, avatar: msg.author_avatar }),
-                chatId: msg.chat_id,
-                sentAt: timestampToDate(msg.sent_at),
+                text: msg.content,
+                sender: CreateUserData(msg.sender),
+                chatId: msg.chatId,
+                sentAt: msg.sentAt,
             });
         }),
     );
 }
 
-export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
+export function ProcessChatsAndReturn(chats_payload: FetchChatsResult): Promise<ChatData[]> {
+    if (!chats_payload.success) return Promise.resolve([]);
+    const chats = chats_payload.chats;
+
     const promises: Promise<any>[] = [];
 
     // Default chat
@@ -60,25 +63,21 @@ export function ProcessChatsAndReturn(chats_payload: any): Promise<ChatData[]> {
 
     // Saving chats to db
     promises.push(
-        ...chats_payload.chats.slice().map(async (chat: any) => {
+        ...chats.slice().map(async chat => {
             await db.insert(chatsTable).values({ id: chat.id, type: chatTypes.private, title: chat.name || "Unknown" });
             await Promise.all(
-                chat.participants.map(async (user: any) => {
+                chat.participants.map(async user => {
                     await db
                         .insert(usersTable)
-                        .values({ id: user.id, username: user.name, avatar: user.avatar })
-                        .onConflictDoUpdate({ target: usersTable.id, set: { username: user.name, avatar: user.avatar } });
+                        .values(user)
+                        .onConflictDoUpdate({ target: usersTable.id, set: { username: user.username, avatar: user.avatar } });
                     await db.insert(chatUsersTable).values({ chatId: chat.id, userId: user.id }).onConflictDoNothing();
                 }),
             );
             return CreateChat({
                 id: chat.id,
                 title: chat.name || "Unknown",
-                participants: chat.participants.map((user: any) => {
-                    user.username = user.name;
-                    delete user.name;
-                    return user;
-                }),
+                participants: chat.participants,
             });
         }),
     );

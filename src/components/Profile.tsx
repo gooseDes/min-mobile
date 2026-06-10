@@ -45,14 +45,11 @@ function Profile(props: ProfileProps) {
             setUser(CreateUserData(userData[0]));
 
             // Get user info from socket
-            apiClient.socket.subscribe(
-                "userInfo",
-                data => {
-                    setUser(CreateUserData({ id: data.user?.id, username: data.user?.name, avatar: data.user?.avatar }));
-                },
-                { once: true },
-            );
-            apiClient.socket.emit("getUserInfo", { id: props.id });
+            const userInfo = await apiClient.fetchUser({ id: props.id });
+            if (userInfo.success)
+                setUser(
+                    CreateUserData({ id: userInfo.user.id, username: userInfo.user.username, avatar: userInfo.user.avatar }),
+                );
         }
         fetchUser();
     }, [props.id]);

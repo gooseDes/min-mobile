@@ -208,26 +208,16 @@ function MessageBase(props: MessageProps) {
 
     async function getReplyText() {
         const replyId = parseInt(textStr.split("\n")[0].split(" ")[1], 10);
-        apiClient.socket.subscribe(
-            "requestedMessage",
-            (msgData: any) => {
-                apiClient.socket.subscribe(
-                    "userInfo",
-                    (userData: any) => {
-                        setReplyText(`${userData.user.name}: ${msgData.message.content}`);
-                    },
-                    { once: true },
-                );
-                apiClient.socket.emit("getUserInfo", { msg_id: msgData.message.sender_id });
-            },
-            { once: true },
-        );
         const replyMessage = await db.query.messagesTable.findFirst({ where: eq(messagesTable.id, replyId) });
         if (replyMessage) {
             const sender = await db.query.usersTable.findFirst({ where: eq(usersTable.id, replyMessage.senderId) });
             setReplyText(`${sender?.username || replyMessage.senderId}: ${withoutCommand(replyMessage.content || "")}`);
         } else {
-            apiClient.socket.emit("getMessage", { messageId: replyId });
+            const messageInfo = await apiClient.fetchMessage({ id: replyId });
+            if (messageInfo.success) {
+                const senderInfo = await apiClient.fetchUser({ id: messageInfo.message.senderId });
+                if (senderInfo.success) setReplyText(`${senderInfo.user.username}: ${messageInfo.message.content}`);
+            }
         }
     }
 

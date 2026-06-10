@@ -198,31 +198,27 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             });
 
         // Initialize messages from socket
-        apiClient.socket.subscribe(
-            "history",
-            async data => {
-                if (data.messages.length > 0) {
-                    const lastMessage = await db.query.messagesTable.findFirst({
-                        where: eq(messagesTable.chatId, currentChat?.id || 0),
-                        orderBy: (messages, { desc }) => [desc(messages.id)],
-                    });
-                    const lastSocketMessage = data.messages.findIndex((msg: any) => msg.id === lastMessage?.id);
-                    const diff = data.messages.length - ((lastSocketMessage || 0) + 1);
-                    if (lastSocketMessage !== -1) {
-                        messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
-                        messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
-                    } else {
-                        messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
-                        messagesRef.current?.show();
-                    }
+        const messagesInfo = await apiClient.fetchChatMessages({ id: currentChat?.id || 1 });
+        if (messagesInfo.success) {
+            const messages = messagesInfo.messages;
+            if (messages.length > 0) {
+                const lastMessage = await db.query.messagesTable.findFirst({
+                    where: eq(messagesTable.chatId, currentChat?.id || 0),
+                    orderBy: (msgs, { desc }) => [desc(msgs.id)],
+                });
+                const lastSocketMessage = messages.findIndex((msg: any) => msg.id === lastMessage?.id);
+                const diff = messages.length - ((lastSocketMessage || 0) + 1);
+                messagesRef.current?.setMessages(await ProcessHistoryAndReturn(messagesInfo));
+                if (lastSocketMessage !== -1) {
+                    messagesRef.current?.changeMessageNumberBy(diff >= 0 ? diff : 0);
                 } else {
-                    messagesRef.current?.setMessages(await ProcessHistoryAndReturn(data));
                     messagesRef.current?.show();
                 }
-            },
-            { once: true },
-        );
-        apiClient.socket.emit("getChatHistory", { chat: currentChat?.id || 1 });
+            } else {
+                messagesRef.current?.setMessages(await ProcessHistoryAndReturn(messagesInfo));
+                messagesRef.current?.show();
+            }
+        }
     }
 
     async function requestChats() {
@@ -250,32 +246,28 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             });
 
         // Initialize chats from socket
-        apiClient.socket.subscribe(
-            "chats",
-            async data => {
-                // Clear db
-                try {
-                    await db.delete(chatsTable);
-                } catch {}
-                try {
-                    await db.delete(chatUsersTable);
-                } catch {}
-                try {
-                    await db.delete(usersTable);
-                } catch {}
+        const chatsInfo = await apiClient.fetchChats();
+        if (chatsInfo.success) {
+            // Clear db
+            try {
+                await db.delete(chatsTable);
+            } catch {}
+            try {
+                await db.delete(chatUsersTable);
+            } catch {}
+            try {
+                await db.delete(usersTable);
+            } catch {}
 
-                // Save chats to db, reformat and show them
-                const prevChats = chatsRef.current?.getChats();
-                chatsRef.current?.setChats(await ProcessChatsAndReturn(data));
-                if (prevChats?.length) {
-                    chatsRef.current?.showWithoutAnimation();
-                } else {
-                    chatsRef.current?.show();
-                }
-            },
-            { once: true },
-        );
-        apiClient.socket.emit("getChats", {});
+            // Save chats to db, reformat and show them
+            const prevChats = chatsRef.current?.getChats();
+            chatsRef.current?.setChats(await ProcessChatsAndReturn(chatsInfo));
+            if (prevChats?.length) {
+                chatsRef.current?.showWithoutAnimation();
+            } else {
+                chatsRef.current?.show();
+            }
+        }
     }
 
     useEffect(() => {
@@ -284,8 +276,9 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         const connectSub = apiClient.socket.subscribe("connect", async () => {
             console.log("Connected to server");
 
-            apiClient.socket.subscribe("userInfo", (data: any) => Storage.set("avatar", data.user.avatar), { once: true });
-            apiClient.socket.emit("getUserInfo", { id: Auth.id });
+            apiClient.fetchUser({ id: Auth.id || -1 }).then(res => {
+                if (res.success) Storage.set("avatar", res.user.avatar);
+            });
 
             const messaging = getMessaging();
 
