@@ -6,6 +6,7 @@ import IconButton from "@components/IconButton";
 import InputField from "@components/InputField";
 import PopupButton, { PopupButtonHandler } from "@components/PopupButton";
 import { useTranslation } from "@contexts/TranslationContext";
+import { ChatData } from "@min/api-client";
 import { showNotification } from "@services/NotifyService";
 import { useRef, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
@@ -26,7 +27,11 @@ const styles = StyleSheet.create({
     },
 });
 
-function AddChatButton() {
+export interface AddChatButtonProps {
+    onChatCreated?: (chat: ChatData) => void;
+}
+
+function AddChatButton(props: AddChatButtonProps) {
     const [username, setUsername] = useState<string>("");
     const popupRef = useRef<PopupButtonHandler>(null);
     const theme = useThemeStore(s => s.theme);
@@ -35,20 +40,14 @@ function AddChatButton() {
 
     async function createChat() {
         Keyboard.dismiss();
-        apiClient.socket.subscribe(
-            "createChatResult",
-            data => {
-                if (data.success) {
-                    setUsername("");
-                    popupRef.current?.close();
-                    apiClient.socket.emit("getChats", {});
-                } else {
-                    showNotification("Failed to create chat", data.msg);
-                }
-            },
-            { once: true },
-        );
-        apiClient.socket.emit("createChat", { nickname: username.trim().replace("@", "") });
+        const newChatInfo = await apiClient.createChat({ targetUsername: username.trim().replace("@", "") });
+        if (newChatInfo.success) {
+            setUsername("");
+            popupRef.current?.close();
+            props.onChatCreated?.(newChatInfo.chat);
+        } else {
+            showNotification("Failed to create chat", newChatInfo.message);
+        }
     }
 
     return (

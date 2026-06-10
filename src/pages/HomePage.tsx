@@ -20,6 +20,7 @@ import Profile from "@components/Profile";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { SERVER } from "@env";
+import { ChatData as ApiChatData } from "@min/api-client";
 import { getMessaging, getToken } from "@react-native-firebase/messaging";
 import { useFocusEffect } from "@react-navigation/native";
 import { messageInputRef } from "@services/InputControlService";
@@ -274,6 +275,19 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         }
     }
 
+    async function addChat(chat: ApiChatData) {
+        chat.participants.forEach(async p => {
+            await db
+                .insert(usersTable)
+                .values(p)
+                .onConflictDoUpdate({ target: [usersTable.id], set: { username: p.username, avatar: p.avatar } });
+            await db.insert(chatUsersTable).values({ chatId: chat.id, userId: p.id }).onConflictDoNothing();
+        });
+        await db.insert(chatsTable).values({ id: chat.id, type: chat.type, title: chat.name });
+        chatsRef.current?.setChats([{ ...chat, title: chat.name }, ...chatsRef.current?.getChats()]);
+        chatsRef.current?.showWithoutAnimation();
+    }
+
     useEffect(() => {
         changeLanguage(Translation.getCurrentLanguage());
 
@@ -492,7 +506,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     )}
                     {currentTab === "chats" && <Divider />}
                     {currentTab === "chats" && <ChatsContainer bottomGap={90} handler={handleChat} ref={chatsRef} />}
-                    {currentTab === "chats" && <AddChatButton />}
+                    {currentTab === "chats" && <AddChatButton onChatCreated={addChat} />}
                 </Animated.View>
             </View>
             {currentTab === "chat" && (
