@@ -1,8 +1,8 @@
 import { apiClient } from "@/Socket";
 import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
 import Divider from "@components/Divider";
+import HapticPressable from "@components/HapticPressable";
 import Icon from "@components/Icon";
-import IconButton from "@components/IconButton";
 import InputField from "@components/InputField";
 import PopupButton, { PopupButtonHandler } from "@components/PopupButton";
 import { useTranslation } from "@contexts/TranslationContext";
@@ -51,7 +51,7 @@ function AddChatButton(props: AddChatButtonProps) {
     }
 
     return (
-        <PopupButton right={10} bottom={80} icon="plus" iconSize={24} ref={popupRef}>
+        <PopupButton right={10} bottom={70} icon="plus" iconSize={24} ref={popupRef}>
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
                     <Icon name="plus" size={24} color={theme.primaryTextColor} />
@@ -67,12 +67,24 @@ function AddChatButton(props: AddChatButtonProps) {
                         value={username}
                     />
                     <View style={{ width: "100%", height: 50, justifyContent: "center", alignItems: "flex-end" }}>
-                        <IconButton
-                            layoutTransition={false}
-                            icon="check"
-                            style={[Styles.bgAndBorder, { aspectRatio: 1, width: 50 }]}
+                        <HapticPressable
+                            style={[
+                                Styles.bgAndBorder,
+                                {
+                                    aspectRatio: 1,
+                                    width: 50,
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    padding: 0,
+                                    overflow: "hidden",
+                                },
+                            ]}
+                            android_ripple={{ color: theme.rippleColor, foreground: true }}
                             onPress={createChat}
-                        />
+                        >
+                            <Icon name="check" size={20} color={theme.primaryTextColor} />
+                        </HapticPressable>
                     </View>
                 </View>
             </View>

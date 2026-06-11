@@ -1,7 +1,7 @@
 import { useThemeStore } from "@/Style";
 import { setAlphaForColor } from "@/Utils";
 import { vibratePreset } from "@specs/HapticsModule";
-import { Pressable, PressableProps } from "react-native-gesture-handler";
+import { Pressable, PressableProps } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SpringConfig } from "react-native-reanimated/lib/typescript/animation/spring";
 

@@ -101,7 +101,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const [containerSize, setContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
     const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
-    const [chatTabBottomGap, setChatTabBottomGap] = useState<number>(70);
+    const [chatTabBottomGap, setChatTabBottomGap] = useState<number>(66);
     const lastBackButtonPress = useRef<number>(0);
     const { t, changeLanguage } = useTranslation();
     const insets = useSafeAreaInsets();
@@ -402,9 +402,9 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
     function handleInputUpdate(text: string) {
         if (text.startsWith("/reply")) {
-            setChatTabBottomGap(90);
+            setChatTabBottomGap(86);
         } else {
-            setChatTabBottomGap(70);
+            setChatTabBottomGap(66);
         }
     }
 
@@ -514,7 +514,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     ref={messageInputRef}
                     style={{
                         position: "absolute",
-                        bottom: Styles.container.paddingVertical + insets.bottom + 15 + keyboardHeight,
+                        bottom: Styles.container.paddingVertical + insets.bottom + 10 + keyboardHeight,
                         width: insideContainerSize.width - 20,
                     }}
                     onTextChanged={handleInputUpdate}
