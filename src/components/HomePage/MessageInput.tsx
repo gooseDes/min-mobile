@@ -2,6 +2,7 @@ import Auth from "@/Auth";
 import { apiClient } from "@/Socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import { getShadow } from "@/Utils";
+import HapticPressable from "@components/HapticPressable";
 import Icon from "@components/Icon";
 import PressableWithEffect from "@components/PressableWithEffect";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
@@ -9,7 +10,7 @@ import { useTranslation } from "@contexts/TranslationContext";
 import { SERVER } from "@env";
 import { showPopup } from "@services/PopupService";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { Pressable, StyleProp, StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 import Animated, { SlideInDown, SlideOutDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 
@@ -123,11 +124,12 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                         <Animated.View
                             entering={ZoomIn}
                             exiting={ZoomOut}
-                            style={[styles.horizontalRow, { height: 20, gap: 4, paddingHorizontal: 12 }]}
+                            style={[styles.horizontalRow, { height: 20, gap: 4, paddingHorizontal: 16 }]}
                         >
                             <Icon name="reply" size={12} color={theme.secondaryTextColor} />
                             <Text style={[Styles.secondaryText, { fontSize: 14 }]}>{t.replying_to}</Text>
-                            <Pressable
+                            <HapticPressable
+                                hitSlop={16}
                                 style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }}
                                 android_ripple={{ color: theme.rippleColor }}
                                 onPress={() => {
@@ -135,7 +137,7 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
                                 }}
                             >
                                 <Icon name="x" size={12} color={theme.secondaryTextColor} />
-                            </Pressable>
+                            </HapticPressable>
                         </Animated.View>
                     )}
                     <View style={[styles.horizontalRow, { flex: 1 }]}>
