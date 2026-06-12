@@ -45,7 +45,7 @@ function Profile(props: ProfileProps) {
             setUser(CreateUserData(userData[0]));
 
             // Get user info from socket
-            const userInfo = await apiClient.fetchUser({ id: props.id });
+            const userInfo = await apiClient.fetchUser({ userId: props.id });
             if (userInfo.success)
                 setUser(
                     CreateUserData({ id: userInfo.user.id, username: userInfo.user.username, avatar: userInfo.user.avatar }),

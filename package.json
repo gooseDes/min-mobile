@@ -12,7 +12,8 @@
         "assets": "npx react-native-asset",
         "release": "git push origin main:release -f",
         "apk": "export $(grep -v '^#' .env | xargs -d '\n') && cd android && ./gradlew assembleRelease && adb install ./app/build/outputs/apk/release/app-release.apk && cd ..",
-        "update_api": "npm i github:gooseDes/min-node-api-client#build --prefer-online"
+        "update_api": "npm i github:gooseDes/min-node-api-client#build --prefer-online",
+        "check": "npx tsc --noEmit"
     },
     "dependencies": {
         "@d11/react-native-fast-image": "^8.13.0",
@@ -26,8 +27,8 @@
         "@react-navigation/native-stack": "^7.9.0",
         "babel-plugin-module-resolver": "^5.0.2",
         "drizzle-orm": "^0.45.1",
-        "react": "19.1.1",
-        "react-native": "0.82.1",
+        "react": "19.2.3",
+        "react-native": "^0.85.3",
         "react-native-dotenv": "^3.4.11",
         "react-native-fs": "^2.20.0",
         "react-native-gesture-handler": "^2.31.2",
@@ -35,27 +36,24 @@
         "react-native-keychain": "^10.0.0",
         "react-native-marked": "^7.1.1",
         "react-native-material-you-colors": "^0.1.2",
-        "react-native-mmkv": "^4.1.1",
-        "react-native-nitro-modules": "^0.33.0",
-        "react-native-reanimated": "^4.2.0",
+        "react-native-mmkv": "^4.3.1",
+        "react-native-nitro-modules": "^0.35.9",
+        "react-native-reanimated": "^4.3.1",
         "react-native-safe-area-context": "^5.5.2",
         "react-native-screens": "^4.19.0",
         "react-native-vector-icons": "^10.3.0",
-        "react-native-worklets": "^0.7.1",
-        "socket.io-client": "^4.8.1",
+        "react-native-worklets": "^0.9.1",
         "zustand": "^5.0.12"
     },
     "devDependencies": {
         "@babel/core": "^7.25.2",
         "@babel/preset-env": "^7.25.3",
         "@babel/runtime": "^7.25.0",
-        "@react-native-community/cli": "^20.1.3",
-        "@react-native-community/cli-platform-android": "^20.1.3",
-        "@react-native-community/cli-platform-ios": "^20.1.3",
-        "@react-native/babel-preset": "0.82.1",
-        "@react-native/eslint-config": "0.82.1",
-        "@react-native/metro-config": "0.82.1",
-        "@react-native/typescript-config": "0.82.1",
+        "@react-native-community/cli": "20.1.3",
+        "@react-native/babel-preset": "0.85.3",
+        "@react-native/eslint-config": "0.85.3",
+        "@react-native/metro-config": "0.85.3",
+        "@react-native/typescript-config": "0.85.3",
         "@types/jest": "^29.5.13",
         "@types/react": "^19.1.1",
         "@types/react-native-vector-icons": "^6.4.18",
@@ -73,7 +71,8 @@
     },
     "overrides": {
         "esbuild": "0.25.0",
-        "uuid": ">=11.1.1"
+        "uuid": ">=11.1.1",
+        "joi": "^18.2.1"
     },
     "engines": {
         "node": ">=20"
@@ -96,8 +95,8 @@
         }
     },
     "allowScripts": {
-        "@firebase/util@1.13.0": true,
         "esbuild@0.25.0": true,
-        "protobufjs@7.5.8": true
+        "@firebase/util@1.14.0": true,
+        "protobufjs@7.6.3": true
     }
 }

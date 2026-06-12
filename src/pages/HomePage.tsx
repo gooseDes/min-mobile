@@ -6,7 +6,7 @@ import { apiClient } from "@/Socket";
 import Storage from "@/Storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
 import Translation from "@/Translation";
-import { CreateChat, CreateMessage, getShadow, timestampToDate } from "@/Utils";
+import { CreateChat, CreateMessage, getShadow } from "@/Utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
@@ -203,7 +203,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             });
 
         // Initialize messages from socket
-        const messagesInfo = await apiClient.fetchChatMessages({ id: currentChat?.id || 1 });
+        const messagesInfo = await apiClient.fetchChatMessages({ chatId: currentChat?.id || 1 });
         if (messagesInfo.success) {
             const messages = messagesInfo.messages;
             if (messages.length > 0) {
@@ -294,7 +294,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         const connectSub = apiClient.socket.subscribe("connect", async () => {
             console.log("Connected to server");
 
-            apiClient.fetchUser({ id: Auth.id || -1 }).then(res => {
+            apiClient.fetchUser({ userId: Auth.id || -1 }).then(res => {
                 if (res.success) Storage.set("avatar", res.user.avatar);
             });
 
@@ -304,7 +304,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             const token = await getToken(messaging);
 
             // Send Firebase token to server
-            apiClient.socket.emit("addFcmToken", { token });
+            apiClient.linkFcmToken({ token });
         });
         const connectErrorSub = apiClient.socket.subscribe("connect_error", err => {
             if (err.message.includes("Invalid token")) {
@@ -317,32 +317,32 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             if (data.hidden) return;
             console.error(data);
         });
-        const messageSub = apiClient.socket.subscribe("message", (message: any) => {
-            if (message.chat && parseInt(message.chat, 10) === currentChatRef.current?.id) {
+        const messageSub = apiClient.subscribeToMessages(message => {
+            if (message.chatId === currentChatRef.current?.id) {
                 messagesRef.current?.addMessage(
                     CreateMessage({
                         id: message.id,
-                        text: message.text,
-                        sender: { id: message.author_id, username: message.author, avatar: message.author_avatar },
-                        chatId: message.chat,
-                        sentAt: timestampToDate(message.sent_at),
+                        text: message.content,
+                        sender: message.sender,
+                        chatId: message.chatId,
+                        sentAt: message.sentAt,
                     }),
                 );
                 vibrateEffectPreset("quick_fall");
                 db.insert(messagesTable)
                     .values({
                         id: message.id,
-                        content: message.text,
-                        senderId: message.author_id,
-                        chatId: message.chat,
-                        sentAt: timestampToDate(message.sent_at),
+                        content: message.content,
+                        senderId: message.senderId,
+                        chatId: message.chatId,
+                        sentAt: message.sentAt,
                     })
                     .run();
             }
         });
-        const deleteMessageSub = apiClient.socket.subscribe("deleteMessage", (data: any) => {
-            messagesRef.current?.deleteMessage(data.message);
-            db.delete(messagesTable).where(eq(messagesTable.id, data.message)).run();
+        const deleteMessageSub = apiClient.subscribeToDeletingMessages(messageId => {
+            messagesRef.current?.deleteMessage(messageId);
+            db.delete(messagesTable).where(eq(messagesTable.id, messageId)).run();
         });
 
         // Handling keyboard height
@@ -391,7 +391,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     async function sendMessage(message: string) {
         if (!currentChatRef.current) return;
         const chatId = currentChatRef.current.id;
-        apiClient.socket.emit("msg", { text: message, chat: chatId });
+        apiClient.sendMessage({ content: message, chatId });
     }
 
     function openProfile(id: number) {

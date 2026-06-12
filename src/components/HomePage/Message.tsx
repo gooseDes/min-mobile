@@ -213,9 +213,9 @@ function MessageBase(props: MessageProps) {
             const sender = await db.query.usersTable.findFirst({ where: eq(usersTable.id, replyMessage.senderId) });
             setReplyText(`${sender?.username || replyMessage.senderId}: ${withoutCommand(replyMessage.content || "")}`);
         } else {
-            const messageInfo = await apiClient.fetchMessage({ id: replyId });
+            const messageInfo = await apiClient.fetchMessage({ messageId: replyId });
             if (messageInfo.success) {
-                const senderInfo = await apiClient.fetchUser({ id: messageInfo.message.senderId });
+                const senderInfo = await apiClient.fetchUser({ userId: messageInfo.message.senderId });
                 if (senderInfo.success) setReplyText(`${senderInfo.user.username}: ${messageInfo.message.content}`);
             }
         }
@@ -243,7 +243,7 @@ function MessageBase(props: MessageProps) {
     }));
 
     async function deleteMessage() {
-        apiClient.socket.emit("deleteMessage", { message: msg_id });
+        if (msg_id) apiClient.deleteMessage({ messageId: msg_id });
     }
 
     function calculateMargin(md: string) {
