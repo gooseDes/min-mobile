@@ -17,7 +17,7 @@ function Icon(props: IconProps) {
 export interface AnimatedIconProps extends IconProps {
     entering?: EntryOrExitLayoutType;
     exiting?: EntryOrExitLayoutType;
-    containerStyle?: AnimatedStyle;
+    containerStyle?: AnimatedStyle | AnimatedStyle[];
 }
 
 export function AnimatedIcon(props: AnimatedIconProps) {

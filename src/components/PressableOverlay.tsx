@@ -1,5 +1,7 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
+import { GestureDetector, usePanGesture, useSimultaneousGestures, useTapGesture } from "react-native-gesture-handler";
+import { useSharedValue } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
     pressableOverlay: {
@@ -23,11 +25,13 @@ export interface PressableOverlayHandler {
 const PressableOverlay = forwardRef<PressableOverlayHandler, PressableOverlayProps>((_props, ref) => {
     const [interceptNextClick, setInterceptNextClick] = useState<boolean>(false);
     const [onPress, setOnPress] = useState<(() => void) | null>(null);
+    const isClickIntercepted = useSharedValue<boolean>(true);
 
     useImperativeHandle(ref, () => ({
         interceptNextClick: (callback: () => void) => {
             setInterceptNextClick(true);
             setOnPress(callback);
+            isClickIntercepted.value = false;
         },
         cancelClickInterception: () => {
             setInterceptNextClick(false);
@@ -36,18 +40,26 @@ const PressableOverlay = forwardRef<PressableOverlayHandler, PressableOverlayPro
     }));
 
     function handleClick() {
-        if (interceptNextClick && onPress) {
+        if (interceptNextClick && onPress && !isClickIntercepted.value) {
+            isClickIntercepted.value = true;
             setInterceptNextClick(false);
             onPress();
             setOnPress(null);
         }
     }
 
+    const gesture = usePanGesture({ runOnJS: true, onBegin: handleClick, enabled: interceptNextClick });
+    const gesture2 = useTapGesture({ runOnJS: true, onBegin: handleClick, enabled: interceptNextClick });
+
+    const finalGesture = useSimultaneousGestures(gesture, gesture2);
+
     return (
-        <Pressable
-            style={[styles.pressableOverlay, { pointerEvents: interceptNextClick ? "auto" : "none" }]}
-            onPress={handleClick}
-        />
+        <GestureDetector gesture={finalGesture}>
+            <Pressable
+                style={[styles.pressableOverlay, { pointerEvents: interceptNextClick ? "auto" : "none" }]}
+                onPress={handleClick}
+            />
+        </GestureDetector>
     );
 });
 

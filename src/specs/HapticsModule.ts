@@ -11,9 +11,9 @@ export function vibrateEffect(type: HapticEffectType, scale?: number): void {
     NativeHapticsModule?.vibrateEffect(type, scale ?? 1);
 }
 
-export function vibratePreset(type: PredefinedVibrateType, duration?: number) {
+export function vibratePreset(type: PredefinedVibrateType, scale?: number) {
     if (type === "tap") {
-        vibrate(duration ?? 10, 0.25);
+        vibrate(10, 0.25 * (scale ?? 1));
     }
 }
 
