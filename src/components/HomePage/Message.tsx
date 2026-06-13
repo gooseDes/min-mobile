@@ -70,7 +70,7 @@ const createStyles = (theme: ThemeData) =>
         emptySpace: {
             flex: 1,
             justifyContent: "center",
-            padding: 16,
+            paddingHorizontal: 16,
         },
         swipeStateIcon: {
             filter: [{ blur: 1 }],
@@ -326,9 +326,10 @@ function MessageBase(props: MessageProps) {
             }
             const distance = Math.abs(e.translationX);
             const isActive = distance >= swipeTreshold;
-            const swipeProgress = 1 - Math.pow(2, -10 * (distance / swipeTreshold));
+            const swipeProgressLinear = distance / swipeTreshold;
+            const swipeProgress = 1 - Math.pow(2, -10 * swipeProgressLinear);
             if (!isActive) {
-                vibrate((1 / swipeProgress) * 10 + 1, 0.4 * swipeProgress);
+                vibrate((1 / swipeProgress) * 10 + 1, 0.4 * swipeProgressLinear);
             }
             translateX.value = withSpring(e.translationX * (isActive ? 1 : 0.3 * swipeProgress));
         },
