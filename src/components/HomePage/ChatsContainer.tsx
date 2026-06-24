@@ -1,6 +1,5 @@
 import { useStorage } from "@/Storage";
 import ClickableProfile from "@components/ClickableProfile";
-import { SERVER } from "@env";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -57,7 +56,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
             <Animated.View style={{ paddingHorizontal: 5 }} entering={FadeIn} exiting={FadeOut}>
                 <ClickableProfile
                     text={chat.title}
-                    image={`${SERVER}/avatars/${
+                    image={`${process.env.EXPO_PUBLIC_SERVER}/avatars/${
                         chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
                     }.webp`}
                     anim={index % 2 === 0 ? "left" : "right"}

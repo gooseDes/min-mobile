@@ -6,7 +6,6 @@ import Popup from "@components/Popup";
 import PressableOverlay from "@components/PressableOverlay";
 import { TranslationProvider } from "@contexts/TranslationContext";
 import migrations from "@drizzle/migrations";
-import { SERVER } from "@env";
 import { setActiveBackgroundHandler } from "@index";
 import notifee, { AndroidCategory, AndroidImportance, AndroidStyle } from "@notifee/react-native";
 import ProfilePage from "@pages/ProfilePage";
@@ -93,7 +92,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                 android: {
                     smallIcon: "ic_notification",
                     channelId: "min",
-                    largeIcon: `${SERVER}/avatars/${data.authorAvatar}.webp`,
+                    largeIcon: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${data.authorAvatar}.webp`,
                     importance: AndroidImportance.HIGH,
                     category: AndroidCategory.MESSAGE,
                     showTimestamp: true,
@@ -109,7 +108,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                                 timestamp: data.sentAt * 1000,
                                 person: {
                                     name: data.authorName,
-                                    icon: `${SERVER}/avatars/${data.authorAvatar}.webp`,
+                                    icon: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${data.authorAvatar}.webp`,
                                 },
                             },
                         ],
@@ -160,7 +159,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             const data = CreateRemoteMessagePayload(remoteMessage.data);
             notificationRef.current?.setTitle(data.authorName);
             notificationRef.current?.setText(data.text);
-            notificationRef.current?.setImage(`${SERVER}/avatars/${data.authorAvatar}.webp` || null);
+            notificationRef.current?.setImage(`${process.env.EXPO_PUBLIC_SERVER}/avatars/${data.authorAvatar}.webp` || null);
             if (homePageRef.current?.getCurrentChat().id !== data.chatId || homePageRef.current?.getCurrentTab() !== "chat") {
                 notificationRef.current?.show();
             }

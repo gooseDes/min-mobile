@@ -19,7 +19,6 @@ import IconButton from "@components/IconButton";
 import Profile from "@components/Profile";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
-import { SERVER } from "@env";
 import { ChatData as ApiChatData } from "@min/api-client";
 import { getMessaging, getToken } from "@react-native-firebase/messaging";
 import { useFocusEffect } from "@react-navigation/native";
@@ -456,7 +455,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
                             return (
                                 <ClickableProfile
-                                    image={`${SERVER}/avatars/${otherParticipant.avatar}.webp`}
+                                    image={`${process.env.EXPO_PUBLIC_SERVER}/avatars/${otherParticipant.avatar}.webp`}
                                     text={currentChat?.title}
                                     bottomText={isPrivate ? t.private_chat : t.group_chat}
                                     onPress={isPrivate ? () => openProfile(otherParticipant.id) : () => {}}

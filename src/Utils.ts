@@ -1,6 +1,5 @@
 import FastImage from "@d11/react-native-fast-image";
 import migrations from "@drizzle/migrations";
-import { AUTO_UPDATE, REPO_AUTHOR, REPO_NAME, VERSION } from "@env";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { showNotification } from "@services/NotifyService";
 import { setOverlay } from "@services/OverlayService";
@@ -159,12 +158,14 @@ export function getShadow(theme: ThemeData): string {
 // Check for updates and prompt the user to update if necessary
 export async function checkForUpdates(silent: boolean = false) {
     if (!silent) setOverlay("loading");
-    if (VERSION) {
-        if (AUTO_UPDATE === "true") {
-            const result = await fetch(`https://api.github.com/repos/${REPO_AUTHOR}/${REPO_NAME}/releases/latest`);
+    if (process.env.EXPO_PUBLIC_VERSION) {
+        if (process.env.EXPO_PUBLIC_AUTO_UPDATE === "true") {
+            const result = await fetch(
+                `https://api.github.com/repos/${process.env.EXPO_PUBLIC_REPO_AUTHOR}/${process.env.EXPO_PUBLIC_REPO_NAME}/releases/latest`,
+            );
             const data = await result.json();
             const latestVersion = data.tag_name?.slice(1);
-            if (latestVersion && latestVersion !== VERSION) {
+            if (latestVersion && latestVersion !== process.env.EXPO_PUBLIC_VERSION) {
                 const confirmUpdate = () => {
                     const downloadUrl = data?.assets?.[0]?.browser_download_url;
                     console.log("Downloading", downloadUrl);

@@ -8,7 +8,6 @@ import HapticPressable from "@components/HapticPressable";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import IconButton from "@components/IconButton";
 import { useTranslation } from "@contexts/TranslationContext";
-import { SERVER } from "@env";
 import { goBack, navigate } from "@services/NavigationService";
 import { setOverlay } from "@services/OverlayService";
 import { showPopup } from "@services/PopupService";
@@ -125,7 +124,9 @@ function ActionButton(props: ActionButtonProps) {
 function ProfilePage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [avatarPreview, setAvatarPreview] = useState<Asset | undefined>(undefined);
-    const [avatar, setAvatar] = useState<string>(`${SERVER}/avatars/${Storage.getString("avatar")}.webp`);
+    const [avatar, setAvatar] = useState<string>(
+        `${process.env.EXPO_PUBLIC_SERVER}/avatars/${Storage.getString("avatar")}.webp`,
+    );
     const { t } = useTranslation();
     const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
@@ -137,7 +138,7 @@ function ProfilePage() {
             return true;
         });
 
-        setAvatar(`${SERVER}/avatars/${Storage.getString("avatar")}.webp`);
+        setAvatar(`${process.env.EXPO_PUBLIC_SERVER}/avatars/${Storage.getString("avatar")}.webp`);
 
         return () => listener.remove();
     }, []);
@@ -162,7 +163,7 @@ function ProfilePage() {
                     type: avatarPreview.type,
                 });
                 if (response.success) {
-                    setAvatar(`${SERVER}${response.url}`);
+                    setAvatar(`${process.env.EXPO_PUBLIC_SERVER}${response.url}`);
                     Storage.set("avatar", response.avatar);
                 } else {
                     showPopup("Error", response.message);

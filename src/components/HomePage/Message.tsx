@@ -7,7 +7,6 @@ import { countChars, dateToString, getShadow } from "@/Utils";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import { useTranslation } from "@contexts/TranslationContext";
 import FastImage from "@d11/react-native-fast-image";
-import { SERVER } from "@env";
 import { openDropdown } from "@services/DropdownService";
 import { setMessagePrefix } from "@services/InputControlService";
 import { setOverlayImage } from "@services/OverlayService";
@@ -354,7 +353,10 @@ function MessageBase(props: MessageProps) {
                 style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
             >
                 {showAvatar && (
-                    <FastImage source={{ uri: `${SERVER}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
+                    <FastImage
+                        source={{ uri: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${props.author_avatar || ""}.webp` }}
+                        style={styles.avatar}
+                    />
                 )}
                 <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
                     <Animated.View

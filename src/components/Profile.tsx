@@ -3,7 +3,6 @@ import { usersTable } from "@/db/Schema";
 import { apiClient } from "@/Socket";
 import { Constants, createGlobalStyles, useAppStyles } from "@/Style";
 import { CreateUserData } from "@/Utils";
-import { SERVER } from "@env";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -58,7 +57,10 @@ function Profile(props: ProfileProps) {
         <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
             {user && (
                 <View style={{ alignItems: "center", justifyContent: "center" }}>
-                    <Image source={{ uri: `${SERVER}/avatars/${user.avatar}.webp` }} style={styles.avatar} />
+                    <Image
+                        source={{ uri: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${user.avatar}.webp` }}
+                        style={styles.avatar}
+                    />
                     <Text style={[Styles.primaryText, styles.name]} selectable={true}>
                         {user.username}
                     </Text>

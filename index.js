@@ -2,12 +2,12 @@
  * @format
  */
 
+import App from "@/App";
 import { appRef } from "@/Utils";
 import notifee, { AndroidImportance } from "@notifee/react-native";
 import { getMessaging, setBackgroundMessageHandler } from "@react-native-firebase/messaging";
 import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
-import App from "./src/App";
 
 async function createChannel() {
     await notifee.createChannel({

@@ -7,7 +7,6 @@ import Icon from "@components/Icon";
 import PressableWithEffect from "@components/PressableWithEffect";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
-import { SERVER } from "@env";
 import { showPopup } from "@services/PopupService";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { StyleProp, StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
@@ -103,7 +102,12 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
             });
             if (response.success) {
                 setValue(
-                    value + value ? " " : "" + response.urls.map((att: string) => `![attachment](${SERVER}${att})`).join("\n"),
+                    value + value
+                        ? " "
+                        : "" +
+                              response.urls
+                                  .map((att: string) => `![attachment](${process.env.EXPO_PUBLIC_SERVER}${att})`)
+                                  .join("\n"),
                 );
             } else {
                 showPopup("Error", response.message);

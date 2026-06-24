@@ -54,6 +54,24 @@ react {
 
     /* Autolinking */
     autolinkLibrariesWithApp()
+    //
+    // Added by install-expo-modules
+    entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", rootDir.getAbsoluteFile().getParentFile().getAbsolutePath(), "android", "absolute"].execute(null, rootDir).text.trim())
+    // Resolve Expo CLI if available; fall back to React Native CLI if not.
+    def _resolvedExpoCli = ""
+    try {
+        _resolvedExpoCli = ["node", "--print", "require.resolve('@expo/cli')"].execute(null, rootDir).text.trim()
+    } catch (Exception e) {
+        _resolvedExpoCli = ""
+    }
+    if (_resolvedExpoCli) {
+        cliFile = new File(_resolvedExpoCli)
+        bundleCommand = "export:embed"
+    } else {
+        cliFile = file("../../node_modules/react-native/cli.js")
+        // Use the standard RN bundle command when Expo CLI isn't available
+        bundleCommand = "bundle"
+    }
 }
 
 /**
@@ -127,4 +145,22 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.0.0"))
     implementation("com.google.firebase:firebase-analytics")
+}
+
+tasks.configureEach { task ->
+    if (task.name == "createBundleReleaseJsAndAssets") {
+        def targetTasks = [
+            "generateReactNativeEntryPoint",
+            "generateAutolinkingPackageList",
+            "generateAutolinkingNewArchitectureFiles",
+            "generateReleaseBuildConfig",
+            "checkReleaseDuplicateClasses",
+            "mergeReleaseJniLibFolders",
+            "buildKotlinToolingMetadata"
+        ]
+        targetTasks.each { targetName ->
+            // Используем tasks.matching, чтобы не упасть, если какая-то таска отсутствует в текущем типе сборки
+            task.dependsOn(tasks.matching { it.name == targetName })
+        }
+    }
 }

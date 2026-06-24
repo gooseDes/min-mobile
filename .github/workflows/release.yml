@@ -57,8 +57,13 @@ jobs:
 
             - name: Build Release APK
               run: |
+                  npm run start &
+                  BUNDLER_PID=$!
+                  while ! curl -s http://localhost:8081/status > /dev/null; do sleep 2; done
                   cd android
                   ./gradlew assembleRelease
+                  cd ..
+                  kill $BUNDLER_PID || true
               env:
                   KEYSTORE_FILE: release.keystore
                   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
