@@ -1,5 +1,5 @@
 import { ApiClient } from "@min/api-client";
-import Auth from "./Auth";
+import Auth from "./auth";
 
 export const apiClient = new ApiClient({ url: process.env.EXPO_PUBLIC_SERVER ?? "" });
 

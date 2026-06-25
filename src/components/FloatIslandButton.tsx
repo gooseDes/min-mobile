@@ -1,4 +1,4 @@
-import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { StyleSheet, Text } from "react-native";
 import { ZoomIn, ZoomOut } from "react-native-reanimated";
 import Icon from "./Icon";

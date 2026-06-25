@@ -1,4 +1,4 @@
-import { useStorage } from "@/Storage";
+import { useStorage } from "@/storage";
 import ClickableProfile from "@components/ClickableProfile";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";

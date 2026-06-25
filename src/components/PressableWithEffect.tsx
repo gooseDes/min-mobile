@@ -1,5 +1,5 @@
-import { useThemeStore } from "@/Style";
-import { setAlphaForColor } from "@/Utils";
+import { useThemeStore } from "@/style";
+import { setAlphaForColor } from "@/utils";
 import { vibratePreset } from "@specs/HapticsModule";
 import { Pressable, PressableProps } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";

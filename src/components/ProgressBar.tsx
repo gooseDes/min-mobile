@@ -1,4 +1,4 @@
-import { ThemeData, useAppStyles } from "@/Style";
+import { ThemeData, useAppStyles } from "@/style";
 import { useEffect, useState } from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";

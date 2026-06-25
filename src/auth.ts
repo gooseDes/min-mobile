@@ -1,6 +1,6 @@
 import * as Keychain from "react-native-keychain";
-import { apiClient, initSocket } from "./Socket";
-import Storage from "./Storage";
+import { apiClient, initSocket } from "./socket";
+import Storage from "./storage";
 
 export type AuthResult =
     | {

@@ -1,7 +1,7 @@
-import { CreateChat, CreateMessage, CreateUserData } from "@/Utils";
+import { CreateChat, CreateMessage, CreateUserData } from "@/utils";
 import { FetchChatMessagesResult, FetchChatsResult } from "@min/api-client";
-import db from "./Client";
-import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./Schema";
+import db from "./client";
+import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./schema";
 
 export function ProcessHistoryAndReturn(history_payload: FetchChatMessagesResult): Promise<MessageData[]> {
     if (!history_payload.success) return Promise.resolve([]);

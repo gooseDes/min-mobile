@@ -1,4 +1,4 @@
-import { blurApp } from "@/Utils";
+import { blurApp } from "@/utils";
 import { ImageOverlayHandler } from "@components/ImageOverlay";
 import { OverlayHandler } from "@components/Overlay";
 import React from "react";

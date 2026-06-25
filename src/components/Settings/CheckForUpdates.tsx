@@ -1,4 +1,4 @@
-import { checkForUpdates } from "@/Utils";
+import { checkForUpdates } from "@/utils";
 import Button from "@components/Button";
 import { useTranslation } from "@contexts/TranslationContext";
 

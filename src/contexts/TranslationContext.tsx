@@ -1,4 +1,4 @@
-import Translation, { Language, changeLanguage as changeLanguageFn } from "@/Translation";
+import Translation, { Language, changeLanguage as changeLanguageFn } from "@/translation";
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 interface TranslationContextProps {

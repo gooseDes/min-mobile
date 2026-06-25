@@ -1,11 +1,11 @@
-import Auth from "@/Auth";
-import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { AdaptiveTheme, generateAdaptiveTheme, midnightTheme, OneishDarkTheme, OneishLightTheme } from "@/Themes";
+import Auth from "@/auth";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
+import { AdaptiveTheme, generateAdaptiveTheme, midnightTheme, OneishDarkTheme, OneishLightTheme } from "@/themes";
 import Button from "@components/Button";
 import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage/MessagesContainer";
 import PressableWithEffect from "@components/PressableWithEffect";
 import { useTranslation } from "@contexts/TranslationContext";
-import { openDropdown } from "@services/DropdownService";
+import { openDropdown } from "@services/dropdownService";
 import { useEffect, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 

@@ -1,4 +1,4 @@
-import { Constants } from "@/Style";
+import { Constants } from "@/style";
 import { StyleProp, TextStyle } from "react-native";
 import Animated, { AnimatedStyle, EntryOrExitLayoutType } from "react-native-reanimated";
 import { default as FontAwesomeIcon } from "react-native-vector-icons/FontAwesome6";

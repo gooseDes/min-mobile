@@ -1,4 +1,4 @@
-import { ThemeData, useAppStyles } from "@/Style";
+import { ThemeData, useAppStyles } from "@/style";
 import { StyleSheet, View } from "react-native";
 
 const createStyles = (theme: ThemeData) =>

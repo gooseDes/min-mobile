@@ -1,5 +1,5 @@
 import ThemeSettings from "@components/Settings/ThemeSettings";
-import { checkForUpdates } from "./Utils";
+import { checkForUpdates } from "./utils";
 
 export const settings: Settings = {
     sections: [

@@ -1,12 +1,12 @@
-import settings from "@/Settings";
-import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { getShadow } from "@/Utils";
+import settings from "@/settings";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
+import { getShadow } from "@/utils";
 import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import SettingsSection from "@components/Settings/SettingsSection";
 import { useTranslation } from "@contexts/TranslationContext";
-import { goBack } from "@services/NavigationService";
+import { goBack } from "@services/navigationService";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 

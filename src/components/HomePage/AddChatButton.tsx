@@ -1,5 +1,5 @@
-import { apiClient } from "@/Socket";
-import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
+import { apiClient } from "@/socket";
+import { createGlobalStyles, useAppStyles, useThemeStore } from "@/style";
 import Divider from "@components/Divider";
 import HapticPressable from "@components/HapticPressable";
 import Icon from "@components/Icon";
@@ -7,7 +7,7 @@ import InputField from "@components/InputField";
 import PopupButton, { PopupButtonHandler } from "@components/PopupButton";
 import { useTranslation } from "@contexts/TranslationContext";
 import { ChatData } from "@min/api-client";
-import { showNotification } from "@services/NotifyService";
+import { showNotification } from "@services/notifyService";
 import { useRef, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
 

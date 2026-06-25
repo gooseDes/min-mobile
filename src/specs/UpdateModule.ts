@@ -1,4 +1,4 @@
-import { t } from "@/Translation";
+import { t } from "@/translation";
 import { NativeEventEmitter, NativeModules } from "react-native";
 import NativeUpdateModule from "./NativeUpdateModule";
 

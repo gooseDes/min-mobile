@@ -1,13 +1,13 @@
-import Auth from "@/Auth";
-import { apiClient } from "@/Socket";
-import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { getShadow } from "@/Utils";
+import Auth from "@/auth";
+import { apiClient } from "@/socket";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
+import { getShadow } from "@/utils";
 import HapticPressable from "@components/HapticPressable";
 import Icon from "@components/Icon";
 import PressableWithEffect from "@components/PressableWithEffect";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
-import { showPopup } from "@services/PopupService";
+import { showPopup } from "@services/popupService";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { StyleProp, StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";

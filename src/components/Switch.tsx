@@ -1,4 +1,4 @@
-import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";

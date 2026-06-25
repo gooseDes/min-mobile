@@ -1,8 +1,8 @@
-import db from "@/db/Client";
-import { usersTable } from "@/db/Schema";
-import { apiClient } from "@/Socket";
-import { Constants, createGlobalStyles, useAppStyles } from "@/Style";
-import { CreateUserData } from "@/Utils";
+import db from "@/db/client";
+import { usersTable } from "@/db/schema";
+import { apiClient } from "@/socket";
+import { Constants, createGlobalStyles, useAppStyles } from "@/style";
+import { CreateUserData } from "@/utils";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";

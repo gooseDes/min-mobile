@@ -1,4 +1,4 @@
-import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
+import { createGlobalStyles, useAppStyles, useThemeStore } from "@/style";
 import FastImage from "@d11/react-native-fast-image";
 import { useEffect } from "react";
 import { StyleSheet, Text, View, ViewProps } from "react-native";

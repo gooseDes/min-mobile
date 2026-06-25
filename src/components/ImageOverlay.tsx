@@ -1,5 +1,5 @@
-import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { saveImageToGallery } from "@/Utils";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
+import { saveImageToGallery } from "@/utils";
 import FastImage from "@d11/react-native-fast-image";
 import { vibrateEffect } from "@specs/HapticsModule";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";

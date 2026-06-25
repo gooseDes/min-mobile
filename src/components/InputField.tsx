@@ -1,4 +1,4 @@
-import { createGlobalStyles, useAppStyles, useThemeStore } from "@/Style";
+import { createGlobalStyles, useAppStyles, useThemeStore } from "@/style";
 import { TextInput, TextInputProps } from "react-native";
 
 function InputField(props: TextInputProps) {

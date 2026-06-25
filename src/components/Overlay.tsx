@@ -1,5 +1,5 @@
-import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { setAlphaForColor } from "@/Utils";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
+import { setAlphaForColor } from "@/utils";
 import { useTranslation } from "@contexts/TranslationContext";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { StyleSheet } from "react-native";

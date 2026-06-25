@@ -1,5 +1,5 @@
-import { useStorage } from "@/Storage";
-import { Constants } from "@/Style";
+import { useStorage } from "@/storage";
+import { Constants } from "@/style";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";

@@ -1,5 +1,5 @@
-import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { getShadow } from "@/Utils";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
+import { getShadow } from "@/utils";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Keyboard, StyleSheet, TouchableOpacity, TouchableOpacityProps, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";

@@ -1,6 +1,6 @@
 import { Appearance } from "react-native";
 import MaterialYou from "react-native-material-you-colors";
-import { ThemeData } from "./Style";
+import { ThemeData } from "./style";
 
 export const midnightTheme: ThemeData = {
     name: "midnight",

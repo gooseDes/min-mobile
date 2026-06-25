@@ -1,4 +1,4 @@
-import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { Constants, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { StyleSheet, TouchableOpacityProps } from "react-native";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import Icon from "./Icon";

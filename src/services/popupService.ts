@@ -1,4 +1,4 @@
-import { blurApp } from "@/Utils";
+import { blurApp } from "@/utils";
 import { PopupHandler } from "@components/Popup";
 import React from "react";
 import { BackHandler } from "react-native";

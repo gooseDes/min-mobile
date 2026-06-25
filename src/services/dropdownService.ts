@@ -1,7 +1,7 @@
 import { DropdownHandler } from "@components/Dropdown";
 import React from "react";
 import { BackHandler } from "react-native";
-import { cancelClickInterception, interceptNextClick } from "./InterceptClickService";
+import { cancelClickInterception, interceptNextClick } from "./interceptClickService";
 
 export const dropdownRef = React.createRef<DropdownHandler>();
 

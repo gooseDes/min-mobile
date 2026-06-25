@@ -1,4 +1,4 @@
-import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
+import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { StyleSheet, Text } from "react-native";
 import Animated from "react-native-reanimated";
 import Icon from "./Icon";

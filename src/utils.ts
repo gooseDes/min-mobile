@@ -1,19 +1,19 @@
 import FastImage from "@d11/react-native-fast-image";
 import migrations from "@drizzle/migrations";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-import { showNotification } from "@services/NotifyService";
-import { setOverlay } from "@services/OverlayService";
-import { showPopup } from "@services/PopupService";
+import { showNotification } from "@services/notifyService";
+import { setOverlay } from "@services/overlayService";
+import { showPopup } from "@services/popupService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { sql } from "drizzle-orm";
 import React from "react";
 import { Alert } from "react-native";
 import RNFS from "react-native-fs";
 import { AppHandler } from "./App";
-import db, { sqliteClient } from "./db/Client";
-import Storage from "./Storage";
-import { ThemeData } from "./Style";
-import { t } from "./Translation";
+import db, { sqliteClient } from "./db/client";
+import Storage from "./storage";
+import { ThemeData } from "./style";
+import { t } from "./translation";
 
 export const appRef = React.createRef<AppHandler>();
 

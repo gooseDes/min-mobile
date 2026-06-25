@@ -3,9 +3,9 @@ import { StyleSheet } from "react-native";
 import { cubicBezier, LinearTransition } from "react-native-reanimated";
 import { create } from "zustand";
 import { createJSONStorage, persist, StateStorage } from "zustand/middleware";
-import Storage from "./Storage";
-import { midnightTheme, themes } from "./Themes";
-import { getShadow } from "./Utils";
+import Storage from "./storage";
+import { midnightTheme, themes } from "./themes";
+import { getShadow } from "./utils";
 
 export interface ThemeData {
     name: string;

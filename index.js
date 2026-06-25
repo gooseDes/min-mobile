@@ -3,7 +3,7 @@
  */
 
 import App from "@/App";
-import { appRef } from "@/Utils";
+import { appRef } from "@/utils";
 import notifee, { AndroidImportance } from "@notifee/react-native";
 import { getMessaging, setBackgroundMessageHandler } from "@react-native-firebase/messaging";
 import { AppRegistry } from "react-native";

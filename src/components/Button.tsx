@@ -1,5 +1,5 @@
-import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/Style";
-import { getShadow } from "@/Utils";
+import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
+import { getShadow } from "@/utils";
 import { GestureResponderEvent, StyleSheet, Text, ViewProps } from "react-native";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import HapticPressable from "./HapticPressable";

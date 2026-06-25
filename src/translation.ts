@@ -1,4 +1,4 @@
-import Storage from "./Storage";
+import Storage from "./storage";
 
 export interface Language {
     language_name?: string;
