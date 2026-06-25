@@ -1,4 +1,3 @@
-import FastImage from "@d11/react-native-fast-image";
 import migrations from "@drizzle/migrations";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { showNotification } from "@services/notifyService";
@@ -6,9 +5,10 @@ import { setOverlay } from "@services/overlayService";
 import { showPopup } from "@services/popupService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { sql } from "drizzle-orm";
+import { File, Paths } from "expo-file-system";
+import { Image } from "expo-image";
 import React from "react";
 import { Alert } from "react-native";
-import RNFS from "react-native-fs";
 import { AppHandler } from "./App";
 import db, { sqliteClient } from "./db/client";
 import { APP_VERSION, AUTO_UPDATE_ENABLED, EXPO_PUBLIC_REPO_NAME, GITHUB_REPO_AUTHOR } from "./env";
@@ -89,8 +89,8 @@ export async function CreateDatabase() {
 export async function ClearCache() {
     sqliteClient.delete();
     Storage.set("createNewDB", true);
-    FastImage.clearDiskCache();
-    FastImage.clearMemoryCache();
+    Image.clearDiskCache();
+    Image.clearMemoryCache();
     Alert.alert("Cache Cleared", "Now we need you to restart the app");
 }
 
@@ -195,10 +195,10 @@ export async function checkForUpdates(silent: boolean = false) {
 export async function saveImageToGallery(uri: string) {
     try {
         const ext = uri.split(".").pop() || "jpg";
-        const dest = `${RNFS.TemporaryDirectoryPath}/min_${Date.now()}.${ext}`;
+        const dest = new File(`${Paths.cache.uri}/min_${Date.now()}.${ext}`);
 
-        await RNFS.downloadFile({ fromUrl: uri, toFile: dest }).promise;
-        await CameraRoll.saveAsset(`file://${dest}`, { type: "photo" });
+        await File.downloadFileAsync(uri, dest);
+        await CameraRoll.saveAsset(dest.uri, { type: "photo" });
     } catch {
         showNotification("Error");
     }

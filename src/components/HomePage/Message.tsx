@@ -7,12 +7,12 @@ import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/st
 import { countChars, dateToString, getShadow } from "@/utils";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import { useTranslation } from "@contexts/TranslationContext";
-import FastImage from "@d11/react-native-fast-image";
 import { openDropdown } from "@services/dropdownService";
 import { setMessagePrefix } from "@services/inputControlService";
 import { setOverlayImage } from "@services/overlayService";
 import { vibrate, vibrateEffectPreset, vibratePreset } from "@specs/HapticsModule";
 import { eq } from "drizzle-orm";
+import { Image } from "expo-image";
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { ImageStyle, StyleSheet, Text, useWindowDimensions, View, ViewProps } from "react-native";
 import { GestureDetector, useExclusiveGestures, usePanGesture, useTapGesture } from "react-native-gesture-handler";
@@ -120,7 +120,7 @@ function MarkdownImage({ uri, style }: { uri: string; style?: any }) {
     return (
         <GestureDetector gesture={tapGesture}>
             <View ref={ref} style={{ borderRadius: 8, overflow: "hidden", opacity: isImageVisible ? 1 : 0 }}>
-                <FastImage
+                <Image
                     source={{ uri }}
                     style={[
                         {
@@ -129,9 +129,9 @@ function MarkdownImage({ uri, style }: { uri: string; style?: any }) {
                         },
                         style,
                     ]}
-                    resizeMode={FastImage.resizeMode.contain}
+                    contentFit="contain"
                     onLoad={e => {
-                        const { width: imgWidth, height: imgHeight } = e.nativeEvent;
+                        const { width: imgWidth, height: imgHeight } = e.source;
                         setRatio(imgWidth / imgHeight);
                     }}
                 />
@@ -354,7 +354,7 @@ function MessageBase(props: MessageProps) {
                 style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
             >
                 {showAvatar && (
-                    <FastImage source={{ uri: `${API_URL}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
+                    <Image source={{ uri: `${API_URL}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
                 )}
                 <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
                     <Animated.View

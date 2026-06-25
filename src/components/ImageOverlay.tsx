@@ -1,7 +1,7 @@
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { saveImageToGallery } from "@/utils";
-import FastImage from "@d11/react-native-fast-image";
 import { vibrateEffect } from "@specs/HapticsModule";
+import { Image } from "expo-image";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -213,14 +213,14 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
                 <Animated.View
                     style={[styles.imageContainer, animatedStyle, { opacity: isShown ? 1 : 0, transition: "opacity 0.1s" }]}
                 >
-                    <FastImage
+                    <Image
                         source={{ uri: image }}
                         style={{ width: "100%", height: "100%" }}
                         onLoad={e => {
                             if (animateOnLoad.current) {
-                                const event = e.nativeEvent;
+                                const src = e.source;
                                 setTimeout(() => {
-                                    const ratio = event.width / event.height;
+                                    const ratio = src.width / src.height;
                                     const imageWidth = screenWidth - Styles.container.paddingHorizontal;
                                     const imageHeight = screenWidth / ratio - Styles.container.paddingVertical;
                                     if (screenWidth > screenHeight) {
@@ -237,7 +237,7 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
                                 }, 100);
                             }
                         }}
-                        resizeMode="stretch"
+                        contentFit="contain"
                     />
                 </Animated.View>
             </GestureDetector>

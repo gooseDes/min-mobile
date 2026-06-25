@@ -1,5 +1,5 @@
 import { createGlobalStyles, useAppStyles, useThemeStore } from "@/style";
-import FastImage from "@d11/react-native-fast-image";
+import { Image } from "expo-image";
 import { useEffect } from "react";
 import { StyleSheet, Text, View, ViewProps } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
@@ -84,7 +84,7 @@ function ClickableProfile(props: ClickableProfileProps) {
                     style={{ borderRadius: theme.rounding, flex: 1, padding: 8 }}
                 >
                     <View style={styles.container}>
-                        <FastImage source={{ uri: image }} style={styles.image} />
+                        <Image source={{ uri: image }} style={styles.image} />
                         <View style={styles.textContainer}>
                             {text && <Text style={Styles.primaryText}>{text}</Text> /* Name */}
                             {bottomText && <Text style={Styles.secondaryText}>{bottomText}</Text> /* Status */}

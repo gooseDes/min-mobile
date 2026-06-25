@@ -8,10 +8,11 @@ import Icon from "@components/Icon";
 import PressableWithEffect from "@components/PressableWithEffect";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
+import { setOverlay } from "@services/overlayService";
 import { showPopup } from "@services/popupService";
+import { launchImageLibraryAsync } from "expo-image-picker";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { StyleProp, StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
-import { launchImageLibrary } from "react-native-image-picker";
 import Animated, { SlideInDown, SlideOutDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 
 const createStyles = (theme: ThemeData) =>
@@ -91,19 +92,22 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
     }
 
     async function attach() {
-        const result = await launchImageLibrary({ mediaType: "photo", selectionLimit: 1 });
-        if (result.didCancel) return;
+        const result = await launchImageLibraryAsync({ mediaTypes: ["images"], selectionLimit: 1 });
         if (!result.assets) return;
         const asset = result.assets[0];
-        if (asset.uri && asset.fileName && asset.type) {
+        if (asset.uri && asset.fileName && asset.mimeType) {
+            setOverlay("loading");
             const response = await apiClient.attachImage(await Auth.getFromStorage("token"), {
                 uri: asset.uri,
                 name: asset.fileName,
-                type: asset.type,
+                type: asset.mimeType,
             });
+            setOverlay("none");
             if (response.success) {
                 setValue(
-                    value + value ? " " : "" + response.urls.map((att: string) => `![attachment](${API_URL}${att})`).join("\n"),
+                    value +
+                        (value ? " " : "") +
+                        response.urls.map((att: string) => `![attachment](${API_URL}${att})`).join("\n"),
                 );
             } else {
                 showPopup("Error", response.message);

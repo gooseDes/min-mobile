@@ -1,4 +1,7 @@
 {
-    "name": "MinMobile",
-    "displayName": "Min Mobile"
+  "name": "MinMobile",
+  "displayName": "Min Mobile",
+  "plugins": [
+    "expo-image"
+  ]
 }

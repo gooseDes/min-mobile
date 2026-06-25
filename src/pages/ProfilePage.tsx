@@ -12,9 +12,9 @@ import { useTranslation } from "@contexts/TranslationContext";
 import { goBack, navigate } from "@services/navigationService";
 import { setOverlay } from "@services/overlayService";
 import { showPopup } from "@services/popupService";
+import { ImagePickerAsset, launchImageLibraryAsync } from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { BackHandler, StyleSheet, Text, View } from "react-native";
-import { Asset, launchImageLibrary } from "react-native-image-picker";
 import Animated, { ZoomInEasyDown, ZoomInEasyUp, ZoomOutEasyDown, ZoomOutEasyUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -124,7 +124,7 @@ function ActionButton(props: ActionButtonProps) {
 
 function ProfilePage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
-    const [avatarPreview, setAvatarPreview] = useState<Asset | undefined>(undefined);
+    const [avatarPreview, setAvatarPreview] = useState<ImagePickerAsset | undefined>(undefined);
     const [avatar, setAvatar] = useState<string>(`${API_URL}/avatars/${Storage.getString("avatar")}.webp`);
     const { t } = useTranslation();
     const theme = useThemeStore(s => s.theme);
@@ -144,8 +144,7 @@ function ProfilePage() {
 
     async function uploadAvatar() {
         if (!isEditMode) return;
-        const result = await launchImageLibrary({ mediaType: "photo", selectionLimit: 1 });
-        if (result.didCancel) return;
+        const result = await launchImageLibraryAsync({ mediaTypes: ["images"], selectionLimit: 1 });
         if (!result.assets) return;
 
         setAvatarPreview(result.assets[0]);
