@@ -57,6 +57,7 @@ jobs:
 
             - name: Build Release APK
               run: |
+                  export $(grep -v '^#' .env | xargs -d '\n')
                   npm run start &
                   BUNDLER_PID=$!
                   while ! curl -s http://localhost:8081/status > /dev/null; do sleep 2; done
