@@ -3,7 +3,7 @@
     "include": ["**/*.ts", "**/*.tsx"],
     "exclude": ["**/node_modules", "**/Pods"],
     "compilerOptions": {
-        "types": ["node"],
+        "types": ["react-native"],
         "paths": {
             "@components/*": ["./src/components/*"],
             "@pages/*": ["./src/pages/*"],

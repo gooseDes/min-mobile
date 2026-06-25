@@ -1,11 +1,13 @@
-import { open } from "@op-engineering/op-sqlite";
-import { drizzle } from "drizzle-orm/op-sqlite";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import { openDatabaseSync } from "expo-sqlite";
 import * as schema from "./schema";
 
-export const sqliteClient = open({
-    name: "min-mobile.db",
-});
+const client = openDatabaseSync("min-mobile.db");
 
-const db = drizzle<typeof schema>(sqliteClient, { schema });
+export function deleteDB() {
+    // TODO
+}
+
+const db = drizzle<typeof schema>(client, { schema });
 
 export default db;

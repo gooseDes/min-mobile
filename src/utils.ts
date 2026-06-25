@@ -1,5 +1,4 @@
 import migrations from "@drizzle/migrations";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { showNotification } from "@services/notifyService";
 import { setOverlay } from "@services/overlayService";
 import { showPopup } from "@services/popupService";
@@ -10,7 +9,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { Alert } from "react-native";
 import { AppHandler } from "./App";
-import db, { sqliteClient } from "./db/client";
+import db, { deleteDB } from "./db/client";
 import { APP_VERSION, AUTO_UPDATE_ENABLED, EXPO_PUBLIC_REPO_NAME, GITHUB_REPO_AUTHOR } from "./env";
 import Storage from "./storage";
 import { ThemeData } from "./style";
@@ -87,7 +86,7 @@ export async function CreateDatabase() {
 }
 
 export async function ClearCache() {
-    sqliteClient.delete();
+    deleteDB();
     Storage.set("createNewDB", true);
     Image.clearDiskCache();
     Image.clearMemoryCache();
@@ -193,6 +192,7 @@ export async function checkForUpdates(silent: boolean = false) {
 }
 
 export async function saveImageToGallery(uri: string) {
+    const { CameraRoll } = await import("@react-native-camera-roll/camera-roll");
     try {
         const ext = uri.split(".").pop() || "jpg";
         const dest = new File(`${Paths.cache.uri}/min_${Date.now()}.${ext}`);

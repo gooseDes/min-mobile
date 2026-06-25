@@ -26,7 +26,7 @@ import { notificationRef, showNotification } from "@services/notifyService";
 import { imageOverlayRef, overlayRef, setOverlay, setOverlayProgress } from "@services/overlayService";
 import { popupRef } from "@services/popupService";
 import { UpdateModule } from "@specs/UpdateModule";
-import { migrate } from "drizzle-orm/op-sqlite/migrator";
+import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StatusBar, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
