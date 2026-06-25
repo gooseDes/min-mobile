@@ -1,3 +1,4 @@
+import { API_URL } from "@/env";
 import { useStorage } from "@/storage";
 import ClickableProfile from "@components/ClickableProfile";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
@@ -56,7 +57,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
             <Animated.View style={{ paddingHorizontal: 5 }} entering={FadeIn} exiting={FadeOut}>
                 <ClickableProfile
                     text={chat.title}
-                    image={`${process.env.EXPO_PUBLIC_SERVER}/avatars/${
+                    image={`${API_URL}/avatars/${
                         chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
                     }.webp`}
                     anim={index % 2 === 0 ? "left" : "right"}

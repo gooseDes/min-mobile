@@ -11,6 +11,7 @@ import { Alert } from "react-native";
 import RNFS from "react-native-fs";
 import { AppHandler } from "./App";
 import db, { sqliteClient } from "./db/client";
+import { APP_VERSION, AUTO_UPDATE_ENABLED, EXPO_PUBLIC_REPO_NAME, GITHUB_REPO_AUTHOR } from "./env";
 import Storage from "./storage";
 import { ThemeData } from "./style";
 import { t } from "./translation";
@@ -158,14 +159,14 @@ export function getShadow(theme: ThemeData): string {
 // Check for updates and prompt the user to update if necessary
 export async function checkForUpdates(silent: boolean = false) {
     if (!silent) setOverlay("loading");
-    if (process.env.EXPO_PUBLIC_VERSION) {
-        if (process.env.EXPO_PUBLIC_AUTO_UPDATE === "true") {
+    if (APP_VERSION) {
+        if (AUTO_UPDATE_ENABLED) {
             const result = await fetch(
-                `https://api.github.com/repos/${process.env.EXPO_PUBLIC_REPO_AUTHOR}/${process.env.EXPO_PUBLIC_REPO_NAME}/releases/latest`,
+                `https://api.github.com/repos/${GITHUB_REPO_AUTHOR}/${EXPO_PUBLIC_REPO_NAME}/releases/latest`,
             );
             const data = await result.json();
             const latestVersion = data.tag_name?.slice(1);
-            if (latestVersion && latestVersion !== process.env.EXPO_PUBLIC_VERSION) {
+            if (latestVersion && latestVersion !== APP_VERSION) {
                 const confirmUpdate = () => {
                     const downloadUrl = data?.assets?.[0]?.browser_download_url;
                     console.log("Downloading", downloadUrl);

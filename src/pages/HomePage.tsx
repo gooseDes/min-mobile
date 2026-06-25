@@ -2,6 +2,7 @@ import Auth from "@/auth";
 import db from "@/db/client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/schema";
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/utils";
+import { API_URL } from "@/env";
 import { apiClient } from "@/socket";
 import Storage from "@/storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
@@ -455,7 +456,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
                             return (
                                 <ClickableProfile
-                                    image={`${process.env.EXPO_PUBLIC_SERVER}/avatars/${otherParticipant.avatar}.webp`}
+                                    image={`${API_URL}/avatars/${otherParticipant.avatar}.webp`}
                                     text={currentChat?.title}
                                     bottomText={isPrivate ? t.private_chat : t.group_chat}
                                     onPress={isPrivate ? () => openProfile(otherParticipant.id) : () => {}}

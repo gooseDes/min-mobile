@@ -1,5 +1,6 @@
 import db from "@/db/client";
 import { usersTable } from "@/db/schema";
+import { API_URL } from "@/env";
 import { apiClient } from "@/socket";
 import { Constants, createGlobalStyles, useAppStyles } from "@/style";
 import { CreateUserData } from "@/utils";
@@ -57,10 +58,7 @@ function Profile(props: ProfileProps) {
         <Animated.View layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
             {user && (
                 <View style={{ alignItems: "center", justifyContent: "center" }}>
-                    <Image
-                        source={{ uri: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${user.avatar}.webp` }}
-                        style={styles.avatar}
-                    />
+                    <Image source={{ uri: `${API_URL}/avatars/${user.avatar}.webp` }} style={styles.avatar} />
                     <Text style={[Styles.primaryText, styles.name]} selectable={true}>
                         {user.username}
                     </Text>

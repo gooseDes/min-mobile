@@ -1,4 +1,5 @@
 import Auth from "@/auth";
+import { API_URL } from "@/env";
 import { apiClient } from "@/socket";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { getShadow } from "@/utils";
@@ -102,12 +103,7 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
             });
             if (response.success) {
                 setValue(
-                    value + value
-                        ? " "
-                        : "" +
-                              response.urls
-                                  .map((att: string) => `![attachment](${process.env.EXPO_PUBLIC_SERVER}${att})`)
-                                  .join("\n"),
+                    value + value ? " " : "" + response.urls.map((att: string) => `![attachment](${API_URL}${att})`).join("\n"),
                 );
             } else {
                 showPopup("Error", response.message);

@@ -35,6 +35,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
 import Auth from "./auth";
 import db from "./db/client";
+import { API_URL } from "./env";
 import HomePage, { HomePageHandler } from "./pages/HomePage";
 import SignPage from "./pages/SignPage";
 import { initSocket } from "./socket";
@@ -92,7 +93,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                 android: {
                     smallIcon: "ic_notification",
                     channelId: "min",
-                    largeIcon: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${data.authorAvatar}.webp`,
+                    largeIcon: `${API_URL}/avatars/${data.authorAvatar}.webp`,
                     importance: AndroidImportance.HIGH,
                     category: AndroidCategory.MESSAGE,
                     showTimestamp: true,
@@ -108,7 +109,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                                 timestamp: data.sentAt * 1000,
                                 person: {
                                     name: data.authorName,
-                                    icon: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${data.authorAvatar}.webp`,
+                                    icon: `${API_URL}/avatars/${data.authorAvatar}.webp`,
                                 },
                             },
                         ],
@@ -159,7 +160,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             const data = CreateRemoteMessagePayload(remoteMessage.data);
             notificationRef.current?.setTitle(data.authorName);
             notificationRef.current?.setText(data.text);
-            notificationRef.current?.setImage(`${process.env.EXPO_PUBLIC_SERVER}/avatars/${data.authorAvatar}.webp` || null);
+            notificationRef.current?.setImage(`${API_URL}/avatars/${data.authorAvatar}.webp` || null);
             if (homePageRef.current?.getCurrentChat().id !== data.chatId || homePageRef.current?.getCurrentTab() !== "chat") {
                 notificationRef.current?.show();
             }

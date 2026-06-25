@@ -1,6 +1,7 @@
 import Auth from "@/auth";
 import db from "@/db/client";
 import { messagesTable, usersTable } from "@/db/schema";
+import { API_URL } from "@/env";
 import { apiClient } from "@/socket";
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { countChars, dateToString, getShadow } from "@/utils";
@@ -353,10 +354,7 @@ function MessageBase(props: MessageProps) {
                 style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
             >
                 {showAvatar && (
-                    <FastImage
-                        source={{ uri: `${process.env.EXPO_PUBLIC_SERVER}/avatars/${props.author_avatar || ""}.webp` }}
-                        style={styles.avatar}
-                    />
+                    <FastImage source={{ uri: `${API_URL}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
                 )}
                 <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
                     <Animated.View

@@ -1,4 +1,5 @@
 import Auth from "@/auth";
+import { API_URL } from "@/env";
 import { apiClient } from "@/socket";
 import Storage from "@/storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
@@ -124,9 +125,7 @@ function ActionButton(props: ActionButtonProps) {
 function ProfilePage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [avatarPreview, setAvatarPreview] = useState<Asset | undefined>(undefined);
-    const [avatar, setAvatar] = useState<string>(
-        `${process.env.EXPO_PUBLIC_SERVER}/avatars/${Storage.getString("avatar")}.webp`,
-    );
+    const [avatar, setAvatar] = useState<string>(`${API_URL}/avatars/${Storage.getString("avatar")}.webp`);
     const { t } = useTranslation();
     const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
@@ -138,7 +137,7 @@ function ProfilePage() {
             return true;
         });
 
-        setAvatar(`${process.env.EXPO_PUBLIC_SERVER}/avatars/${Storage.getString("avatar")}.webp`);
+        setAvatar(`${API_URL}/avatars/${Storage.getString("avatar")}.webp`);
 
         return () => listener.remove();
     }, []);
@@ -163,7 +162,7 @@ function ProfilePage() {
                     type: avatarPreview.type,
                 });
                 if (response.success) {
-                    setAvatar(`${process.env.EXPO_PUBLIC_SERVER}${response.url}`);
+                    setAvatar(`${API_URL}${response.url}`);
                     Storage.set("avatar", response.avatar);
                 } else {
                     showPopup("Error", response.message);
