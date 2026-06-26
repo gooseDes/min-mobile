@@ -1,13 +1,28 @@
-import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite";
+import { drizzle, ExpoSQLiteDatabase } from "drizzle-orm/expo-sqlite";
+import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
 import * as schema from "./schema";
 
-const client = openDatabaseSync("min-mobile.db");
+export async function deleteDb() {}
 
-export function deleteDB() {
-    // TODO
+let dbInstance:
+    | (ExpoSQLiteDatabase<typeof schema> & {
+          $client: SQLiteDatabase;
+      })
+    | null = null;
+let initPromise: Promise<any> | null = null;
+
+export default async function getDb(): Promise<
+    | ExpoSQLiteDatabase<typeof schema> & {
+          $client: SQLiteDatabase;
+      }
+> {
+    if (dbInstance) return dbInstance;
+    if (!initPromise) {
+        initPromise = (async () => {
+            const client = await openDatabaseAsync("min-mobile.db");
+            dbInstance = drizzle<typeof schema>(client, { schema });
+            return dbInstance;
+        })();
+    }
+    return initPromise;
 }
-
-const db = drizzle<typeof schema>(client, { schema });
-
-export default db;

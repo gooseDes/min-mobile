@@ -1,7 +1,26 @@
 {
-  "name": "MinMobile",
-  "displayName": "Min Mobile",
-  "plugins": [
-    "expo-image"
-  ]
+    "name": "MinMobile",
+    "displayName": "Min Mobile",
+    "expo": {
+        "name": "MinMobile",
+        "displayName": "Min Mobile",
+        "scheme": "min-mobile",
+        "plugins": [
+            "expo-image",
+            "expo-sqlite",
+            [
+                "expo-router",
+                {
+                    "headers": {
+                        "Cross-Origin-Embedder-Policy": "credentialless",
+                        "Cross-Origin-Opener-Policy": "same-origin"
+                    }
+                }
+            ]
+        ],
+        "android": {
+            "googleServicesFile": "./android/app/google-services.json"
+        }
+    }
 }
+

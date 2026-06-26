@@ -1,5 +1,5 @@
 import Auth from "@/auth";
-import db from "@/db/client";
+import getDb from "@/db/client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/schema";
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/utils";
 import { API_URL } from "@/env";
@@ -22,12 +22,11 @@ import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { ChatData as ApiChatData } from "@min/api-client";
 import { getMessaging, getToken } from "@react-native-firebase/messaging";
-import { useFocusEffect } from "@react-navigation/native";
 import { messageInputRef } from "@services/inputControlService";
-import { navigate } from "@services/navigationService";
 import { showPopup } from "@services/popupService";
 import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { eq } from "drizzle-orm";
+import { useRouter } from "expo-router";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, useWindowDimensions, View, ViewStyle } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
@@ -104,6 +103,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const [chatTabBottomGap, setChatTabBottomGap] = useState<number>(66);
     const lastBackButtonPress = useRef<number>(0);
     const { t, changeLanguage } = useTranslation();
+    const router = useRouter();
     const insets = useSafeAreaInsets();
     const styles = useAppStyles(createStyles);
     const theme = useThemeStore(s => s.theme);
@@ -115,7 +115,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     }));
 
     // Back button/gesture handler
-    useFocusEffect(
+    useEffect(
         useCallback(() => {
             const onBackPress = () => {
                 if (currentTabRef.current === "chat") {
@@ -179,6 +179,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     }, [keyboardHeight, contentPanelScale]);
 
     async function requestHistory() {
+        const db = await getDb();
         // Initialize messages from database
         db.query.messagesTable
             .findMany({
@@ -227,6 +228,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     }
 
     async function requestChats() {
+        const db = await getDb();
         // Initialize chats from database
         db.query.chatsTable
             .findMany({
@@ -276,6 +278,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     }
 
     async function addChat(chat: ApiChatData) {
+        const db = await getDb();
         chat.participants.forEach(async p => {
             await db
                 .insert(usersTable)
@@ -308,7 +311,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         });
         const connectErrorSub = apiClient.socket.subscribe("connect_error", err => {
             if (err.message.includes("Invalid token")) {
-                showPopup(t.relogin, t.relogin_msg, [{ text: t.ok, onPress: () => navigate("Sign") }]);
+                showPopup(t.relogin, t.relogin_msg, [{ text: t.ok, onPress: () => router.replace("auth") }]);
             } else {
                 console.log("Connection Error:", err);
             }
@@ -317,7 +320,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             if (data.hidden) return;
             console.error(data);
         });
-        const messageSub = apiClient.subscribeToMessages(message => {
+        const messageSub = apiClient.subscribeToMessages(async message => {
             if (message.chatId === currentChatRef.current?.id) {
                 messagesRef.current?.addMessage(
                     CreateMessage({
@@ -329,7 +332,8 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     }),
                 );
                 vibrateEffectPreset("quick_fall");
-                db.insert(messagesTable)
+                (await getDb())
+                    .insert(messagesTable)
                     .values({
                         id: message.id,
                         content: message.content,
@@ -340,9 +344,9 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     .run();
             }
         });
-        const deleteMessageSub = apiClient.subscribeToDeletingMessages(messageId => {
+        const deleteMessageSub = apiClient.subscribeToDeletingMessages(async messageId => {
             messagesRef.current?.deleteMessage(messageId);
-            db.delete(messagesTable).where(eq(messagesTable.id, messageId)).run();
+            (await getDb()).delete(messagesTable).where(eq(messagesTable.id, messageId)).run();
         });
 
         // Handling keyboard height
@@ -467,10 +471,10 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
                     {/* Chats Tab */}
                     {currentTab === "chats" && (
-                        <FloatIslandButton icon="gear" text={t.settings} onPress={() => navigate("Settings", "push")} />
+                        <FloatIslandButton icon="gear" text={t.settings} onPress={() => router.push("settings")} />
                     )}
                     {currentTab === "chats" && (
-                        <FloatIslandButton icon="user-circle" text={t.profile} onPress={() => navigate("Profile", "push")} />
+                        <FloatIslandButton icon="user-circle" text={t.profile} onPress={() => router.push("profile")} />
                     )}
 
                     {/* Profile Tab */}

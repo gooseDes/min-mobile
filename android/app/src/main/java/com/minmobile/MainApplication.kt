@@ -9,6 +9,7 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
+import com.google.firebase.FirebaseApp
 
 class MainApplication : Application(), ReactApplication {
 
@@ -27,6 +28,15 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
+    
+    // Initialize Firebase
+    try {
+      FirebaseApp.initializeApp(this)
+      android.util.Log.d("[FCM]", "Firebase initialized in MainApplication")
+    } catch (e: Exception) {
+      android.util.Log.e("[FCM]", "Error initializing Firebase: ${e.message}", e)
+    }
+    
     loadReactNative(this)
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
   }

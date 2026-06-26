@@ -8,8 +8,8 @@ import Icon from "@components/Icon";
 import Switch from "@components/Switch";
 import { useTranslation } from "@contexts/TranslationContext";
 import { openDropdown } from "@services/dropdownService";
-import { goBack } from "@services/navigationService";
 import { vibrateEffectPreset } from "@specs/HapticsModule";
+import { useRouter } from "expo-router";
 import { JSX, useEffect, useRef, useState } from "react";
 import { BackHandler, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import Animated, {
@@ -125,6 +125,7 @@ interface SettingsSectionProps {
 }
 
 function SettingsSection(props: SettingsSectionProps) {
+    const router = useRouter();
     const { width, height } = useWindowDimensions();
     const insets = useSafeAreaInsets();
     const [expanded, setExpanded] = useState<boolean>(false);
@@ -171,7 +172,7 @@ function SettingsSection(props: SettingsSectionProps) {
             if (expandedRef.current) {
                 setExpanded(false);
             } else {
-                goBack();
+                router.back();
             }
             return true;
         });

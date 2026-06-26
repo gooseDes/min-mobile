@@ -6,9 +6,9 @@ import Divider from "@components/Divider";
 import Icon from "@components/Icon";
 import InputField from "@components/InputField";
 import { useTranslation } from "@contexts/TranslationContext";
-import { navigate } from "@services/navigationService";
 import { showNotification } from "@services/notifyService";
 import { setOverlay } from "@services/overlayService";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { ZoomInDown, ZoomInUp, ZoomOutDown, ZoomOutUp } from "react-native-reanimated";
@@ -55,6 +55,7 @@ const createStyles = (theme: ThemeData) =>
     });
 
 function SignPage() {
+    const router = useRouter();
     const [emailValue, setEmailValue] = useState<string>("");
     const [loginValue, setLoginValue] = useState<string>("");
     const [passwordValue, setPasswordValue] = useState<string>("");
@@ -68,7 +69,7 @@ function SignPage() {
         setOverlay("loading");
         const result = await Auth.login(emailValue, passwordValue);
         if (result.success) {
-            navigate("Home");
+            router.replace("/");
         } else {
             showNotification("Failed :(", result.message);
         }
@@ -83,7 +84,7 @@ function SignPage() {
         }
         const result = await Auth.register(loginValue, emailValue, passwordValue);
         if (result.success) {
-            navigate("Home");
+            router.replace("/");
         } else {
             showNotification("Failed :(", result.message);
         }

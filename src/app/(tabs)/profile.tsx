@@ -9,10 +9,10 @@ import HapticPressable from "@components/HapticPressable";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import IconButton from "@components/IconButton";
 import { useTranslation } from "@contexts/TranslationContext";
-import { goBack, navigate } from "@services/navigationService";
 import { setOverlay } from "@services/overlayService";
 import { showPopup } from "@services/popupService";
 import { ImagePickerAsset, launchImageLibraryAsync } from "expo-image-picker";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { BackHandler, StyleSheet, Text, View } from "react-native";
 import Animated, { ZoomInEasyDown, ZoomInEasyUp, ZoomOutEasyDown, ZoomOutEasyUp } from "react-native-reanimated";
@@ -126,6 +126,7 @@ function ProfilePage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [avatarPreview, setAvatarPreview] = useState<ImagePickerAsset | undefined>(undefined);
     const [avatar, setAvatar] = useState<string>(`${API_URL}/avatars/${Storage.getString("avatar")}.webp`);
+    const router = useRouter();
     const { t } = useTranslation();
     const theme = useThemeStore(s => s.theme);
     const styles = useAppStyles(createStyles);
@@ -133,7 +134,7 @@ function ProfilePage() {
 
     useEffect(() => {
         const listener = BackHandler.addEventListener("hardwareBackPress", () => {
-            goBack();
+            router.back();
             return true;
         });
 
@@ -173,7 +174,7 @@ function ProfilePage() {
 
     async function logOut() {
         await Auth.clearStorage();
-        navigate("Sign");
+        router.replace("auth");
     }
 
     return (
@@ -182,7 +183,7 @@ function ProfilePage() {
                 {/* Header */}
                 <View style={Styles.header}>
                     {/* Back Button */}
-                    <IconButton icon="list-ul" style={Styles.backButton} onPress={() => goBack()} />
+                    <IconButton icon="list-ul" style={Styles.backButton} onPress={() => router.back()} />
 
                     {/* Title */}
                     <View style={Styles.title}>

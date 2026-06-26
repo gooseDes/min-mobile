@@ -1,16 +1,17 @@
+import { AppHandler } from "@app/_layout";
 import migrations from "@drizzle/migrations";
 import { showNotification } from "@services/notifyService";
 import { setOverlay } from "@services/overlayService";
 import { showPopup } from "@services/popupService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { sql } from "drizzle-orm";
+import * as Device from "expo-device";
 import { File, Paths } from "expo-file-system";
 import { Image } from "expo-image";
 import React from "react";
 import { Alert } from "react-native";
-import { AppHandler } from "./App";
-import db, { deleteDB } from "./db/client";
-import { APP_VERSION, AUTO_UPDATE_ENABLED, EXPO_PUBLIC_REPO_NAME, GITHUB_REPO_AUTHOR } from "./env";
+import getDb, { deleteDb } from "./db/client";
+import { APP_VERSION, AUTO_UPDATE_ENABLED, GITHUB_REPO_AUTHOR, GITHUB_REPO_NAME } from "./env";
 import Storage from "./storage";
 import { ThemeData } from "./style";
 import { t } from "./translation";
@@ -59,6 +60,7 @@ export function CreateRemoteMessagePayload(obj: any): RemoteMessagePayload {
 export async function CreateDatabase() {
     console.log("Creating Database");
     const migrationEntries = Object.entries(migrations.migrations || {});
+    const db = await getDb();
 
     for (const [key, migration] of migrationEntries) {
         try {
@@ -71,7 +73,7 @@ export async function CreateDatabase() {
             for (const subquery of subqueries) {
                 if (subquery) {
                     try {
-                        await db.run(sql.raw(subquery));
+                        db.run(sql.raw(subquery));
                     } catch (error: any) {
                         console.warn(`Safe-skipping submigration from ${key}:`, error.message);
                     }
@@ -86,7 +88,7 @@ export async function CreateDatabase() {
 }
 
 export async function ClearCache() {
-    deleteDB();
+    deleteDb();
     Storage.set("createNewDB", true);
     Image.clearDiskCache();
     Image.clearMemoryCache();
@@ -155,19 +157,47 @@ export function getShadow(theme: ThemeData): string {
     }px ${theme.shadowColor}`;
 }
 
+export function getRequiredApkArchitecture(): string {
+    const architectures = Device.supportedCpuArchitectures;
+
+    if (!architectures || architectures.length === 0) {
+        return "universal";
+    }
+
+    const primaryArch = architectures[0];
+
+    if (primaryArch.includes("arm64-v8a")) {
+        return "arm64-v8a";
+    }
+    if (primaryArch.includes("armeabi-v7a")) {
+        return "armeabi-v7a";
+    }
+    if (primaryArch.includes("x86_64")) {
+        return "x86_64";
+    }
+    if (primaryArch.includes("x86")) {
+        return "x86";
+    }
+
+    return "universal";
+}
+
 // Check for updates and prompt the user to update if necessary
 export async function checkForUpdates(silent: boolean = false) {
     if (!silent) setOverlay("loading");
     if (APP_VERSION) {
         if (AUTO_UPDATE_ENABLED) {
             const result = await fetch(
-                `https://api.github.com/repos/${GITHUB_REPO_AUTHOR}/${EXPO_PUBLIC_REPO_NAME}/releases/latest`,
+                `https://api.github.com/repos/${GITHUB_REPO_AUTHOR}/${GITHUB_REPO_NAME}/releases/latest`,
             );
             const data = await result.json();
             const latestVersion = data.tag_name?.slice(1);
             if (latestVersion && latestVersion !== APP_VERSION) {
                 const confirmUpdate = () => {
-                    const downloadUrl = data?.assets?.[0]?.browser_download_url;
+                    const requiredArch = getRequiredApkArchitecture();
+                    const downloadUrl =
+                        data?.assets?.find((asset: any) => asset.name.includes(requiredArch))?.browser_download_url ||
+                        data?.assets?.[0]?.browser_download_url;
                     console.log("Downloading", downloadUrl);
                     if (downloadUrl) {
                         UpdateModule?.downloadAndInstall(downloadUrl);

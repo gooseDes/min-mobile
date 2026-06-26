@@ -8,10 +8,11 @@ module.exports = function (api) {
                 {
                     root: ["./src"],
                     alias: {
+                        "@app": "./src/app",
                         "@components": "./src/components",
-                        "@pages": "./src/pages",
                         "@types": "./src/types",
                         "@services": "./src/services",
+                        "@db": "./src/db",
                         "@drizzle": "./drizzle",
                         "@specs": "./src/specs",
                         "@contexts": "./src/contexts",

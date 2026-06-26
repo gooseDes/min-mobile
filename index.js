@@ -1,11 +1,7 @@
-/**
- * @format
- */
-
-import App from "@/App";
-import { appRef } from "@/utils";
+import { getMessaging, setBackgroundMessageHandler } from "@/fcm";
+import { getBackgroundMessageHandler } from "@/fcmBackgroundHandler";
 import notifee, { AndroidImportance } from "@notifee/react-native";
-import { getMessaging, setBackgroundMessageHandler } from "@react-native-firebase/messaging";
+import { ExpoRoot } from "expo-router";
 import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
 
@@ -21,22 +17,30 @@ createChannel();
 
 const messaging = getMessaging();
 
-export const setActiveBackgroundHandler = handler => {
-    backgroundMessageHandler = handler;
-};
-
-let backgroundMessageHandler = null;
-
 setBackgroundMessageHandler(messaging, async remoteMessage => {
-    if (!remoteMessage.data) return;
-    if (!backgroundMessageHandler) return;
-    return backgroundMessageHandler(remoteMessage);
+    if (!remoteMessage.data) {
+        console.warn("[FCM] Background: No data in message");
+        return;
+    }
+    
+    const handler = getBackgroundMessageHandler();
+    if (handler) {
+        try {
+            await handler(remoteMessage);
+            console.log("[FCM] Background: Message handled");
+        } catch (error) {
+            console.error("[FCM] Background: Error handling message", error);
+        }
+    } else {
+        console.warn("[FCM] Background: No handler registered yet");
+    }
 });
 
 notifee.requestPermission();
 
-function AppWrapper() {
-    return <App ref={appRef} />;
+export function App() {
+    const ctx = require.context("./src/app");
+    return <ExpoRoot context={ctx} />;
 }
 
-AppRegistry.registerComponent(appName, () => AppWrapper);
+AppRegistry.registerComponent(appName, () => App);

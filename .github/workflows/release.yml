@@ -57,14 +57,7 @@ jobs:
 
             - name: Build Release APK
               run: |
-                  export $(grep -v '^#' .env | xargs -d '\n')
-                  npm run start &
-                  BUNDLER_PID=$!
-                  while ! curl -s http://localhost:8081/status > /dev/null; do sleep 2; done
-                  cd android
-                  ./gradlew assembleRelease
-                  cd ..
-                  kill $BUNDLER_PID || true
+                  dotenv -e .env -- bash -c "cd android && ./gradlew assembleRelease && cd .."
               env:
                   KEYSTORE_FILE: release.keystore
                   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -77,6 +70,6 @@ jobs:
                   tag_name: v1.0.${{ github.run_number }}
                   name: MinMobile Release v1.0.${{ github.run_number }}
                   body: "This is an automated build from the release branch."
-                  files: android/app/build/outputs/apk/release/app-release.apk
+                  files: android/app/build/outputs/apk/release/app-*-release.apk
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

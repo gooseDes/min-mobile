@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import * as Keychain from "react-native-keychain";
 import { apiClient, initSocket } from "./socket";
 import Storage from "./storage";
@@ -75,16 +76,28 @@ export default class Auth {
     }
 
     static async getFromStorage(key: string): Promise<string> {
-        return (await this.getAllFromStorage())[key];
+        if (Platform.OS === "web") {
+            return Storage.getString(key) ?? "";
+        } else {
+            return (await this.getAllFromStorage())[key];
+        }
     }
 
     static async setInStorage(key: string, value: string) {
-        const json = await this.getAllFromStorage();
-        json[key] = value;
-        await Keychain.setGenericPassword("data", JSON.stringify(json));
+        if (Platform.OS === "web") {
+            Storage.set(key, value);
+        } else {
+            const json = await this.getAllFromStorage();
+            json[key] = value;
+            await Keychain.setGenericPassword("data", JSON.stringify(json));
+        }
     }
 
     static async clearStorage() {
-        await Keychain.resetGenericPassword();
+        if (Platform.OS === "web") {
+            Storage.clearAll();
+        } else {
+            await Keychain.resetGenericPassword();
+        }
     }
 }

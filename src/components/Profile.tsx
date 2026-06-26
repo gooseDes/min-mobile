@@ -1,4 +1,4 @@
-import db from "@/db/client";
+import getDb from "@/db/client";
 import { usersTable } from "@/db/schema";
 import { API_URL } from "@/env";
 import { apiClient } from "@/socket";
@@ -40,6 +40,7 @@ function Profile(props: ProfileProps) {
 
     useEffect(() => {
         async function fetchUser() {
+            const db = await getDb();
             // Get user info from db
             const userData = await db.select().from(usersTable).where(eq(usersTable.id, props.id)).limit(1);
             setUser(CreateUserData(userData[0]));

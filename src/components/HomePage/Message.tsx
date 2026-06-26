@@ -1,5 +1,5 @@
 import Auth from "@/auth";
-import db from "@/db/client";
+import getDb from "@/db/client";
 import { messagesTable, usersTable } from "@/db/schema";
 import { API_URL } from "@/env";
 import { apiClient } from "@/socket";
@@ -219,6 +219,7 @@ function MessageBase(props: MessageProps) {
     );
 
     async function getReplyText() {
+        const db = await getDb();
         const replyId = parseInt(textStr.split("\n")[0].split(" ")[1], 10);
         const replyMessage = await db.query.messagesTable.findFirst({ where: eq(messagesTable.id, replyId) });
         if (replyMessage) {

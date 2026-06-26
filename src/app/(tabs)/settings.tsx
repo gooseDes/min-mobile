@@ -6,7 +6,7 @@ import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import SettingsSection from "@components/Settings/SettingsSection";
 import { useTranslation } from "@contexts/TranslationContext";
-import { goBack } from "@services/navigationService";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -29,6 +29,7 @@ const createStyles = (theme: ThemeData) =>
     });
 
 function SettingsPage() {
+    const router = useRouter();
     const { t } = useTranslation();
     const theme = useThemeStore(s => s.theme);
     const styles = createStyles(theme);
@@ -40,7 +41,7 @@ function SettingsPage() {
                 {/* Header */}
                 <View style={Styles.header}>
                     {/* Back Button */}
-                    <IconButton icon="list-ul" style={Styles.backButton} onPress={() => goBack()} />
+                    <IconButton icon="list-ul" style={Styles.backButton} onPress={() => router.back()} />
 
                     {/* Title */}
                     <View style={Styles.title}>

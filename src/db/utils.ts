@@ -1,6 +1,6 @@
 import { CreateChat, CreateMessage, CreateUserData } from "@/utils";
 import { FetchChatMessagesResult, FetchChatsResult } from "@min/api-client";
-import db from "./client";
+import getDb from "./client";
 import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./schema";
 
 export function ProcessHistoryAndReturn(history_payload: FetchChatMessagesResult): Promise<MessageData[]> {
@@ -9,6 +9,7 @@ export function ProcessHistoryAndReturn(history_payload: FetchChatMessagesResult
 
     return Promise.all(
         messages.slice().map(async msg => {
+            const db = await getDb();
             await db
                 .insert(usersTable)
                 .values(msg.sender)
@@ -56,7 +57,10 @@ export function ProcessChatsAndReturn(chats_payload: FetchChatsResult): Promise<
 
     // Default chat
     const defaultChatPromise = async (): Promise<ChatData> => {
-        await db.insert(chatsTable).values({ id: 1, type: chatTypes.group, title: "Default Chat" }).onConflictDoNothing();
+        await (await getDb())
+            .insert(chatsTable)
+            .values({ id: 1, type: chatTypes.group, title: "Default Chat" })
+            .onConflictDoNothing();
         return CreateChat({ id: 1, title: "Default Chat", participants: [] });
     };
     promises.push(defaultChatPromise());
@@ -64,6 +68,7 @@ export function ProcessChatsAndReturn(chats_payload: FetchChatsResult): Promise<
     // Saving chats to db
     promises.push(
         ...chats.slice().map(async chat => {
+            const db = await getDb();
             await db.insert(chatsTable).values({ id: chat.id, type: chatTypes.private, title: chat.name || "Unknown" });
             await Promise.all(
                 chat.participants.map(async user => {
