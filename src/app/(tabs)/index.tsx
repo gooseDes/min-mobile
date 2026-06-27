@@ -18,6 +18,7 @@ import MessagesContainer, { MessagesContainerHandle } from "@components/HomePage
 import Icon from "@components/Icon";
 import IconButton from "@components/IconButton";
 import Profile from "@components/Profile";
+import ScreenPanel from "@components/ScreenPanel";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { ChatData as ApiChatData } from "@min/api-client";
@@ -102,7 +103,6 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [profileId, setProfileId] = useState<number>(-1);
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-    const [containerSize, setContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
     const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
     const [chatTabBottomGap, setChatTabBottomGap] = useState<number>(66);
     const lastBackButtonPress = useRef<number>(0);
@@ -416,20 +416,8 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         }
     }
 
-    useEffect(() => {
-        setInsideContainerSize({
-            width: containerSize.width - Styles.container.paddingHorizontal * 2 - insets.left - insets.right,
-            height: containerSize.height - Styles.container.paddingVertical * 2 - insets.top - insets.bottom,
-        });
-    }, [containerSize, insets.top, insets.bottom]);
-
     return (
-        <View
-            style={styles.container}
-            onLayout={event =>
-                setContainerSize({ width: event.nativeEvent.layout.width, height: event.nativeEvent.layout.height })
-            }
-        >
+        <ScreenPanel insidePanel={false} setSize={setInsideContainerSize}>
             <View
                 style={[
                     styles.sizedContainer,
@@ -529,7 +517,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     onSend={sendMessage}
                 />
             )}
-        </View>
+        </ScreenPanel>
     );
 });
 

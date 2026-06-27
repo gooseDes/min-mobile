@@ -8,6 +8,7 @@ import Divider from "@components/Divider";
 import HapticPressable from "@components/HapticPressable";
 import Icon, { AnimatedIcon } from "@components/Icon";
 import IconButton from "@components/IconButton";
+import ScreenPanel from "@components/ScreenPanel";
 import { useTranslation } from "@contexts/TranslationContext";
 import { setOverlay } from "@services/overlayService";
 import { showPopup } from "@services/popupService";
@@ -16,7 +17,6 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { BackHandler, StyleSheet, Text, View } from "react-native";
 import Animated, { ZoomInEasyDown, ZoomInEasyUp, ZoomOutEasyDown, ZoomOutEasyUp } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
@@ -178,76 +178,74 @@ function ProfilePage() {
     }
 
     return (
-        <SafeAreaView style={Styles.container}>
-            <View style={styles.panel}>
-                {/* Header */}
-                <View style={Styles.header}>
-                    {/* Back Button */}
-                    <IconButton icon="list-ul" style={Styles.backButton} onPress={() => router.back()} />
+        <ScreenPanel>
+            {/* Header */}
+            <View style={Styles.header}>
+                {/* Back Button */}
+                <IconButton icon="list-ul" style={Styles.backButton} onPress={() => router.back()} />
 
-                    {/* Title */}
-                    <View style={Styles.title}>
-                        <Icon name="user-circle" size={24} color={theme.primaryTextColor} />
-                        <Text style={Styles.titleText}>{t.profile}</Text>
-                    </View>
-
-                    {/* Spacer */}
-                    <View style={Styles.backButton} />
+                {/* Title */}
+                <View style={Styles.title}>
+                    <Icon name="user-circle" size={24} color={theme.primaryTextColor} />
+                    <Text style={Styles.titleText}>{t.profile}</Text>
                 </View>
 
-                <Divider />
+                {/* Spacer */}
+                <View style={Styles.backButton} />
+            </View>
 
-                {/* Content */}
-                <View style={[Styles.content, { justifyContent: "flex-start", paddingVertical: 32 }]}>
-                    {/* Profile */}
-                    <View style={styles.avatarContainerContainer}>
-                        <HapticPressable
-                            android_ripple={{ color: theme.rippleColor, foreground: true, borderless: true }}
-                            style={styles.avatarContainer}
-                            onPress={() => uploadAvatar()}
-                        >
-                            <Animated.Image
-                                src={avatarPreview ? avatarPreview.uri : avatar}
-                                style={[
-                                    styles.avatar,
-                                    {
-                                        filter: `blur(${isEditMode && !avatarPreview ? 5 : 0})`,
-                                        transition: "filter 0.25s ease",
-                                    } as any,
-                                ]}
-                            />
-                        </HapticPressable>
-                        <AnimatedIcon
-                            name="upload"
-                            color={"#fff"}
-                            size={64}
-                            containerStyle={{
-                                position: "absolute",
-                                mixBlendMode: "difference",
-                                opacity: isEditMode ? 1 : 0,
-                                right: avatarPreview ? -8 : undefined,
-                                bottom: avatarPreview ? -8 : undefined,
-                                transform: [{ scale: avatarPreview ? 0.5 : 1 }],
-                                transition: "opacity 0.25s ease, transform 0.25s ease",
-                                pointerEvents: "none",
-                                zIndex: 1,
-                            }}
-                        />
-                    </View>
-                    <Text style={[Styles.primaryBoldText, styles.username]}>{Auth.username}</Text>
+            <Divider />
 
-                    {/* Actions */}
-                    <View style={styles.actionButtonContainer}>
-                        <ActionButton
-                            text={isEditMode ? t.apply : t.edit}
-                            icon={isEditMode ? "check" : "pencil"}
-                            onPress={() => setIsEditMode(!isEditMode)}
+            {/* Content */}
+            <View style={[Styles.content, { justifyContent: "flex-start", paddingVertical: 32 }]}>
+                {/* Profile */}
+                <View style={styles.avatarContainerContainer}>
+                    <HapticPressable
+                        android_ripple={{ color: theme.rippleColor, foreground: true, borderless: true }}
+                        style={styles.avatarContainer}
+                        onPress={() => uploadAvatar()}
+                    >
+                        <Animated.Image
+                            src={avatarPreview ? avatarPreview.uri : avatar}
+                            style={[
+                                styles.avatar,
+                                {
+                                    filter: `blur(${isEditMode && !avatarPreview ? 5 : 0})`,
+                                    transition: "filter 0.25s ease",
+                                } as any,
+                            ]}
                         />
-                        <ActionButton text={t.log_out} icon="right-from-bracket" onPress={logOut} />
-                    </View>
+                    </HapticPressable>
+                    <AnimatedIcon
+                        name="upload"
+                        color={"#fff"}
+                        size={64}
+                        containerStyle={{
+                            position: "absolute",
+                            mixBlendMode: "difference",
+                            opacity: isEditMode ? 1 : 0,
+                            right: avatarPreview ? -8 : undefined,
+                            bottom: avatarPreview ? -8 : undefined,
+                            transform: [{ scale: avatarPreview ? 0.5 : 1 }],
+                            transition: "opacity 0.25s ease, transform 0.25s ease",
+                            pointerEvents: "none",
+                            zIndex: 1,
+                        }}
+                    />
+                </View>
+                <Text style={[Styles.primaryBoldText, styles.username]}>{Auth.username}</Text>
+
+                {/* Actions */}
+                <View style={styles.actionButtonContainer}>
+                    <ActionButton
+                        text={isEditMode ? t.apply : t.edit}
+                        icon={isEditMode ? "check" : "pencil"}
+                        onPress={() => setIsEditMode(!isEditMode)}
+                    />
+                    <ActionButton text={t.log_out} icon="right-from-bracket" onPress={logOut} />
                 </View>
             </View>
-        </SafeAreaView>
+        </ScreenPanel>
     );
 }
 
