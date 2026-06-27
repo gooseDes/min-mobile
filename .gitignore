@@ -157,3 +157,4 @@ android/app/google-services.json
 android/link-assets-manifest.json
 
 .expo
+.vscode

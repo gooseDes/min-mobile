@@ -7,7 +7,7 @@ import Storage from "@/storage";
 import { ThemeData, useThemeStore } from "@/style";
 import { generateAdaptiveTheme } from "@/themes";
 import Translation from "@/translation";
-import { appRef, checkForUpdates, CreateDatabase, CreateRemoteMessagePayload } from "@/utils";
+import { appRef, checkForUpdates, CreateDatabase, CreateRemoteMessagePayload, homePageRef } from "@/utils";
 import Dropdown from "@components/Dropdown";
 import ImageOverlay from "@components/ImageOverlay";
 import Notification from "@components/Notification";
@@ -27,12 +27,11 @@ import { popupRef } from "@services/popupService";
 import { UpdateModule } from "@specs/UpdateModule";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { Stack, useRouter } from "expo-router";
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { StatusBar, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { HomePageHandler } from "./(tabs)";
 
 export interface AppHandler {
     setBlurEnabled: (enabled: boolean) => void;
@@ -46,7 +45,6 @@ function RootLayout() {
 
 const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
     const router = useRouter();
-    const homePageRef = useRef<HomePageHandler | null>(null);
     const [isContentBlurred, setIsContentBlurred] = useState<boolean>(false);
     const systemColorScheme = useColorScheme();
     const { theme, setTheme } = useThemeStore();
@@ -63,9 +61,9 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             console.log("[FCM] Requesting user permission...");
             const authStatus = await requestPermission(messaging);
             console.log("[FCM] Authorization status:", authStatus);
-            
+
             const enabled = authStatus === AuthorizationStatus.AUTHORIZED || authStatus === AuthorizationStatus.PROVISIONAL;
-            
+
             if (enabled) {
                 console.log("[FCM] Permission granted, initializing Firebase handlers");
                 initializeFirebase();
@@ -84,7 +82,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                     console.warn("[FCM] Background handler: No data in message");
                     return;
                 }
-                
+
                 try {
                     console.log("[FCM] Background handler: Processing message");
                     const data = CreateRemoteMessagePayload(remoteMessage.data);
@@ -172,15 +170,15 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
                     console.warn("[FCM] Foreground handler: No data in message");
                     return;
                 }
-                
+
                 const data = CreateRemoteMessagePayload(remoteMessage.data);
                 notificationRef.current?.setTitle(data.authorName);
                 notificationRef.current?.setText(data.text);
                 notificationRef.current?.setImage(`${API_URL}/avatars/${data.authorAvatar}.webp` || null);
-                
+
                 const currentChat = homePageRef.current?.getCurrentChat();
                 const currentTab = homePageRef.current?.getCurrentTab();
-                
+
                 if (currentChat?.id !== data.chatId || currentTab !== "chat") {
                     console.log("[FCM] Foreground handler: Showing notification (not in chat)");
                     notificationRef.current?.show();

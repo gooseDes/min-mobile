@@ -1,3 +1,4 @@
+import { HomePageHandler } from "@app/(tabs)";
 import { AppHandler } from "@app/_layout";
 import migrations from "@drizzle/migrations";
 import { showNotification } from "@services/notifyService";
@@ -17,6 +18,7 @@ import { ThemeData } from "./style";
 import { t } from "./translation";
 
 export const appRef = React.createRef<AppHandler>();
+export const homePageRef = React.createRef<HomePageHandler>();
 
 export function CreateUserData(obj: any = {}): UserData {
     const o = obj || {};

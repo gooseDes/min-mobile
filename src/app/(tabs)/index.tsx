@@ -7,7 +7,7 @@ import { apiClient } from "@/socket";
 import Storage from "@/storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import Translation from "@/translation";
-import { CreateChat, CreateMessage, getShadow } from "@/utils";
+import { CreateChat, CreateMessage, getShadow, homePageRef } from "@/utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
 import FloatIslandButton from "@components/FloatIslandButton";
@@ -87,6 +87,10 @@ type Tabs = "chat" | "chats" | "profile";
 type TabStyles = {
     [K in keyof ViewStyle]?: Record<Tabs, ViewStyle[K]>;
 };
+
+function HomePageWrapper() {
+    return <HomePage ref={homePageRef} />;
+}
 
 const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const messagesRef = useRef<MessagesContainerHandle>(null);
@@ -529,4 +533,4 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     );
 });
 
-export default HomePage;
+export default HomePageWrapper;
