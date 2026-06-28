@@ -1,7 +1,7 @@
 import { Constants } from "@/style";
+import { FontAwesome6 } from "@react-native-vector-icons/fontawesome6";
 import { StyleProp, TextStyle } from "react-native";
 import Animated, { AnimatedStyle, EntryOrExitLayoutType } from "react-native-reanimated";
-import { default as FontAwesomeIcon } from "react-native-vector-icons/FontAwesome6";
 
 export interface IconProps {
     name: string;
@@ -11,7 +11,9 @@ export interface IconProps {
 }
 
 function Icon(props: IconProps) {
-    return <FontAwesomeIcon name={props.name} size={props.size} color={props.color} style={props.style} />;
+    const { name, size, color, style } = props;
+
+    return <FontAwesome6 name={name as any} iconStyle="solid" size={size} color={color} style={style} />;
 }
 
 export interface AnimatedIconProps extends IconProps {
@@ -31,7 +33,7 @@ export function AnimatedIcon(props: AnimatedIconProps) {
             layout={Constants.layoutTransition}
             style={containerStyle}
         >
-            <FontAwesomeIcon name={name} size={size} color={color} style={style} />
+            <FontAwesome6 name={name as any} iconStyle="solid" size={size} color={color} style={style} />
         </Animated.View>
     );
 }

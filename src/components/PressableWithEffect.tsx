@@ -1,17 +1,27 @@
 import { useThemeStore } from "@/style";
 import { setAlphaForColor } from "@/utils";
 import { vibratePreset } from "@specs/HapticsModule";
-import { Pressable, PressableProps } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { Pressable, PressableProps, StyleProp, ViewStyle } from "react-native";
+import Animated, { AnimatedStyle, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SpringConfig } from "react-native-reanimated/lib/typescript/animation/spring";
 
 export interface PressableWithEffectProps extends PressableProps {
     defaultHaptic?: boolean;
     scaleWhenPressed?: number;
+    containerStyle?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
 }
 
 function PressableWithEffect(props: PressableWithEffectProps) {
-    const { children, onPressIn, onPressOut, onPress, scaleWhenPressed = 0.8, defaultHaptic = true, ...rest } = props;
+    const {
+        children,
+        onPressIn,
+        onPressOut,
+        onPress,
+        scaleWhenPressed = 0.8,
+        defaultHaptic = true,
+        containerStyle,
+        ...rest
+    } = props;
     const theme = useThemeStore(s => s.theme);
 
     const backgroundColor = useSharedValue(setAlphaForColor(theme.rippleColor, 0));
@@ -25,7 +35,7 @@ function PressableWithEffect(props: PressableWithEffectProps) {
     const springConfig: SpringConfig = { velocity: 2, damping: 50 };
 
     return (
-        <Animated.View style={[animatedStyle, { borderRadius: theme.rounding }]}>
+        <Animated.View style={[animatedStyle, { borderRadius: theme.rounding }, containerStyle]}>
             <Pressable
                 hitSlop={8}
                 onPressIn={e => {

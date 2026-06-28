@@ -24,7 +24,6 @@ const createStyles = (theme: ThemeData) =>
             alignItems: "center",
             flex: 1,
             aspectRatio: 1,
-            transform: [{ translateY: 2 }],
         },
         text: {
             color: theme.primaryTextColor,
@@ -39,10 +38,12 @@ const FloatIslandButton = ({ icon, text, onPress }: FloatIslandButtonProps) => {
     return (
         <SurelyAnimatedView layout={Constants.layoutTransition} entering={ZoomIn} exiting={ZoomOut} style={styles.container}>
             <PressableWithEffect onPress={onPress} style={styles.touchable}>
-                <Icon name={icon} size={16} color={theme.primaryTextColor} />
-                <Text style={[Styles.primaryText, styles.text, { fontSize: 12 }]} numberOfLines={1}>
-                    {text}
-                </Text>
+                <Icon name={icon} size={text ? 16 : 20} color={theme.primaryTextColor} />
+                {text && (
+                    <Text style={[Styles.primaryText, styles.text, { fontSize: 12 }]} numberOfLines={1}>
+                        {text}
+                    </Text>
+                )}
             </PressableWithEffect>
         </SurelyAnimatedView>
     );

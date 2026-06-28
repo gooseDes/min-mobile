@@ -57,7 +57,7 @@ jobs:
 
             - name: Build Release APK
               run: |
-                  dotenv -e .env -- bash -c "cd android && ./gradlew assembleRelease && cd .."
+                  npx dotenv -e .env -- bash -c "cd android && ./gradlew assembleRelease && cd .."
               env:
                   KEYSTORE_FILE: release.keystore
                   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
