@@ -18,6 +18,7 @@ import { ImageStyle, StyleSheet, Text, useWindowDimensions, View, ViewProps } fr
 import { GestureDetector, useExclusiveGestures, usePanGesture, useTapGesture } from "react-native-gesture-handler";
 import Markdown, { MarkedStyles, Renderer, RendererInterface } from "react-native-marked";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
+import { SpringConfig } from "react-native-reanimated/lib/typescript/animation/spring";
 
 const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
@@ -240,19 +241,23 @@ function MessageBase(props: MessageProps) {
 
     const opacity = useSharedValue(shown ? 1 : 0);
     const translateX = useSharedValue(shown ? 0 : side === "left" ? -100 : 100);
-    const translateY = useSharedValue(shown ? 0 : 100);
-    const scale = useSharedValue(shown ? 1 : 0);
+    const translateY = useSharedValue(shown ? 0 : -50);
 
     useEffect(() => {
         opacity.value = withTiming(shown ? 1 : 0, { duration: 400 });
-        translateX.value = withSpring(shown ? 0 : side === "left" ? -100 : 100, { damping: 12, stiffness: 150, mass: 1 });
-        translateY.value = withSpring(shown ? 0 : 100, { damping: 12, stiffness: 150, mass: 1 });
-        scale.value = withTiming(shown ? 1 : 0, { duration: 400 });
+        const springConfig: SpringConfig = {
+            velocity: 2,
+            damping: 12,
+            stiffness: 150,
+            mass: 1,
+        };
+        translateX.value = withSpring(shown ? 0 : side === "left" ? -100 : 100, springConfig);
+        translateY.value = withSpring(shown ? 0 : -50, springConfig);
     }, [shown, side]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,
-        transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }],
+        transform: [{ translateX: translateX.value }, { translateY: translateY.value }],
     }));
 
     async function deleteMessage() {

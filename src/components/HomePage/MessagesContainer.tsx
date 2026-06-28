@@ -26,12 +26,13 @@ export interface MessagesContainerHandle {
 }
 
 export interface MessagesContainerProps {
+    topGap: number;
     bottomGap: number;
     disabled?: boolean;
 }
 
 const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerProps>((props, ref) => {
-    const { bottomGap, disabled } = props;
+    const { bottomGap, topGap, disabled } = props;
     const messagesRef = useRef<MessageData[]>([]);
     const [animProgress, setAnimProgress] = useState<number>(0);
     const [newlyAddedMessages, setNewlyAddedMessages] = useState<number>(0);
@@ -104,6 +105,7 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
                     styles.contentContainerStyle,
                     {
                         paddingTop: bottomGap,
+                        paddingBottom: topGap,
                         pointerEvents: disabled === true ? "none" : "auto",
                         transition: "paddingTop 0.3s ease",
                     },

@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { useEffect } from "react";
 import { StyleSheet, Text, View, ViewProps } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
+import { SpringConfig } from "react-native-reanimated/lib/typescript/animation/spring";
 import PressableWithEffect from "./PressableWithEffect";
 
 interface ClickableProfileProps extends ViewProps {
@@ -11,7 +12,7 @@ interface ClickableProfileProps extends ViewProps {
     image?: string;
     onPress?: () => void;
     shown?: boolean;
-    anim?: "none" | "left" | "right";
+    anim?: boolean;
 }
 
 const styles = StyleSheet.create({
@@ -38,41 +39,35 @@ const styles = StyleSheet.create({
 });
 
 function ClickableProfile(props: ClickableProfileProps) {
-    const { text, bottomText, image, onPress, anim = "none", shown = true, ...rest } = props;
+    const { text, bottomText, image, onPress, anim = false, shown = true, ...rest } = props;
     const theme = useThemeStore(s => s.theme);
     const Styles = useAppStyles(createGlobalStyles);
 
     const translateX = useSharedValue<`${number}%` | number>(0);
-    const translateY = useSharedValue<`${number}%` | number>(0);
-    const scale = useSharedValue<number>(1);
     const opacity = useSharedValue<number>(1);
 
-    const springConfig = {
+    const springConfig: SpringConfig = {
+        velocity: 2,
         damping: 12,
         stiffness: 150,
         mass: 1,
-        overshootClamping: false,
     };
 
     useEffect(() => {
-        if (anim === "none") return;
-        translateX.value = anim === "left" ? "-50%" : "50%";
-        translateY.value = anim === "left" ? "-50%" : "50%";
-        scale.value = 0;
+        if (!anim) return;
+        translateX.value = "-50%";
         opacity.value = 0;
     }, []);
 
     useEffect(() => {
-        if (anim === "none") return;
-        translateX.value = withSpring(shown ? 0 : anim === "left" ? "-50%" : "50%", springConfig);
-        translateY.value = withSpring(shown ? 0 : anim === "left" ? "-50%" : "50%", springConfig);
-        scale.value = withTiming(shown ? 1 : 0, { duration: 400 });
+        if (!anim) return;
+        translateX.value = withSpring(shown ? 0 : "-50%", springConfig);
         opacity.value = withTiming(shown ? 1 : 0, { duration: 400 });
     }, [shown, anim]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,
-        transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }],
+        transform: [{ translateX: translateX.value }],
     }));
 
     return (

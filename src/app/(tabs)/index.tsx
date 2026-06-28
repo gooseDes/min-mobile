@@ -473,7 +473,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                     layout={Constants.layoutTransition}
                 >
                     {/* Chat Tab */}
-                    {currentTab === "chat" && <MessagesContainer bottomGap={chatTabBottomGap} ref={messagesRef} />}
+                    {currentTab === "chat" && <MessagesContainer bottomGap={chatTabBottomGap} topGap={70} ref={messagesRef} />}
 
                     {/* Chats Tab */}
                     {currentTab === "chats" && (

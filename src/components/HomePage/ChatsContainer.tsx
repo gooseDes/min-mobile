@@ -60,7 +60,7 @@ const ChatsContainer = forwardRef<ChatsContainerHandle, ChatsContainerProps>((pr
                     image={`${API_URL}/avatars/${
                         chat.participants?.find(participant => (participant?.id || -1) !== userId)?.avatar || "default"
                     }.webp`}
-                    anim={index % 2 === 0 ? "left" : "right"}
+                    anim
                     shown={animProgress >= index}
                     onPress={() => {
                         if (handler) {
