@@ -379,7 +379,7 @@ function MessageBase(props: MessageProps) {
                         )}
                         {is_reply && replyText && (
                             <Text numberOfLines={1} ellipsizeMode="tail" style={[Styles.secondaryText, styles.replyText]}>
-                                <Icon name="reply" size={10} /> {replyText}
+                                <Icon name="reply" color={theme.secondaryTextColor} size={10} /> {replyText}
                             </Text>
                         )}
 

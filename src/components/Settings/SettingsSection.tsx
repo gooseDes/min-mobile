@@ -8,6 +8,7 @@ import Icon from "@components/Icon";
 import Switch from "@components/Switch";
 import { useTranslation } from "@contexts/TranslationContext";
 import { openDropdown } from "@services/dropdownService";
+import { setTabBarVisibility } from "@services/tabBarControlService";
 import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { useRouter } from "expo-router";
 import { JSX, useEffect, useRef, useState } from "react";
@@ -180,6 +181,7 @@ function SettingsSection(props: SettingsSectionProps) {
     }, [expanded]);
 
     useEffect(() => {
+        setTabBarVisibility(!expanded);
         expandedRef.current = expanded;
     }, [expanded]);
 

@@ -264,7 +264,7 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
             )}
 
             <Animated.View style={[styles.saveIcon, saveAnimatedStyle]}>
-                <Icon name="save" size={48} color={theme.primaryTextColor} />
+                <Icon name="download" size={48} color={theme.primaryTextColor} />
             </Animated.View>
         </Animated.View>
     );

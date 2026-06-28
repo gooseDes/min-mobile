@@ -7,7 +7,6 @@ import { getShadow } from "@/utils";
 import Divider from "@components/Divider";
 import HapticPressable from "@components/HapticPressable";
 import Icon, { AnimatedIcon } from "@components/Icon";
-import IconButton from "@components/IconButton";
 import ScreenPanel from "@components/ScreenPanel";
 import { useTranslation } from "@contexts/TranslationContext";
 import { setOverlay } from "@services/overlayService";
@@ -15,7 +14,7 @@ import { showPopup } from "@services/popupService";
 import { ImagePickerAsset, launchImageLibraryAsync } from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { BackHandler, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { ZoomInEasyDown, ZoomInEasyUp, ZoomOutEasyDown, ZoomOutEasyUp } from "react-native-reanimated";
 
 const createStyles = (theme: ThemeData) =>
@@ -59,7 +58,7 @@ const createStyles = (theme: ThemeData) =>
         actionButtonContainer: {
             position: "absolute",
             right: 0,
-            bottom: 0,
+            bottom: 70,
             gap: 8,
         },
         actionButton: {
@@ -133,14 +132,7 @@ function ProfilePage() {
     const Styles = useAppStyles(createGlobalStyles);
 
     useEffect(() => {
-        const listener = BackHandler.addEventListener("hardwareBackPress", () => {
-            router.back();
-            return true;
-        });
-
         setAvatar(`${API_URL}/avatars/${Storage.getString("avatar")}.webp`);
-
-        return () => listener.remove();
     }, []);
 
     async function uploadAvatar() {
@@ -181,17 +173,11 @@ function ProfilePage() {
         <ScreenPanel>
             {/* Header */}
             <View style={Styles.header}>
-                {/* Back Button */}
-                <IconButton icon="list-ul" style={Styles.backButton} onPress={() => router.back()} />
-
                 {/* Title */}
                 <View style={Styles.title}>
-                    <Icon name="user-circle" size={24} color={theme.primaryTextColor} />
+                    <Icon name="user" iconStyle="solid" size={24} color={theme.primaryTextColor} />
                     <Text style={Styles.titleText}>{t.profile}</Text>
                 </View>
-
-                {/* Spacer */}
-                <View style={Styles.backButton} />
             </View>
 
             <Divider />

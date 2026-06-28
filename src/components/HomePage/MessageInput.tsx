@@ -118,8 +118,8 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
     return (
         <SurelyAnimatedView
             style={props.style}
-            entering={SlideInDown}
-            exiting={SlideOutDown}
+            entering={SlideInDown.springify()}
+            exiting={SlideOutDown.springify()}
             layout={Constants.layoutTransition}
         >
             <Animated.View style={[styles.container, { height: hasPrefix ? 70 : 50, transition: "height 0.3s ease-in-out" }]}>

@@ -10,7 +10,6 @@ import Translation from "@/translation";
 import { CreateChat, CreateMessage, getShadow, homePageRef } from "@/utils";
 import ClickableProfile from "@components/ClickableProfile";
 import Divider from "@components/Divider";
-import FloatIslandButton from "@components/FloatIslandButton";
 import AddChatButton from "@components/HomePage/AddChatButton";
 import ChatsContainer, { ChatsContainerHandle } from "@components/HomePage/ChatsContainer";
 import MessageInput from "@components/HomePage/MessageInput";
@@ -25,12 +24,21 @@ import { ChatData as ApiChatData } from "@min/api-client";
 import { getMessaging, getToken } from "@react-native-firebase/messaging";
 import { messageInputRef } from "@services/inputControlService";
 import { showPopup } from "@services/popupService";
+import { setTabBarVisibility } from "@services/tabBarControlService";
 import { vibrateEffectPreset } from "@specs/HapticsModule";
 import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { BackHandler, Keyboard, StyleSheet, Text, ToastAndroid, useWindowDimensions, View, ViewStyle } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { BackHandler, Keyboard, NativeEventSubscription, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import Animated, {
+    SlideInUp,
+    SlideOutUp,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+    ZoomIn,
+    ZoomOut,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const createStyles = (theme: ThemeData) =>
@@ -49,6 +57,9 @@ const createStyles = (theme: ThemeData) =>
             boxShadow: getShadow(theme),
         },
         topPanel: {
+            position: "absolute",
+            width: "100%",
+            borderRadius: theme.rounding,
             padding: 0,
             flexDirection: "row",
             zIndex: 1,
@@ -85,9 +96,6 @@ export interface HomePageHandler {
 }
 
 type Tabs = "chat" | "chats" | "profile";
-type TabStyles = {
-    [K in keyof ViewStyle]?: Record<Tabs, ViewStyle[K]>;
-};
 
 function HomePageWrapper() {
     return <HomePage ref={homePageRef} />;
@@ -105,7 +113,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
     const [chatTabBottomGap, setChatTabBottomGap] = useState<number>(66);
-    const lastBackButtonPress = useRef<number>(0);
+    const backListener = useRef<NativeEventSubscription | null>(null);
     const { t, changeLanguage } = useTranslation();
     const router = useRouter();
     const insets = useSafeAreaInsets();
@@ -119,59 +127,41 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     }));
 
     // Back button/gesture handler
-    useEffect(
-        useCallback(() => {
-            const onBackPress = () => {
-                if (currentTabRef.current === "chat") {
-                    setCurrentTab("chats");
-                    currentTabRef.current = "chats";
-                    return true;
-                }
-
-                if (currentTabRef.current === "profile") {
-                    setCurrentTab("chat");
-                    currentTabRef.current = "chat";
-                    return true;
-                }
-
-                const now = Date.now();
-                if (lastBackButtonPress.current && now - lastBackButtonPress.current < 2000) {
-                    BackHandler.exitApp();
-                    return true;
-                }
-
-                lastBackButtonPress.current = now;
-                ToastAndroid.show("Press back again to exit", ToastAndroid.SHORT);
-
+    useEffect(() => {
+        const onBackPress = () => {
+            if (currentTabRef.current === "chat") {
+                setCurrentTab("chats");
+                currentTabRef.current = "chats";
                 return true;
-            };
+            }
 
-            const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+            if (currentTabRef.current === "profile") {
+                setCurrentTab("chat");
+                currentTabRef.current = "chat";
+                return true;
+            }
+        };
 
-            return () => backHandler.remove();
-        }, []),
-    );
+        if (currentTab !== "chats") {
+            backListener.current = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+        } else {
+            backListener.current?.remove();
+        }
 
-    const topPanelStyles: TabStyles = {
-        position: { chat: "relative", chats: "absolute", profile: "absolute" },
-        width: { chat: "100%", chats: "auto", profile: "100%" },
-        height: { chat: 60, chats: 60, profile: "100%" },
-        bottom: { chat: 0, chats: 10, profile: -10 },
-        borderRadius: { chat: 16, chats: 30, profile: 16 },
-        paddingHorizontal: { chat: 0, chats: 10, profile: 10 },
-    };
+        return () => backListener.current?.remove();
+    }, [currentTab]);
 
-    function tabStylesToAnimatedStyle(style: TabStyles) {
-        "worklet";
-        let to_return: ViewStyle = {};
-        Object.entries(style).forEach(([key_, value]) => {
-            const key = key_ as keyof ViewStyle;
-            (to_return as any)[key] = value[currentTab];
-        });
-        return to_return;
-    }
+    const topPanelWidth = useSharedValue<number | "100%">("100%");
+    const topPanelHeight = useSharedValue<number | "100%">(60);
+    const topPanelTop = useSharedValue<number>(0);
+    const topPanelPaddingHorizontal = useSharedValue<number>(0);
 
-    const topPanelStyle = useAnimatedStyle(() => tabStylesToAnimatedStyle(topPanelStyles), [currentTab]);
+    const topPanelStyle = useAnimatedStyle(() => ({
+        width: topPanelWidth.value,
+        height: topPanelHeight.value,
+        top: topPanelTop.value,
+        paddingHorizontal: topPanelPaddingHorizontal.value,
+    }));
 
     const contentPanelScale = useSharedValue(1);
 
@@ -386,6 +376,11 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
             contentPanelScale.value = 1;
         }
         currentTabRef.current = currentTab;
+        topPanelWidth.value = currentTab === "profile" ? "100%" : insideContainerSize.width - 20;
+        topPanelHeight.value = currentTab === "profile" ? "100%" : 60;
+        topPanelTop.value = currentTab === "profile" ? 0 : 10;
+        topPanelPaddingHorizontal.value = withSpring(currentTab === "profile" ? 10 : 0);
+        setTabBarVisibility(currentTab === "chats");
     }, [currentTab]);
 
     function handleChat(chat: ChatData) {
@@ -429,49 +424,48 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                 ]}
             >
                 {/* Top Panel */}
-                <Animated.View style={[styles.panel, styles.topPanel, topPanelStyle]} layout={Constants.layoutTransition}>
-                    {/* Chat Tab */}
-                    {currentTab === "chat" && (
-                        <IconButton
-                            icon="list-ul"
-                            style={{ aspectRatio: 1, height: "100%" }}
-                            onPress={() => {
-                                setCurrentTab("chats");
-                                currentTabRef.current = "chats";
-                                setCurrentChat(null);
-                                currentChatRef.current = null;
-                            }}
-                        />
-                    )}
-                    {currentTab === "chat" &&
-                        (() => {
-                            const isPrivate = currentChat?.participants.length === 2;
-                            const otherParticipant = currentChat?.participants.find(p => p.id !== Auth.id) || {
-                                id: -1,
-                            };
+                {currentTab !== "chats" && (
+                    <Animated.View
+                        entering={SlideInUp.springify()}
+                        exiting={SlideOutUp.springify()}
+                        style={[styles.panel, styles.topPanel, topPanelStyle]}
+                        layout={Constants.layoutTransition}
+                    >
+                        {/* Chat Tab */}
+                        {currentTab === "chat" && (
+                            <IconButton
+                                icon="list-ul"
+                                style={{ aspectRatio: 1, height: "100%" }}
+                                onPress={() => {
+                                    setCurrentTab("chats");
+                                    currentTabRef.current = "chats";
+                                    setCurrentChat(null);
+                                    currentChatRef.current = null;
+                                }}
+                            />
+                        )}
+                        {currentTab === "chat" &&
+                            (() => {
+                                const isPrivate = currentChat?.participants.length === 2;
+                                const otherParticipant = currentChat?.participants.find(p => p.id !== Auth.id) || {
+                                    id: -1,
+                                };
 
-                            return (
-                                <ClickableProfile
-                                    image={`${API_URL}/avatars/${otherParticipant.avatar}.webp`}
-                                    text={currentChat?.title}
-                                    bottomText={isPrivate ? t.private_chat : t.group_chat}
-                                    onPress={isPrivate ? () => openProfile(otherParticipant.id) : () => {}}
-                                />
-                            );
-                        })()}
-                    {currentTab === "chat" && <View style={{ flex: 1 }} /> /*Filler*/}
+                                return (
+                                    <ClickableProfile
+                                        image={`${API_URL}/avatars/${otherParticipant.avatar}.webp`}
+                                        text={currentChat?.title}
+                                        bottomText={isPrivate ? t.private_chat : t.group_chat}
+                                        onPress={isPrivate ? () => openProfile(otherParticipant.id) : () => {}}
+                                    />
+                                );
+                            })()}
+                        {currentTab === "chat" && <View style={{ flex: 1 }} /> /*Filler*/}
 
-                    {/* Chats Tab */}
-                    {currentTab === "chats" && (
-                        <FloatIslandButton icon="gear" text={t.settings} onPress={() => router.push("settings")} />
-                    )}
-                    {currentTab === "chats" && (
-                        <FloatIslandButton icon="user-circle" text={t.profile} onPress={() => router.push("profile")} />
-                    )}
-
-                    {/* Profile Tab */}
-                    {currentTab === "profile" && <Profile id={profileId} />}
-                </Animated.View>
+                        {/* Profile Tab */}
+                        {currentTab === "profile" && <Profile id={profileId} />}
+                    </Animated.View>
+                )}
 
                 {/* Content Panel */}
                 <Animated.View
@@ -496,7 +490,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                             entering={ZoomIn}
                             exiting={ZoomOut}
                         >
-                            <Icon name="comments" size={24} color={theme.primaryTextColor} />
+                            <Icon name="comments" iconStyle="regular" size={24} color={theme.primaryTextColor} />
                             <Text style={[Styles.titleText, { marginLeft: 10 }]}>{t.chats}</Text>
                         </SurelyAnimatedView>
                     )}
