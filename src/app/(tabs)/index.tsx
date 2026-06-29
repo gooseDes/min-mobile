@@ -510,7 +510,11 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                             <Text style={[Styles.titleText, { marginLeft: 10 }]}>{t.chats}</Text>
                         </SurelyAnimatedView>
                     )}
-                    {currentTab === "chats" && <Divider style={{ marginHorizontal: 10 }} />}
+                    {currentTab === "chats" && (
+                        <View style={{ paddingHorizontal: Styles.bgPanel.padding, width: "100%" }}>
+                            <Divider />
+                        </View>
+                    )}
                     {currentTab === "chats" && <ChatsContainer bottomGap={90} handler={handleChat} ref={chatsRef} />}
                     {currentTab === "chats" && <AddChatButton onChatCreated={addChat} />}
                 </Animated.View>
