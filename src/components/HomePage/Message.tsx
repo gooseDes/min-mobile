@@ -29,7 +29,7 @@ const createStyles = (theme: ThemeData) =>
             flexDirection: "column",
         },
         messageContent: {
-            backgroundColor: theme.messageBackgroundColor,
+            backgroundColor: theme.panelColor,
             paddingHorizontal: 10,
             paddingTop: 4,
             borderColor: theme.borderColor,

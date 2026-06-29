@@ -26,6 +26,7 @@ const createStyles = (theme: ThemeData) =>
             alignSelf: "center",
             height: 60,
             borderRadius: 30,
+            padding: 4,
         },
         tabBarItem: {
             height: 50,
@@ -110,7 +111,7 @@ function TabBar(props: TabBarProps) {
     return (
         <Animated.View
             style={[
-                Styles.bgAndBorder,
+                Styles.panel,
                 styles.tabBar,
                 { bottom: insets.bottom + Styles.container.paddingVertical + 10 },
                 animatedStyle,
@@ -141,7 +142,7 @@ function TabBar(props: TabBarProps) {
                             name={routeNameToIcon[route.name]}
                             iconStyle={state.index === index ? "filled" : "outlined"}
                             style={{ zIndex: 2 }}
-                            color={state.index === index ? theme.primaryTextColor : theme.secondaryTextColor}
+                            color={state.index === index ? theme.accentColor : theme.secondaryTextColor}
                         />
                     </PressableWithEffect>
                 </View>

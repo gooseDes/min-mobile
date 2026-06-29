@@ -3,6 +3,7 @@ import getDb from "@/db/client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/schema";
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/utils";
 import { API_URL } from "@/env";
+import { getMessaging, getToken } from "@/fcm";
 import { apiClient } from "@/socket";
 import Storage from "@/storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
@@ -21,7 +22,6 @@ import ScreenPanel from "@components/ScreenPanel";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { ChatData as ApiChatData } from "@min/api-client";
-import { getMessaging, getToken } from "@/fcm";
 import { messageInputRef } from "@services/inputControlService";
 import { showPopup } from "@services/popupService";
 import { setTabBarVisibility } from "@services/tabBarControlService";
@@ -43,8 +43,21 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
-        panel: {
+        BGpanel: {
             backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
+            padding: 10,
+            margin: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            boxShadow: getShadow(theme),
+        },
+        panel: {
+            backgroundColor: theme.panelColor,
             borderColor: theme.borderColor,
             borderWidth: theme.borderWidth,
             borderRadius: theme.rounding,
@@ -155,12 +168,14 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     const topPanelHeight = useSharedValue<number | "100%">(60);
     const topPanelTop = useSharedValue<number>(0);
     const topPanelPaddingHorizontal = useSharedValue<number>(0);
+    const topPanelBgColor = useSharedValue<string>(theme.panelColor);
 
     const topPanelStyle = useAnimatedStyle(() => ({
         width: topPanelWidth.value,
         height: topPanelHeight.value,
         top: topPanelTop.value,
         paddingHorizontal: topPanelPaddingHorizontal.value,
+        backgroundColor: topPanelBgColor.value,
     }));
 
     const contentPanelScale = useSharedValue(1);
@@ -380,6 +395,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         topPanelHeight.value = currentTab === "profile" ? "100%" : 60;
         topPanelTop.value = currentTab === "profile" ? 0 : 10;
         topPanelPaddingHorizontal.value = withSpring(currentTab === "profile" ? 10 : 0);
+        topPanelBgColor.value = withSpring(currentTab === "profile" ? theme.backgroundPanelColor : theme.panelColor);
         setTabBarVisibility(currentTab === "chats");
     }, [currentTab]);
 
@@ -469,7 +485,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
                 {/* Content Panel */}
                 <Animated.View
-                    style={[styles.panel, styles.contentPanel, contentPanelStyle]}
+                    style={[styles.BGpanel, styles.contentPanel, contentPanelStyle]}
                     layout={Constants.layoutTransition}
                 >
                     {/* Chat Tab */}
@@ -490,11 +506,11 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                             entering={ZoomIn}
                             exiting={ZoomOut}
                         >
-                            <Icon name="comments" iconStyle="regular" size={24} color={theme.primaryTextColor} />
+                            <Icon name="comments" iconStyle="regular" size={24} color={theme.accentColor} />
                             <Text style={[Styles.titleText, { marginLeft: 10 }]}>{t.chats}</Text>
                         </SurelyAnimatedView>
                     )}
-                    {currentTab === "chats" && <Divider />}
+                    {currentTab === "chats" && <Divider style={{ marginHorizontal: 10 }} />}
                     {currentTab === "chats" && <ChatsContainer bottomGap={90} handler={handleChat} ref={chatsRef} />}
                     {currentTab === "chats" && <AddChatButton onChatCreated={addChat} />}
                 </Animated.View>

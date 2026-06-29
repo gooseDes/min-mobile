@@ -21,7 +21,7 @@ function SettingsPage() {
             <View style={Styles.header}>
                 {/* Title */}
                 <View style={Styles.title}>
-                    <Icon name="gear" size={24} color={theme.primaryTextColor} />
+                    <Icon name="gear" size={24} color={theme.accentColor} />
                     <Text style={[Styles.primaryBoldText, Styles.titleText]}>{t.settings}</Text>
                 </View>
             </View>

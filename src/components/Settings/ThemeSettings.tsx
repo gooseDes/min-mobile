@@ -74,7 +74,7 @@ function ThemeSettings() {
         <View>
             {/* Preview */}
             <View style={styles.previewContainer}>
-                <Text style={[{ fontSize: 24 }, Styles.primaryBoldText]}>{t.settings_preview}</Text>
+                <Text style={[{ fontSize: 24 }, Styles.titleText]}>{t.settings_preview}</Text>
                 <View
                     style={{
                         height: 64,
@@ -93,7 +93,7 @@ function ThemeSettings() {
                         }
                     />
                 </View>
-                <MessagesContainer bottomGap={8} disabled={true} ref={messagesRef} />
+                <MessagesContainer topGap={8} bottomGap={8} disabled={true} ref={messagesRef} />
             </View>
 
             {/* Theme selection */}

@@ -101,7 +101,7 @@ const Overlay = forwardRef<OverlayHandler, OverlayProps>((_props, ref) => {
             {overlayState === "downloading" && (
                 <Animated.View
                     style={{
-                        ...Styles.bgAndBorder,
+                        ...Styles.panel,
                         justifyContent: "center",
                         alignItems: "center",
                         width: "100%",

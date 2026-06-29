@@ -12,10 +12,10 @@ export interface ThemeData {
     isDark: boolean;
     backgroundColor: string;
     backgroundPanelColor: string;
-    backgroundPanelColorOpaque: string;
+    panelColor: string;
     borderColor: string;
     dividerColor: string;
-    messageBackgroundColor: string;
+    accentColor: string;
     primaryTextColor: string;
     secondaryTextColor: string;
     rippleColor: string;
@@ -151,14 +151,22 @@ export const createGlobalStyles = (theme: ThemeData) =>
             color: theme.primaryTextColor,
             fontFamily: "Rubik",
             textAlign: "center",
-            backgroundColor: theme.backgroundPanelColor,
+            backgroundColor: theme.panelColor,
             borderColor: theme.borderColor,
             borderWidth: theme.borderWidth,
             borderRadius: theme.rounding,
             boxShadow: getShadow(theme),
         },
-        bgAndBorder: {
+        bgPanel: {
             backgroundColor: theme.backgroundPanelColor,
+            borderColor: theme.borderColor,
+            borderWidth: theme.borderWidth,
+            borderRadius: theme.rounding,
+            padding: 8,
+            boxShadow: getShadow(theme),
+        },
+        panel: {
+            backgroundColor: theme.panelColor,
             borderColor: theme.borderColor,
             borderWidth: theme.borderWidth,
             borderRadius: theme.rounding,
@@ -183,7 +191,7 @@ export const createGlobalStyles = (theme: ThemeData) =>
             gap: 10,
         },
         titleText: {
-            color: theme.primaryTextColor,
+            color: theme.accentColor,
             fontSize: 26,
             fontFamily: "Rubik-Medium",
             textAlign: "center",

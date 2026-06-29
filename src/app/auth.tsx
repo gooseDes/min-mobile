@@ -3,6 +3,7 @@ import { Constants, createGlobalStyles, ThemeData, useAppStyles } from "@/style"
 import { getShadow } from "@/utils";
 import Button from "@components/Button";
 import Divider from "@components/Divider";
+import FlatSelector from "@components/FlatSelector";
 import Icon from "@components/Icon";
 import InputField from "@components/InputField";
 import { useTranslation } from "@contexts/TranslationContext";
@@ -10,8 +11,8 @@ import { showNotification } from "@services/notifyService";
 import { setOverlay } from "@services/overlayService";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Animated, { ZoomInDown, ZoomInUp, ZoomOutDown, ZoomOutUp } from "react-native-reanimated";
+import { StyleSheet, Text, TextInputProps, TouchableOpacity, View } from "react-native";
+import Animated, { EntryAnimationsValues, LayoutAnimation, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const createStyles = (theme: ThemeData) =>
@@ -34,7 +35,7 @@ const createStyles = (theme: ThemeData) =>
             flex: 1,
         },
         buttonsContainer: {
-            height: 100,
+            height: 50,
             gap: 10,
         },
         languageButtonContainer: {
@@ -53,6 +54,46 @@ const createStyles = (theme: ThemeData) =>
             flexDirection: "column",
         },
     });
+
+const animatedInputEntering = (_values: EntryAnimationsValues): LayoutAnimation => {
+    "worklet";
+    return {
+        initialValues: {
+            opacity: 0,
+            transform: [{ translateX: -100 }],
+        },
+        animations: {
+            opacity: withSpring(1),
+            transform: [{ translateX: withSpring(0) }],
+        },
+    };
+};
+
+const animatedInputExiting = (_values: EntryAnimationsValues): LayoutAnimation => {
+    "worklet";
+    return {
+        initialValues: {
+            opacity: 1,
+            transform: [{ translateX: 0 }],
+        },
+        animations: {
+            opacity: withSpring(0),
+            transform: [{ translateX: withSpring(100) }],
+        },
+    };
+};
+
+function AnimatedInputField(props: TextInputProps) {
+    const { style, children, ...rest } = props;
+
+    return (
+        <Animated.View entering={animatedInputEntering} exiting={animatedInputExiting} layout={Constants.layoutTransition}>
+            <InputField style={style} {...rest}>
+                {children}
+            </InputField>
+        </Animated.View>
+    );
+}
 
 function SignPage() {
     const router = useRouter();
@@ -93,90 +134,59 @@ function SignPage() {
 
     return (
         <SafeAreaView style={Styles.container}>
-            {/* Sign In */}
-            {state === "sign_in" && (
-                <Animated.View
-                    style={styles.signContainer}
-                    entering={ZoomInDown.springify(500)}
-                    exiting={ZoomOutUp.springify(500)}
-                >
-                    <Text style={Styles.titleText}>{t.welcome}</Text>
+            <View style={styles.signContainer}>
+                <Text style={Styles.titleText}>{t.welcome}</Text>
 
-                    <Divider />
+                <Divider />
 
-                    <View style={styles.signForm}>
-                        <InputField
-                            autoCapitalize="none"
-                            onChangeText={value => setEmailValue(value)}
-                            placeholder={t.email}
-                            key={t.email + "1"}
-                        />
-                        <InputField
-                            autoCapitalize="none"
-                            onChangeText={value => setPasswordValue(value)}
-                            placeholder={t.password}
-                            secureTextEntry={true}
-                            key={t.password + "1"}
-                        />
-                    </View>
+                <FlatSelector
+                    options={[t.sign_in, t.sign_up]}
+                    onSelect={option => setState(option === t.sign_in ? "sign_in" : "sign_up")}
+                />
 
-                    <Divider />
-
-                    <View style={styles.buttonsContainer}>
-                        <Button text={t.sign_in} onPress={SignIn} style={{ flex: 1 }} />
-                        <Button text={t.no_account} onPress={() => setState("sign_up")} style={{ flex: 1 }} />
-                    </View>
-                </Animated.View>
-            )}
-
-            {/* Sign Up */}
-            {state === "sign_up" && (
-                <Animated.View
-                    style={styles.signContainer}
-                    entering={ZoomInUp.springify(500)}
-                    exiting={ZoomOutDown.springify(500)}
-                >
-                    <Text style={Styles.titleText}>{t.welcome}</Text>
-
-                    <Divider />
-
-                    <View style={styles.signForm}>
-                        <InputField
+                <View style={styles.signForm}>
+                    <AnimatedInputField
+                        autoCapitalize="none"
+                        onChangeText={value => setEmailValue(value)}
+                        placeholder={t.email}
+                        key={t.email}
+                    />
+                    {state === "sign_up" && (
+                        <AnimatedInputField
                             autoCapitalize="none"
                             onChangeText={value => setLoginValue(value)}
                             placeholder={t.login}
-                            key={t.login + "2"}
+                            key={t.login}
                         />
-                        <InputField
-                            autoCapitalize="none"
-                            onChangeText={value => setEmailValue(value)}
-                            placeholder={t.email}
-                            key={t.email + "2"}
-                        />
-                        <InputField
-                            autoCapitalize="none"
-                            onChangeText={value => setPasswordValue(value)}
-                            placeholder={t.password}
-                            secureTextEntry={true}
-                            key={t.password + "2"}
-                        />
-                        <InputField
+                    )}
+                    <AnimatedInputField
+                        autoCapitalize="none"
+                        onChangeText={value => setPasswordValue(value)}
+                        placeholder={t.password}
+                        secureTextEntry={true}
+                        key={t.password}
+                    />
+                    {state === "sign_up" && (
+                        <AnimatedInputField
                             autoCapitalize="none"
                             onChangeText={value => setConfirmPasswordValue(value)}
                             placeholder={t.confirm_password}
                             secureTextEntry={true}
-                            key={t.confirm_password + "2"}
+                            key={t.confirm_password}
                         />
-                    </View>
+                    )}
+                </View>
 
-                    <Divider />
+                <Divider />
 
-                    <View style={styles.buttonsContainer}>
-                        <Button text={t.sign_up} onPress={SignUp} style={{ flex: 1 }} />
-                        <Button text={t.have_account} onPress={() => setState("sign_in")} style={{ flex: 1 }} />
-                    </View>
-                </Animated.View>
-            )}
+                <View style={styles.buttonsContainer}>
+                    <Button
+                        text={state === "sign_in" ? t.sign_in : t.sign_up}
+                        onPress={state === "sign_in" ? SignIn : SignUp}
+                        style={{ flex: 1 }}
+                    />
+                </View>
+            </View>
 
             {/* Language Change Button */}
             <Animated.View style={styles.languageButtonContainer} layout={Constants.layoutTransition}>

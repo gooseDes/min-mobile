@@ -69,7 +69,7 @@ function AddChatButton(props: AddChatButtonProps) {
                     <View style={{ width: "100%", height: 50, justifyContent: "center", alignItems: "flex-end" }}>
                         <HapticPressable
                             style={[
-                                Styles.bgAndBorder,
+                                Styles.panel,
                                 {
                                     aspectRatio: 1,
                                     width: 50,

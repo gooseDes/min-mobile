@@ -62,7 +62,7 @@ const createStyles = (theme: ThemeData) =>
             gap: 8,
         },
         actionButton: {
-            backgroundColor: theme.backgroundColor,
+            backgroundColor: theme.panelColor,
             borderColor: theme.borderColor,
             borderWidth: theme.borderWidth,
             borderRadius: 25,
@@ -175,7 +175,7 @@ function ProfilePage() {
             <View style={Styles.header}>
                 {/* Title */}
                 <View style={Styles.title}>
-                    <Icon name="user" iconStyle="solid" size={24} color={theme.primaryTextColor} />
+                    <Icon name="user" iconStyle="solid" size={24} color={theme.accentColor} />
                     <Text style={Styles.titleText}>{t.profile}</Text>
                 </View>
             </View>

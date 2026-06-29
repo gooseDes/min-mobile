@@ -1,5 +1,5 @@
 import { ThemeData, useAppStyles } from "@/style";
-import { StyleSheet, View } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
 const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
@@ -13,7 +13,7 @@ const createStyles = (theme: ThemeData) =>
     });
 
 interface DividerProps {
-    style?: any;
+    style?: StyleProp<ViewStyle>;
 }
 
 function Divider(props: DividerProps) {

@@ -69,7 +69,7 @@ function ScreenPanel(props: ScreenPanelProps) {
             {insidePanel && (
                 <View
                     style={[
-                        Styles.bgAndBorder,
+                        Styles.bgPanel,
                         styles.sizedContainer,
                         panelStyle,
                         {

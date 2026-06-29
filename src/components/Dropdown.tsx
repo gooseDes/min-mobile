@@ -23,7 +23,7 @@ const createStyles = (theme: ThemeData) =>
     StyleSheet.create({
         container: {
             position: "absolute",
-            backgroundColor: theme.backgroundColor,
+            backgroundColor: theme.panelColor,
             borderRadius: theme.rounding,
             borderWidth: theme.borderWidth,
             borderColor: theme.borderColor,

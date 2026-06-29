@@ -51,6 +51,7 @@ const createStyles = (theme: ThemeData) =>
             alignItems: "center",
             flexDirection: "row",
             gap: 8,
+            paddingHorizontal: 16,
         },
         buttonText: {
             fontSize: 24,
@@ -81,7 +82,7 @@ const createStyles = (theme: ThemeData) =>
             fontSize: 24,
         },
         languageSelectorContainer: {
-            backgroundColor: theme.backgroundColor,
+            backgroundColor: theme.panelColor,
             padding: 16,
             borderRadius: theme.rounding,
             borderColor: theme.borderColor,
@@ -102,7 +103,7 @@ const createStyles = (theme: ThemeData) =>
             overflow: "hidden",
         },
         switchContainer: {
-            backgroundColor: theme.backgroundColor,
+            backgroundColor: theme.panelColor,
             padding: 16,
             borderRadius: theme.rounding,
             borderColor: theme.borderColor,
@@ -148,12 +149,12 @@ function SettingsSection(props: SettingsSectionProps) {
     // Update styles
     useEffect(() => {
         contentPosition.value = expanded ? "absolute" : "relative";
-        contentWidth.value = withSpring(expanded ? width - Styles.container.paddingHorizontal * 2 : width - 40);
+        contentWidth.value = withSpring(width - Styles.container.paddingHorizontal * 2);
         contentHeight.value = withSpring(
             expanded ? height - insets.top - insets.bottom - Styles.container.paddingVertical * 2 : 50,
         );
-        contentBottom.value = withSpring(expanded ? -20 : 0);
-        contentBgColor.value = withSpring(expanded ? theme.backgroundPanelColorOpaque : "#ffffff00");
+        contentBottom.value = withSpring(expanded ? -12 : 0);
+        contentBgColor.value = withSpring(expanded ? theme.backgroundPanelColor : "#ffffff00");
         contentBorderWidth.value = withSpring(expanded ? theme.borderWidth : 0);
         contentZIndex.value = expanded ? 1 : 0;
     }, [expanded, width, height, theme]);
@@ -201,14 +202,16 @@ function SettingsSection(props: SettingsSectionProps) {
             {!expanded && (
                 <Animated.View entering={CustomZoomIn} exiting={FadeOut}>
                     <TouchableOpacity
-                        style={styles.button}
+                        style={[styles.button, { width: contentWidth.value }]}
                         onPress={() => {
                             expand();
                             vibrateEffectPreset("slow_rise");
                         }}
                     >
-                        {props.section.icon && <Icon name={props.section.icon} size={24} color={theme.primaryTextColor} />}
-                        <Text style={[Styles.primaryText, styles.buttonText]}>{itemTitle(props.section.title)}</Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, justifyContent: "flex-start" }}>
+                            {props.section.icon && <Icon name={props.section.icon} size={24} color={theme.primaryTextColor} />}
+                            <Text style={[Styles.primaryText, styles.buttonText]}>{itemTitle(props.section.title)}</Text>
+                        </View>
                     </TouchableOpacity>
                 </Animated.View>
             )}

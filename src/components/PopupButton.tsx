@@ -108,7 +108,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
             width.value = screenWidth;
             height.value = screenHeight;
             borderRadius.value = theme.rounding;
-            backgroundColor.value = theme.backgroundPanelColorOpaque;
+            backgroundColor.value = theme.backgroundPanelColor;
             right.value = -3;
             bottom.value = -4;
             buttonStateOpacity.value = 0;
@@ -117,7 +117,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
             width.value = 60;
             height.value = 60;
             borderRadius.value = 30;
-            backgroundColor.value = theme.backgroundPanelColor;
+            backgroundColor.value = theme.panelColor;
             right.value = rightProp || 0;
             bottom.value = bottomProp || 0;
             buttonStateOpacity.value = 1;
@@ -141,7 +141,7 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
                 <Animated.View style={[styles.view, animatedContentStyle]}>
                     {/* Button state */}
                     <Animated.View style={[styles.content, animatedButtonStateStyle, { pointerEvents: "none" }]}>
-                        <Icon name={icon || "plus"} color={theme.primaryTextColor} size={iconSize || 24} />
+                        <Icon name={icon || "plus"} color={theme.accentColor} size={iconSize || 24} />
                     </Animated.View>
 
                     {/* Popup state */}

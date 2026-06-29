@@ -247,7 +247,7 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
                     entering={FadeIn}
                     exiting={FadeOut}
                     style={[
-                        Styles.bgAndBorder,
+                        Styles.panel,
                         styles.panel,
                         { bottom: -screenHeight / 2 + styles.panel.height / 2 + 8 + insets.bottom, width: screenWidth - 16 },
                     ]}
@@ -264,7 +264,7 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
             )}
 
             <Animated.View style={[styles.saveIcon, saveAnimatedStyle]}>
-                <Icon name="download" size={48} color={theme.primaryTextColor} />
+                <Icon name="download" size={48} color={theme.accentColor} />
             </Animated.View>
         </Animated.View>
     );

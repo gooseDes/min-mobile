@@ -25,7 +25,7 @@ const createStyles = (theme: ThemeData) =>
             borderWidth: theme.borderWidth,
             borderColor: theme.borderColor,
             borderRadius: theme.rounding,
-            backgroundColor: theme.messageBackgroundColor,
+            backgroundColor: theme.panelColor,
             overflow: "hidden",
             boxShadow: getShadow(theme),
         },
