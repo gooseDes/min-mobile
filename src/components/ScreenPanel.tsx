@@ -1,3 +1,4 @@
+import { useRouteStore } from "@/storages";
 import { createGlobalStyles, ThemeData, useAppStyles } from "@/style";
 import { useIsFocused } from "expo-router";
 import React, { ComponentProps, useEffect, useState } from "react";
@@ -29,6 +30,8 @@ function ScreenPanel(props: ScreenPanelProps) {
     const [containerSize, setContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
     const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
 
+    const previousIndex = useRouteStore(s => s.previousIndex);
+    const currentIndex = useRouteStore(s => s.currentIndex);
     const Styles = useAppStyles(createGlobalStyles);
     const styles = useAppStyles(createStyles);
     const insets = useSafeAreaInsets();
@@ -41,11 +44,11 @@ function ScreenPanel(props: ScreenPanelProps) {
     }, [containerSize, insets]);
 
     const opacity = useSharedValue<number>(0);
-    const translateX = useSharedValue<number>(100);
+    const translateX = useSharedValue<number>(50);
 
     useEffect(() => {
         opacity.value = withSpring(isFocused ? 1 : 0);
-        translateX.value = withSpring(isFocused ? 0 : 100);
+        translateX.value = withSpring(isFocused ? 0 : currentIndex < previousIndex ? 50 : -50);
     }, [isFocused]);
 
     const animatedStyle = useAnimatedStyle(() => ({

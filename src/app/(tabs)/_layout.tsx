@@ -1,3 +1,4 @@
+import { useRouteStore } from "@/storages";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { setAlphaForColor } from "@/utils";
 import CustomIcon, { IconName } from "@components/CustomIcon";
@@ -56,6 +57,8 @@ function TabBar(props: TabBarProps) {
     const { state, navigation, ref } = props;
 
     const theme = useThemeStore(s => s.theme);
+    const setPreviousIndex = useRouteStore(s => s.setPreviousIndex);
+    const setCurrentIndex = useRouteStore(s => s.setCurrentIndex);
     const Styles = useAppStyles(createGlobalStyles);
     const styles = useAppStyles(createStyles);
     const insets = useSafeAreaInsets();
@@ -68,6 +71,8 @@ function TabBar(props: TabBarProps) {
     const selectIndicatorHeight = useSharedValue<number>(0);
 
     function handlePress(index: number) {
+        setPreviousIndex(state.index);
+        setCurrentIndex(index);
         navigation.navigate(state.routes[index].name);
     }
 
