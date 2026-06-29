@@ -1,11 +1,10 @@
 import {
     getMessaging as getFirebaseMessaging,
-    Messaging,
     onMessage as onFirebaseMessage,
-    RemoteMessage,
     requestPermission as requestFirebasePermission,
     setBackgroundMessageHandler as setFirebaseBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
+import type { Messaging, RemoteMessage } from "@react-native-firebase/messaging";
 
 export function getMessaging() {
     console.log("[FCM] getMessaging() called");
@@ -16,6 +15,17 @@ export function getMessaging() {
     } catch (error) {
         console.error("[FCM] Error getting Firebase Messaging instance:", error);
         throw error;
+    }
+}
+
+export async function getToken(messaging: Messaging) {
+    try {
+        const token = await messaging.getToken();
+        console.log("[FCM] Firebase token obtained successfully");
+        return token;
+    } catch (error) {
+        console.error("[FCM] Error getting Firebase token:", error);
+        return "";
     }
 }
 

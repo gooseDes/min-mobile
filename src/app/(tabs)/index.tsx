@@ -21,7 +21,7 @@ import ScreenPanel from "@components/ScreenPanel";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { ChatData as ApiChatData } from "@min/api-client";
-import { getMessaging, getToken } from "@react-native-firebase/messaging";
+import { getMessaging, getToken } from "@/fcm";
 import { messageInputRef } from "@services/inputControlService";
 import { showPopup } from "@services/popupService";
 import { setTabBarVisibility } from "@services/tabBarControlService";

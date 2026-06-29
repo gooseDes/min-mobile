@@ -1,4 +1,15 @@
-import RootLayout from "@app/_layout";
-import { registerRootComponent } from "expo";
+import { ExpoRoot } from "expo-router";
+import { AppRegistry } from "react-native";
+import { name as appName } from "./app.json";
 
-registerRootComponent(RootLayout);
+export function App() {
+    const ctx = require.context("./src/app");
+    return <ExpoRoot context={ctx} />;
+}
+
+AppRegistry.registerComponent(appName, () => App);
+
+AppRegistry.runApplication(appName, {
+    initialProps: {},
+    rootTag: document.getElementById("root"),
+});
