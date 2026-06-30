@@ -32,6 +32,9 @@ import { StatusBar, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { enableFreeze } from "react-native-screens";
+
+enableFreeze(true);
 
 export interface AppHandler {
     setBlurEnabled: (enabled: boolean) => void;

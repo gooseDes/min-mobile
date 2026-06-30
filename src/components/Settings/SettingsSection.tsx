@@ -200,9 +200,9 @@ function SettingsSection(props: SettingsSectionProps) {
         <Animated.View style={[styles.content, contentStyle]} layout={Constants.layoutTransition}>
             {/* Button Mode */}
             {!expanded && (
-                <Animated.View entering={CustomZoomIn} exiting={FadeOut}>
+                <Animated.View style={{ width: contentWidth }} entering={CustomZoomIn} exiting={FadeOut}>
                     <TouchableOpacity
-                        style={[styles.button, { width: contentWidth.value }]}
+                        style={[styles.button]}
                         onPress={() => {
                             expand();
                             vibrateEffectPreset("slow_rise");

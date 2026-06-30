@@ -30,13 +30,13 @@ const createStyles = (theme: ThemeData) =>
         },
         selectIndicatorContainer: {
             position: "absolute",
+            pointerEvents: "none",
             left: 0,
             top: 0,
             zIndex: 5,
         },
         selectIndicator: {
             backgroundColor: setAlphaForColor(theme.rippleColor, 0.1),
-            pointerEvents: "none",
             borderRadius: 999,
         },
     });

@@ -91,11 +91,10 @@ function TabBar(props: TabBarProps) {
             selectIndicatorWidth.value = width - 4;
             selectIndicatorHeight.value = height - 4;
         }
-        setTabLayouts(prev => {
-            prev[index] = { x, y, width, height };
-            const newLayouts = prev;
-            return newLayouts;
-        });
+        setTabLayouts(prev => ({
+            ...prev,
+            [index]: { x, y, width, height },
+        }));
     }
 
     useEffect(() => {
@@ -159,15 +158,17 @@ function TabBar(props: TabBarProps) {
 export default function TabsLayout() {
     const theme = useThemeStore(s => s.theme);
 
-    const tabBarFunc = useCallback((props: BottomTabBarProps) => <TabBar ref={tabBarRef} {...props} />, [TabBar]);
+    const tabBarFunc = useCallback((props: BottomTabBarProps) => <TabBar ref={tabBarRef} {...props} />, []);
 
     return (
         <Tabs
+            detachInactiveScreens={false}
             tabBar={tabBarFunc}
             screenOptions={{
                 tabBarShowLabel: false,
                 headerShown: false,
                 sceneStyle: { backgroundColor: theme.backgroundColor },
+                animation: "shift",
             }}
         >
             <Tabs.Screen name="index" />

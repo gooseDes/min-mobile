@@ -1,9 +1,6 @@
-import { useRouteStore } from "@/storages";
 import { createGlobalStyles, ThemeData, useAppStyles } from "@/style";
-import { useIsFocused } from "expo-router";
 import React, { ComponentProps, useEffect, useState } from "react";
 import { StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export interface ScreenPanelProps extends ComponentProps<typeof View> {
@@ -25,13 +22,10 @@ const createStyles = (_theme: ThemeData) =>
 function ScreenPanel(props: ScreenPanelProps) {
     const { style, onLayout, children, panelStyle, setSize, insidePanel = true, ...rest } = props;
 
-    const isFocused = useIsFocused();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const [containerSize, setContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
     const [insideContainerSize, setInsideContainerSize] = useState<Size>({ width: screenWidth, height: screenHeight });
 
-    const previousIndex = useRouteStore(s => s.previousIndex);
-    const currentIndex = useRouteStore(s => s.currentIndex);
     const Styles = useAppStyles(createGlobalStyles);
     const styles = useAppStyles(createStyles);
     const insets = useSafeAreaInsets();
@@ -43,22 +37,9 @@ function ScreenPanel(props: ScreenPanelProps) {
         setSize?.({ width, height });
     }, [containerSize, insets]);
 
-    const opacity = useSharedValue<number>(0);
-    const translateX = useSharedValue<number>(50);
-
-    useEffect(() => {
-        opacity.value = withSpring(isFocused ? 1 : 0);
-        translateX.value = withSpring(isFocused ? 0 : currentIndex < previousIndex ? 50 : -50);
-    }, [isFocused]);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value,
-        transform: [{ translateX: translateX.value }],
-    }));
-
     return (
-        <Animated.View
-            style={[styles.container, style, animatedStyle]}
+        <View
+            style={[styles.container, style]}
             onLayout={e => {
                 onLayout?.(e);
                 setContainerSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
@@ -86,7 +67,7 @@ function ScreenPanel(props: ScreenPanelProps) {
                 </View>
             )}
             {!insidePanel && children}
-        </Animated.View>
+        </View>
     );
 }
 
