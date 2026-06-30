@@ -80,6 +80,7 @@ function TabBar(props: TabBarProps) {
         setVisibility: (visible: boolean) => {
             opacity.value = withSpring(visible ? 1 : 0);
             scale.value = withSpring(visible ? 1 : 0);
+            pointerEvents.value = visible ? "auto" : "none";
         },
     }));
 
@@ -106,10 +107,12 @@ function TabBar(props: TabBarProps) {
 
     const opacity = useSharedValue<number>(1);
     const scale = useSharedValue<number>(1);
+    const pointerEvents = useSharedValue<"auto" | "none">("auto");
 
     const animatedStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,
         transform: [{ scale: scale.value }],
+        pointerEvents: pointerEvents.value,
     }));
 
     return (
