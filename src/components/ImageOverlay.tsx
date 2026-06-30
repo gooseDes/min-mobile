@@ -4,7 +4,7 @@ import { vibrateEffect } from "@specs/HapticsModule";
 import { Image } from "expo-image";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureDetector, usePanGesture, usePinchGesture, useSimultaneousGestures } from "react-native-gesture-handler";
 import Animated, {
     clamp,
     Easing,
@@ -146,26 +146,28 @@ const ImageOverlay = forwardRef<ImageOverlayHandler, ImageOverlayProps>((_props,
         easing: Easing.inOut(Easing.ease),
     };
 
-    const zoomGesture = Gesture.Pinch()
-        .onUpdate(e => {
+    const zoomGesture = usePinchGesture({
+        onUpdate: e => {
             scale.value = clamp(savedScale.value * e.scale, 0.5, 25);
-        })
-        .onEnd(() => {
+        },
+        onFinalize: () => {
             savedScale.value = scale.value;
-        });
+        },
+    });
 
-    const moveGesture = Gesture.Pan()
-        .maxPointers(1)
-        .onUpdate(e => {
+    const moveGesture = usePanGesture({
+        maxPointers: 1,
+        onUpdate: e => {
             translateX.value = Math.min(savedTranslateX.value + e.translationX / scale.value, screenWidth);
             translateY.value = Math.min(savedTranslateY.value + e.translationY / scale.value, screenHeight);
-        })
-        .onEnd(() => {
+        },
+        onFinalize: () => {
             savedTranslateX.value = translateX.value;
             savedTranslateY.value = translateY.value;
-        });
+        },
+    });
 
-    const gesture = Gesture.Simultaneous(zoomGesture, moveGesture);
+    const gesture = useSimultaneousGestures(zoomGesture, moveGesture);
 
     const playSaveAnimation = () => {
         saveAnimOpacity.value = 0;
