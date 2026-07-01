@@ -56,12 +56,12 @@ const MessagesContainer = forwardRef<MessagesContainerHandle, MessagesContainerP
             for (let i = 0; i < Math.min(messagesRef.current.length + 2, 15); i++) {
                 setTimeout(() => {
                     setAnimProgress(i - 1);
-                }, i * 100);
+                }, i * 50);
             }
             setTimeout(() => {
                 setAnimProgress(messagesRef.current.length);
                 setNewlyAddedMessages(0);
-            }, 16 * 100);
+            }, 16 * 50);
         },
         changeMessageNumberBy: (amount: number) => {
             setNewlyAddedMessages(amount);
