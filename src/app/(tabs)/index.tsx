@@ -264,17 +264,6 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         // Initialize chats from socket
         const chatsInfo = await apiClient.fetchChats();
         if (chatsInfo.success) {
-            // Clear db
-            try {
-                await db.delete(chatsTable);
-            } catch {}
-            try {
-                await db.delete(chatUsersTable);
-            } catch {}
-            try {
-                await db.delete(usersTable);
-            } catch {}
-
             // Save chats to db, reformat and show them
             const prevChats = chatsRef.current?.getChats();
             chatsRef.current?.setChats(await ProcessChatsAndReturn(chatsInfo));
@@ -288,13 +277,13 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
     async function addChat(chat: ApiChatData) {
         const db = await getDb();
-        chat.participants.forEach(async p => {
+        for (const p of chat.participants) {
             await db
                 .insert(usersTable)
                 .values(p)
                 .onConflictDoUpdate({ target: [usersTable.id], set: { username: p.username, avatar: p.avatar } });
             await db.insert(chatUsersTable).values({ chatId: chat.id, userId: p.id }).onConflictDoNothing();
-        });
+        }
         await db.insert(chatsTable).values({ id: chat.id, type: chat.type, title: chat.name });
         chatsRef.current?.setChats([{ ...chat, title: chat.name }, ...chatsRef.current?.getChats()]);
         chatsRef.current?.showWithoutAnimation();

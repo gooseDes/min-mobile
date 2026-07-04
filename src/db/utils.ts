@@ -1,5 +1,6 @@
 import { CreateChat, CreateMessage, CreateUserData } from "@/utils";
 import { FetchChatMessagesResult, FetchChatsResult } from "@min/api-client";
+import { eq } from "drizzle-orm";
 import getDb from "./client";
 import { chatsTable, chatTypes, chatUsersTable, messagesTable, usersTable } from "./schema";
 
@@ -49,9 +50,18 @@ export function ProcessHistoryAndReturn(history_payload: FetchChatMessagesResult
     );
 }
 
-export function ProcessChatsAndReturn(chats_payload: FetchChatsResult): Promise<ChatData[]> {
+export async function ProcessChatsAndReturn(chats_payload: FetchChatsResult): Promise<ChatData[]> {
     if (!chats_payload.success) return Promise.resolve([]);
     const chats = chats_payload.chats;
+
+    // Delete chats that no longer exist
+    const db = await getDb();
+    const existingChats = await db.select().from(chatsTable);
+    for (const existingChat of existingChats) {
+        if (!chats.find(chat => chat.id === existingChat.id)) {
+            await db.delete(chatsTable).where(eq(chatsTable.id, existingChat.id));
+        }
+    }
 
     const promises: Promise<any>[] = [];
 
@@ -68,8 +78,13 @@ export function ProcessChatsAndReturn(chats_payload: FetchChatsResult): Promise<
     // Saving chats to db
     promises.push(
         ...chats.slice().map(async chat => {
-            const db = await getDb();
-            await db.insert(chatsTable).values({ id: chat.id, type: chatTypes.private, title: chat.name || "Unknown" });
+            await db
+                .insert(chatsTable)
+                .values({ id: chat.id, type: chatTypes.private, title: chat.name || "Unknown" })
+                .onConflictDoUpdate({
+                    target: [chatsTable.id],
+                    set: { type: chatTypes.private, title: chat.name || "Unknown" },
+                });
             await Promise.all(
                 chat.participants.map(async user => {
                     await db
