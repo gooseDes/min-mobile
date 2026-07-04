@@ -1,6 +1,6 @@
 import { createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
 import { getShadow } from "@/utils";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { Dispatch, forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Keyboard, StyleSheet, TouchableOpacity, TouchableOpacityProps, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -40,6 +40,7 @@ export interface PopupButtonProps extends TouchableOpacityProps {
     bottom?: number;
     icon?: string;
     iconSize?: number;
+    onChange?: Dispatch<boolean>;
 }
 
 export interface PopupButtonHandler {
@@ -49,24 +50,21 @@ export interface PopupButtonHandler {
 }
 
 const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref) => {
+    const { right: rightProp, bottom: bottomProp, children, icon, iconSize, style, onChange, ...rest } = props;
+
     const [isOpened, setIsOpened] = useState<boolean>(false);
     const { width: entireScreenWidth, height: entireScreenHeight } = useWindowDimensions();
     const insets = useSafeAreaInsets();
     const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-    const { right: rightProp, bottom: bottomProp, children, icon, iconSize, style, ...rest } = props;
     const theme = useThemeStore(s => s.theme);
     const Styles = useAppStyles(createGlobalStyles);
     const styles = useAppStyles(createStyles);
 
-    useImperativeHandle(
-        ref,
-        () => ({
-            open: () => setIsOpened(true),
-            close: () => setIsOpened(false),
-            toggle: () => setIsOpened(!isOpened),
-        }),
-        [],
-    );
+    useImperativeHandle(ref, () => ({
+        open: () => setIsOpened(true),
+        close: () => setIsOpened(false),
+        toggle: () => setIsOpened(!isOpened),
+    }));
 
     // Animated styles
     const width = useSharedValue(100);
@@ -137,7 +135,13 @@ const PopupButton = forwardRef<PopupButtonHandler, PopupButtonProps>((props, ref
 
     return (
         <Animated.View entering={ZoomIn} exiting={ZoomOut} style={[styles.container, style, animatedBoxStyle]} {...rest}>
-            <TouchableOpacity activeOpacity={1} onPress={() => setIsOpened(!isOpened)}>
+            <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                    setIsOpened(!isOpened);
+                    onChange?.(!isOpened);
+                }}
+            >
                 <Animated.View style={[styles.view, animatedContentStyle]}>
                     {/* Button state */}
                     <Animated.View style={[styles.content, animatedButtonStateStyle, { pointerEvents: "none" }]}>

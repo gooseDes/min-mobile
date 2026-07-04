@@ -8,8 +8,8 @@ import PopupButton, { PopupButtonHandler } from "@components/PopupButton";
 import { useTranslation } from "@contexts/TranslationContext";
 import { ChatData } from "@min/api-client";
 import { showNotification } from "@services/notifyService";
-import { useRef, useState } from "react";
-import { Keyboard, StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { BackHandler, Keyboard, StyleSheet, Text, View } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
@@ -34,6 +34,7 @@ export interface AddChatButtonProps {
 function AddChatButton(props: AddChatButtonProps) {
     const [username, setUsername] = useState<string>("");
     const popupRef = useRef<PopupButtonHandler>(null);
+    const [isOpen, setIsOpen] = useState(false);
     const theme = useThemeStore(s => s.theme);
     const Styles = useAppStyles(createGlobalStyles);
     const { t } = useTranslation();
@@ -50,8 +51,19 @@ function AddChatButton(props: AddChatButtonProps) {
         }
     }
 
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+            popupRef.current?.close();
+            return true;
+        });
+
+        return () => subscription.remove();
+    }, [isOpen]);
+
     return (
-        <PopupButton right={10} bottom={70} icon="plus" iconSize={24} ref={popupRef}>
+        <PopupButton right={10} bottom={70} icon="plus" iconSize={24} ref={popupRef} onChange={setIsOpen}>
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
                     <Icon name="plus" size={24} color={theme.primaryTextColor} />
