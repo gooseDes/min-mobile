@@ -2,7 +2,7 @@
   "name": "min-mobile",
   "version": "0.0.1",
   "private": true,
-  "main": "index.js",
+  "main": "index.tsx",
   "scripts": {
     "android": "react-native run-android --appIdSuffix debug --no-packager",
     "ios": "react-native run-ios",

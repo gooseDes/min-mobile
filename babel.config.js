@@ -17,7 +17,7 @@ module.exports = function (api) {
                         "@specs": "./src/specs",
                         "@contexts": "./src/contexts",
                         "@": "./src",
-                        "@index": "./index.js",
+                        "@index": "./index.tsx",
                     },
                 },
             ],

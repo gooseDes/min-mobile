@@ -3,7 +3,6 @@ import getDb from "@/db/client";
 import { chatsTable, chatUsersTable, messagesTable, usersTable } from "@/db/schema";
 import { ProcessChatsAndReturn, ProcessHistoryAndReturn } from "@/db/utils";
 import { API_URL } from "@/env";
-import { getMessaging, getToken } from "@/fcm";
 import { apiClient } from "@/socket";
 import Storage from "@/storage";
 import { Constants, createGlobalStyles, ThemeData, useAppStyles, useThemeStore } from "@/style";
@@ -22,6 +21,7 @@ import ScreenPanel from "@components/ScreenPanel";
 import SurelyAnimatedView from "@components/SurelyAnimatedView";
 import { useTranslation } from "@contexts/TranslationContext";
 import { ChatData as ApiChatData } from "@min/api-client";
+import { getMessaging, getToken } from "@react-native-firebase/messaging";
 import { messageInputRef } from "@services/inputControlService";
 import { showPopup } from "@services/popupService";
 import { setTabBarVisibility } from "@services/tabBarControlService";
@@ -292,9 +292,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
     useEffect(() => {
         changeLanguage(Translation.getCurrentLanguage());
 
-        const connectSub = apiClient.socket.subscribe("connect", async () => {
-            console.log("Connected to server");
-
+        const fixAndFcmToken = async () => {
             apiClient.fetchUser({ userId: Auth.id || -1 }).then(res => {
                 if (res.success) Storage.set("avatar", res.user.avatar);
             });
@@ -306,6 +304,13 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
             // Send Firebase token to server
             apiClient.linkFcmToken({ token });
+            console.log("[FCM] Token sent to server");
+        };
+
+        fixAndFcmToken();
+
+        const connectSub = apiClient.socket.subscribe("connect", async () => {
+            console.log("Connected to server");
         });
         const connectErrorSub = apiClient.socket.subscribe("connect_error", err => {
             if (err.message.includes("Invalid token")) {

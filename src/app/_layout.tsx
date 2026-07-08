@@ -1,7 +1,5 @@
 import Auth from "@/auth";
 import { API_URL } from "@/env";
-import { getMessaging, onMessage, requestPermission } from "@/fcm";
-import { setActiveBackgroundHandler } from "@/fcmBackgroundHandler";
 import { initSocket } from "@/socket";
 import Storage from "@/storage";
 import { ThemeData, useThemeStore } from "@/style";
@@ -17,8 +15,13 @@ import PressableOverlay from "@components/PressableOverlay";
 import { TranslationProvider } from "@contexts/TranslationContext";
 import getDb from "@db/client";
 import migrations from "@drizzle/migrations";
-import notifee, { AndroidCategory, AndroidImportance, AndroidStyle } from "@notifee/react-native";
-import { AuthorizationStatus, FirebaseMessagingTypes } from "@react-native-firebase/messaging";
+import {
+    AuthorizationStatus,
+    FirebaseMessagingTypes,
+    getMessaging,
+    onMessage,
+    requestPermission,
+} from "@react-native-firebase/messaging";
 import { dropdownRef } from "@services/dropdownService";
 import { pressableOverlayRef } from "@services/interceptClickService";
 import { notificationRef, showNotification } from "@services/notifyService";
@@ -68,8 +71,7 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             const enabled = authStatus === AuthorizationStatus.AUTHORIZED || authStatus === AuthorizationStatus.PROVISIONAL;
 
             if (enabled) {
-                console.log("[FCM] Permission granted, initializing Firebase handlers");
-                initializeFirebase();
+                console.log("[FCM] Permission granted.");
             } else {
                 console.warn("[FCM] Permission not granted. Status:", authStatus);
             }
@@ -77,59 +79,6 @@ const App = forwardRef<AppHandler, AppProps>((_props, ref) => {
             console.error("[FCM] Error requesting permission:", error);
         }
     }
-
-    const initializeFirebase = async () => {
-        try {
-            setActiveBackgroundHandler(async (remoteMessage: any) => {
-                if (!remoteMessage.data) {
-                    console.warn("[FCM] Background handler: No data in message");
-                    return;
-                }
-
-                try {
-                    console.log("[FCM] Background handler: Processing message");
-                    const data = CreateRemoteMessagePayload(remoteMessage.data);
-
-                    await notifee.displayNotification({
-                        android: {
-                            smallIcon: "ic_notification",
-                            channelId: "min",
-                            largeIcon: `${API_URL}/avatars/${data.authorAvatar}.webp`,
-                            importance: AndroidImportance.HIGH,
-                            category: AndroidCategory.MESSAGE,
-                            showTimestamp: true,
-
-                            style: {
-                                type: AndroidStyle.MESSAGING,
-                                person: {
-                                    name: "me",
-                                },
-                                messages: [
-                                    {
-                                        text: data.text,
-                                        timestamp: data.sentAt * 1000,
-                                        person: {
-                                            name: data.authorName,
-                                            icon: `${API_URL}/avatars/${data.authorAvatar}.webp`,
-                                        },
-                                    },
-                                ],
-                            },
-                            pressAction: {
-                                id: "default",
-                            },
-                        },
-                    });
-                    console.log("[FCM] Background handler: Notification displayed successfully");
-                } catch (error) {
-                    console.error("[FCM] Background handler error:", error);
-                }
-            });
-            console.log("[FCM] Background handler registered");
-        } catch (error) {
-            console.error("[FCM] Error initializing Firebase handlers:", error);
-        }
-    };
 
     useEffect(() => {
         checkForUpdates(true);
