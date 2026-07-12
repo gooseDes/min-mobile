@@ -309,10 +309,11 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
 
         fixAndFcmToken();
 
-        const connectSub = apiClient.socket.subscribe("connect", async () => {
+        apiClient.subscribeToSocketConnectionSuccess(async () => {
             console.log("Connected to server");
         });
-        const connectErrorSub = apiClient.socket.subscribe("connect_error", err => {
+        apiClient.subscribeToSocketConnectionError(err => {
+            console.log(err);
             if (err.message.includes("Invalid token")) {
                 showPopup(t.relogin, t.relogin_msg, [{ text: t.ok, onPress: () => router.replace("auth") }]);
             } else {
@@ -363,8 +364,6 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
         return () => {
             showSubscription.remove();
             hideSubscription.remove();
-            connectSub.remove();
-            connectErrorSub.remove();
             errorSub.remove();
             messageSub.remove();
             deleteMessageSub.remove();
