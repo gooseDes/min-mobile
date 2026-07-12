@@ -150,6 +150,8 @@ function SignPage() {
                         onChangeText={value => setEmailValue(value)}
                         placeholder={t.email}
                         key={t.email}
+                        importantForAutofill="yes"
+                        autoComplete="username"
                     />
                     {state === "sign_up" && (
                         <AnimatedInputField
@@ -157,6 +159,8 @@ function SignPage() {
                             onChangeText={value => setLoginValue(value)}
                             placeholder={t.login}
                             key={t.login}
+                            importantForAutofill="no"
+                            autoComplete="off"
                         />
                     )}
                     <AnimatedInputField
@@ -165,6 +169,8 @@ function SignPage() {
                         placeholder={t.password}
                         secureTextEntry={true}
                         key={t.password}
+                        importantForAutofill="yes"
+                        autoComplete={state === "sign_in" ? "password" : "new-password"}
                     />
                     {state === "sign_up" && (
                         <AnimatedInputField
@@ -173,6 +179,8 @@ function SignPage() {
                             placeholder={t.confirm_password}
                             secureTextEntry={true}
                             key={t.confirm_password}
+                            importantForAutofill="yes"
+                            autoComplete="new-password"
                         />
                     )}
                 </View>
