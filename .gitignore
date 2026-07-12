@@ -158,3 +158,6 @@ android/link-assets-manifest.json
 
 .expo
 .vscode
+
+# Nextcloud things
+.sync_*
