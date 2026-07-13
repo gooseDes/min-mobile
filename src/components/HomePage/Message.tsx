@@ -17,7 +17,16 @@ import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { ImageStyle, StyleSheet, Text, useWindowDimensions, View, ViewProps } from "react-native";
 import { GestureDetector, useExclusiveGestures, usePanGesture, useTapGesture } from "react-native-gesture-handler";
 import Markdown, { MarkedStyles, Renderer, RendererInterface } from "react-native-marked";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated, {
+    FadeIn,
+    FadeOut,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+    withTiming,
+    ZoomIn,
+    ZoomOut,
+} from "react-native-reanimated";
 import { SpringConfig } from "react-native-reanimated/lib/typescript/animation/spring";
 
 const createStyles = (theme: ThemeData) =>
@@ -171,7 +180,7 @@ function withoutCommand(text: string): string {
     return text;
 }
 
-function MessageBase(props: MessageProps) {
+const Message = React.memo((props: MessageProps) => {
     const isCurrentUser = props.author_name === Auth.username;
     const showAvatar = props.show_avatar === undefined ? true : props.show_avatar;
     const showAuthor = props.show_author === undefined ? true : props.show_author;
@@ -356,70 +365,70 @@ function MessageBase(props: MessageProps) {
 
     return (
         <GestureDetector gesture={gesture}>
-            <Animated.View
-                style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
-            >
-                {showAvatar && (
-                    <Image source={{ uri: `${API_URL}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
-                )}
-                <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
-                    <Animated.View
-                        style={[
-                            styles.messageContent,
-                            props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
-                            {
-                                transition: "boxShadow 0.3s ease-in-out, transform 0.3s ease-in-out",
-                                boxShadow: dropdownOpen ? `0px 0px 8px ${theme.secondaryTextColor}` : getShadow(theme),
-                                transform: [
-                                    { scale: dropdownOpen ? 1.1 : 1 },
-                                    { translateX: dropdownOpen ? (side === "left" ? 16 : -16) : 0 },
-                                ],
-                            },
-                        ]}
-                    >
-                        {props.author_name && showAuthor && (
-                            <Text style={[Styles.secondaryText, styles.authorText]}>
-                                {isCurrentUser ? t.you : props.author_name}
-                            </Text>
-                        )}
-                        {is_reply && replyText && (
-                            <Text numberOfLines={1} ellipsizeMode="tail" style={[Styles.secondaryText, styles.replyText]}>
-                                <Icon name="reply" color={theme.secondaryTextColor} size={10} /> {replyText}
-                            </Text>
-                        )}
-
-                        <Markdown
-                            renderer={markdownRenderer || undefined}
-                            styles={markdownStyles}
-                            flatListProps={markdownFlatListProps}
-                            value={textWithoutCommand}
-                        />
-
-                        {sentAt && (
-                            <Text style={[Styles.secondaryText, styles.sentAtText, { marginTop: marginTop }]}>
-                                {dateToString(sentAt)}
-                            </Text>
-                        )}
-                    </Animated.View>
-                    <View style={[styles.emptySpace, { alignItems: side === "left" ? "flex-start" : "flex-end" }]}>
-                        <AnimatedIcon
-                            name="reply"
-                            size={32}
-                            color={theme.primaryTextColor}
-                            entering={ZoomIn}
-                            exiting={ZoomOut}
-                            containerStyle={[
-                                styles.swipeStateIcon,
-                                { opacity: swipeState !== "idle" ? 0.8 : 0, transition: "opacity 0.3s ease" },
+            <Animated.View style={{ paddingHorizontal: 5 }} entering={FadeIn} exiting={FadeOut}>
+                <Animated.View
+                    style={[styles.messageContainer, props.side === "left" ? styles.leftSide : styles.rightSide, animatedStyle]}
+                >
+                    {showAvatar && (
+                        <Image source={{ uri: `${API_URL}/avatars/${props.author_avatar || ""}.webp` }} style={styles.avatar} />
+                    )}
+                    <View style={{ display: "flex", flexDirection: props.side === "left" ? "row" : "row-reverse" }}>
+                        <Animated.View
+                            style={[
+                                styles.messageContent,
+                                props.side === "left" ? styles.leftSideContent : styles.rightSideContent,
+                                {
+                                    transition: "boxShadow 0.3s ease-in-out, transform 0.3s ease-in-out",
+                                    boxShadow: dropdownOpen ? `0px 0px 8px ${theme.secondaryTextColor}` : getShadow(theme),
+                                    transform: [
+                                        { scale: dropdownOpen ? 1.1 : 1 },
+                                        { translateX: dropdownOpen ? (side === "left" ? 16 : -16) : 0 },
+                                    ],
+                                },
                             ]}
-                        />
+                        >
+                            {props.author_name && showAuthor && (
+                                <Text style={[Styles.secondaryText, styles.authorText]}>
+                                    {isCurrentUser ? t.you : props.author_name}
+                                </Text>
+                            )}
+                            {is_reply && replyText && (
+                                <Text numberOfLines={1} ellipsizeMode="tail" style={[Styles.secondaryText, styles.replyText]}>
+                                    <Icon name="reply" color={theme.secondaryTextColor} size={10} /> {replyText}
+                                </Text>
+                            )}
+
+                            <Markdown
+                                renderer={markdownRenderer || undefined}
+                                styles={markdownStyles}
+                                flatListProps={markdownFlatListProps}
+                                value={textWithoutCommand}
+                            />
+
+                            {sentAt && (
+                                <Text style={[Styles.secondaryText, styles.sentAtText, { marginTop: marginTop }]}>
+                                    {dateToString(sentAt)}
+                                </Text>
+                            )}
+                        </Animated.View>
+                        <View style={[styles.emptySpace, { alignItems: side === "left" ? "flex-start" : "flex-end" }]}>
+                            <AnimatedIcon
+                                name="reply"
+                                size={32}
+                                color={theme.primaryTextColor}
+                                entering={ZoomIn}
+                                exiting={ZoomOut}
+                                containerStyle={[
+                                    styles.swipeStateIcon,
+                                    { opacity: swipeState !== "idle" ? 0.8 : 0, transition: "opacity 0.3s ease" },
+                                ]}
+                            />
+                        </View>
                     </View>
-                </View>
+                </Animated.View>
             </Animated.View>
         </GestureDetector>
     );
-}
-
-const Message = React.memo(MessageBase);
+});
 
 export default Message;

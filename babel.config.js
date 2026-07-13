@@ -22,6 +22,7 @@ module.exports = function (api) {
                 },
             ],
             ["inline-import", { extensions: [".sql"] }],
+            ["babel-plugin-react-compiler", {}],
         ],
     };
 };

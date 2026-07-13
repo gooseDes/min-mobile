@@ -236,8 +236,14 @@ export async function saveImageToGallery(uri: string) {
     }
 }
 
+let blurReasons: number = 0;
+
 export function blurApp(blur: boolean) {
+    if (blur) blurReasons++;
+    else {
+        blurReasons = Math.min(0, blurReasons - 1);
+    }
     if (appRef.current) {
-        appRef.current.setBlurEnabled(blur);
+        appRef.current.setBlurEnabled(blurReasons > 0);
     }
 }

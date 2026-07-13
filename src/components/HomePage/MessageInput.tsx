@@ -96,21 +96,26 @@ const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>((props, r
         if (!result.assets) return;
         const asset = result.assets[0];
         if (asset.uri && asset.fileName && asset.mimeType) {
-            setOverlay("loading");
-            const response = await apiClient.attachImage(await Auth.getFromStorage("token"), {
-                uri: asset.uri,
-                name: asset.fileName,
-                type: asset.mimeType,
-            });
-            setOverlay("none");
-            if (response.success) {
-                setValue(
-                    value +
-                        (value ? " " : "") +
-                        response.urls.map((att: string) => `![attachment](${API_URL}${att})`).join("\n"),
-                );
-            } else {
-                showPopup("Error", response.message);
+            try {
+                setOverlay("loading");
+                const response = await apiClient.attachImage(await Auth.getFromStorage("token"), {
+                    uri: asset.uri,
+                    name: asset.fileName,
+                    type: asset.mimeType,
+                });
+                setOverlay("none");
+                if (response.success) {
+                    setValue(
+                        value +
+                            (value ? " " : "") +
+                            response.urls.map((att: string) => `![attachment](${API_URL}${att})`).join("\n"),
+                    );
+                } else {
+                    showPopup("Error", response.message);
+                }
+            } catch (e: any) {
+                setOverlay("none");
+                showPopup("Error", e.message);
             }
         }
     }

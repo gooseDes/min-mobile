@@ -1,3 +1,5 @@
+import "./overrides";
+
 import { API_URL } from "@/env";
 import { CreateRemoteMessagePayload } from "@/utils";
 import notifee, { AndroidCategory, AndroidImportance, AndroidStyle } from "@notifee/react-native";
