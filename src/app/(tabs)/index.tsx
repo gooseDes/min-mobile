@@ -320,7 +320,7 @@ const HomePage = forwardRef<HomePageHandler>((_props, ref) => {
                 console.log("Connection Error:", err);
             }
         });
-        const errorSub = apiClient.socket.subscribe("error", data => {
+        const errorSub = apiClient.socket.subscribe("error" as any, data => {
             if (data.hidden) return;
             console.error(data);
         });
